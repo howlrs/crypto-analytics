@@ -1,0 +1,19 @@
+[2026-08-11T03:29:34Z] Fetching Hyperliquid funding history for BTC from 2023-01-01
+[2026-08-11T03:29:34Z]   hyperliquid BTC page 1: got 500 recs (new=500), max_ts=1687687200201, total=500
+[2026-08-11T03:29:34Z]   hyperliquid BTC page 2: got 500 recs (new=500), max_ts=1689490800164, total=1000
+[2026-08-11T03:29:35Z]   hyperliquid BTC page 3: got 500 recs (new=500), max_ts=1691290800172, total=1500
+[2026-08-11T03:29:35Z]   hyperliquid BTC page 4: got 500 recs (new=500), max_ts=1693094400087, total=2000
+[2026-08-11T03:29:36Z]   hyperliquid BTC page 5: got 500 recs (new=500), max_ts=1694894400123, total=2500
+[2026-08-11T03:29:37Z]   hyperliquid BTC page 6: got 500 recs (new=500), max_ts=1696694400117, total=3000
+Traceback (most recent call last):
+  File "/home/o9oem/workspace/crypto/analytics/data-tools/fetch_hyperliquid_funding.py", line 94, in <module>
+    main()
+  File "/home/o9oem/workspace/crypto/analytics/data-tools/fetch_hyperliquid_funding.py", line 84, in main
+    records = fetch_all(args.coin, start_ms)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/o9oem/workspace/crypto/analytics/data-tools/fetch_hyperliquid_funding.py", line 38, in fetch_all
+    status, data = http_post_json(URL, payload)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/o9oem/workspace/crypto/analytics/data-tools/common.py", line 62, in http_post_json
+    raise RuntimeError(f"POST failed after {retries} attempts: {url} ({last_exc})")
+RuntimeError: POST failed after 3 attempts: https://api.hyperliquid.xyz/info (HTTP Error 429: Too Many Requests)

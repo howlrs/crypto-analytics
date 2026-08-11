@@ -1,0 +1,17 @@
+{
+  "diagnostic": {
+    "symbol": "ETHUSDT",
+    "pre30_all_bp": -0.021652501141825358,
+    "post30_all_bp": 0.6991223349492732,
+    "pre30_top_bp": 2.627290444426769,
+    "post30_top_bp": -0.2936223831209581,
+    "pre30_bottom_bp": 0.5850510145819344,
+    "post30_bottom_bp": 1.0204575858275142
+  },
+  "trial_strategy": null,
+  "hour_distribution": {
+    "0": 2038,
+    "8": 2038,
+    "16": 2038
+  }
+}

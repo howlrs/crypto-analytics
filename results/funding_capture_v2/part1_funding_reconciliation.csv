@@ -1,0 +1,4 @@
+pair,venue,symbol,db_sum,used_sum,match,n_rows_used
+A_BTC,binance,BTCUSDT,0.60846902,0.60846902,True,6114
+B_ETH,binance,ETHUSDT,0.6507067,0.6507067,True,6114
+C_HYPE,hyperliquid,HYPE,0.1246796639,0.1246796639,True,9432

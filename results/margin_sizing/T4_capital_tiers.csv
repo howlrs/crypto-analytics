@@ -1,0 +1,13 @@
+capital_tier,asset,allocation_usd,min_order_notional,min_order_ok,monthly_rebalance_cost_usd,annual_expected_return_usd,feasible,note
+10000.0,BTC,4000.0,5.0,True,6.8,244.68951245583202,False,annualized rebalance cost $109.30 (30.8 rebalances/yr) exceeds 30% of annual expected return ($244.69) -- fixed costs disproportionate to edge at this scale
+10000.0,ETH,4000.0,5.0,True,6.8,257.99824875469346,False,annualized rebalance cost $154.04 (42.1 rebalances/yr) exceeds 30% of annual expected return ($258.00) -- fixed costs disproportionate to edge at this scale
+10000.0,HYPE,2000.0,10.0,True,3.4,102.50185958117285,False,annualized rebalance cost $187.99 (56.8 rebalances/yr) exceeds 30% of annual expected return ($102.50) -- fixed costs disproportionate to edge at this scale
+50000.0,BTC,20000.0,5.0,True,34.0,1223.4475622791601,True,ok
+50000.0,ETH,20000.0,5.0,True,34.0,1289.9912437734672,True,ok
+50000.0,HYPE,10000.0,10.0,True,17.0,512.5092979058643,False,annualized rebalance cost $258.37 (56.8 rebalances/yr) exceeds 30% of annual expected return ($512.51) -- fixed costs disproportionate to edge at this scale
+250000.0,BTC,100000.0,5.0,True,170.0,6117.2378113958,True,ok
+250000.0,ETH,100000.0,5.0,True,170.0,6449.956218867336,True,ok
+250000.0,HYPE,50000.0,10.0,True,85.0,2562.546489529321,True,ok
+1000000.0,BTC,400000.0,5.0,True,680.0,24468.9512455832,True,ok
+1000000.0,ETH,400000.0,5.0,True,680.0,25799.824875469345,True,ok
+1000000.0,HYPE,200000.0,10.0,True,340.0,10250.185958117285,True,ok
