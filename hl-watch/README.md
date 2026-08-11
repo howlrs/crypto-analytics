@@ -32,6 +32,12 @@ python3 hl_watch.py analyze --no-collect
 
 # 収集バースト時間を5分に変更 (鮮度チェック自体の閾値は固定10分)
 python3 hl_watch.py analyze --fresh 5
+
+# 価格帯別 清算ウォール (OI様ラダー)
+python3 hl_watch.py levels --coins BTC,ETH,SOL,HYPE
+
+# ラダーの刻み幅・範囲・最小ノーショナルを変更
+python3 hl_watch.py levels --coins BTC --band-pct 0.5 --range-pct 15 --min-usd 1000
 ```
 
 DB は `/mnt/e/Datas/market/hl_watch.db` (SQLite, WAL)。**既存の `market.db` とは完全に別ファイル**で、
@@ -50,8 +56,9 @@ DB は `/mnt/e/Datas/market/hl_watch.db` (SQLite, WAL)。**既存の `market.db`
 4. **宣言補完**: TWAP 新規検出時のみ Hypurrscan (`/twap/{address}`) を1回叩き、
    `meta`/`spotMeta` で asset id → コイン名変換した上で user+coin+side+時刻近傍でマッチ。
    失敗/データなしなら宣言なしのまま進捗ベース推定にフォールバック (呼び出しは2秒以上間隔)
-5. **対象者スナップショット** (60秒毎): active TWAP を持つ user に `clearinghouseState` を叩き
-   `watch_positions` へ追記
+5. **対象者スナップショット**: active TWAP を持つ user には **60秒毎**に、それ以外の発見済み
+   候補アドレス全体 (LRU全体) にも **5分毎**に `clearinghouseState` を叩き `watch_positions` へ
+   追記する (2026-08-11 levels機能追加でカバレッジ拡大。旧仕様はactive TWAP保有userのみ60秒毎)
 6. **集計** (毎分): コイン別に `twap_flow` へ1行 (active buy/sell 数、直近5分実行レート、
    宣言判明分の残量)
 
@@ -120,9 +127,23 @@ CREATE TABLE twap_flow(
    降順。同user最新ポジションとの突合でポジション文脈 (「ショート買い戻し」等4パターン) を注記
 3. **§3 清算近接ポジション**: 各(user,coin)の最新スナップショットのうち `|mark-liqPx|/mark<=25%` を
    距離の近い順に上位15件。active TWAP保有者には `★TWAP中` を付記
+3.5. **§3.5 清算ウォール要約**: `levels` コマンドと同じロジック (`compute_liq_levels()`) を
+   既定パラメータ (band=1%, range=30%, min_usd=$500, fresh_min=60分) で呼び出し、コイン毎に
+   「下方5%以内累積$/件数」「上方5%以内累積$/件数」「最厚帯」を1行サマリ表示。フルラダーは
+   `levels` コマンドを参照
 4. **§4 複合シグナル**: ショート/ロングスクイーズ素地・大口投げ/買い疑い・清算予備軍のTWAP脱出、を
    ルールベースで検出し根拠数値付きで箇条書き (該当なしなら「なし」)
 5. **§5 データ品質フッタ**: 最終更新時刻・追跡中アドレス数・active TWAP総数・Hypurrscan補完率等
+
+## levels コマンド (価格帯別 清算ウォール)
+
+`allMids` で現在mark取得後、`watch_positions` の最新スナップショット (`--fresh-min` 分以内、
+`liq_px IS NOT NULL`、`position_value >= --min-usd`) を対象に、ロングは mark下方・ショートは
+mark上方へ `szi` 符号で分類し `--band-pct` 刻みでバケット集計・ASCIIバーラダー表示する
+(`compute_liq_levels()`/`render_liq_levels_ladder()`、`analyze` §3.5 とロジック共通化)。
+mark±5%以内の帯には危険帯として `!` フラグが付き、TWAP実行中userの清算ノーショナルは
+`★` 注記される。範囲外 (`--range-pct` 超) は「圏外」として合計表示。詳細は
+`../docs/hl-watch.md` を参照。
 
 ## 既知の制約
 
