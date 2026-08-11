@@ -9,6 +9,8 @@ DB: /mnt/e/Datas/market/hl_watch.db (SQLite, WAL) — 既存の market.db とは
   status                                                  対象者リスト表示
   flow    [--coin BTC] [--limit 60]                       twap_flow 時系列表示
   analyze [--coins BTC,ETH,SOL,HYPE] [--fresh MIN] [--no-collect]  需給・清算・複合シグナル解析
+  levels  [--coins BTC,ETH,SOL,HYPE] [--band-pct 1.0] [--range-pct 30] [--min-usd 500]
+          [--fresh-min 60]  価格帯別 清算ウォール (OI様ラダー)
 
 詳細は README.md を参照。
 """
@@ -39,7 +41,8 @@ DEFAULT_COINS = ["BTC", "ETH", "SOL", "HYPE"]
 DISCOVERY_INTERVAL_S = 20          # recentTrades ポーリング間隔 (対象コイン毎)
 UNCONFIRMED_CHECK_INTERVAL_S = 300  # 未確認アドレスの userTwapSliceFills 確認間隔 (5分)
 ACTIVE_CHECK_INTERVAL_S = 60        # active TWAP 保有アドレスの確認間隔 (60秒)
-POSITION_SNAPSHOT_INTERVAL_S = 60   # watch_positions スナップショット間隔
+POSITION_SNAPSHOT_INTERVAL_S = 60   # watch_positions スナップショット間隔 (active TWAP保有user)
+CANDIDATE_SNAPSHOT_INTERVAL_S = 300  # watch_positions スナップショット間隔 (非active候補全体, 5分)
 AGGREGATION_INTERVAL_S = 60         # twap_flow 集計間隔 (毎分)
 MAIN_LOOP_TICK_S = 5                # メインループの粒度
 
@@ -63,6 +66,14 @@ ANALYZE_LIQ_PROXIMITY_RATIO = 0.25        # §3 清算近接: |mark-liq|/mark <=
 ANALYZE_TOP_TWAP_LIMIT = 10               # §2 上位TWAP件数
 ANALYZE_TOP_LIQ_LIMIT = 15                # §3 上位清算近接件数
 ANALYZE_SQUEEZE_BAND_RATIO = 0.15         # §4 スクイーズ素地: mark の上下15%以内
+
+# levels サブコマンド (清算ウォール) 用
+LEVELS_DEFAULT_BAND_PCT = 1.0             # バケット刻み幅 (mark比 %)
+LEVELS_DEFAULT_RANGE_PCT = 30.0           # 集計対象範囲 (mark比 ±%)
+LEVELS_DEFAULT_MIN_USD = 500.0            # 対象化する position_value 下限 ($)
+LEVELS_DEFAULT_FRESH_MIN = 60             # watch_positions 鮮度閾値 (分)
+LEVELS_DANGER_BAND_PCT = 5.0              # mark直近の危険帯として強調する範囲 (mark比 ±%)
+LEVELS_BAR_MAX_WIDTH = 40                 # ASCII バー最大文字数
 
 
 # ---------------------------------------------------------------------------
@@ -318,6 +329,7 @@ CANDIDATES = CandidateSet()
 CONFIRMED_TWAP_USERS = set()      # active TWAP を最低1件保有したことがあるユーザー
 UNCONFIRMED_LAST_CHECK = {}       # addr -> last checked epoch (未確認アドレス、5分毎)
 ACTIVE_LAST_CHECK = {}            # addr -> last checked epoch (active TWAP保有、60秒毎)
+CANDIDATE_SNAPSHOT_LAST_CHECK = {}  # addr -> last checked epoch (非active候補全体、5分毎)
 HYPURRSCAN_SEEN_USERS = set()     # Hypurrscan を既に叩いたユーザー (初回1回のみ)
 STATE_LOCK = threading.Lock()
 
@@ -706,6 +718,19 @@ def run_loop(coins, duration_min, executor):
             for user in confirmed_now:
                 futures.append(executor.submit(snapshot_position, conn, user))
             next_position_snapshot = now + POSITION_SNAPSHOT_INTERVAL_S
+
+        # 候補スナップショット: active TWAP非保有の発見済みアドレス全体へ clearinghouseState 5分毎/addr
+        with STATE_LOCK:
+            confirmed_for_snapshot = set(CONFIRMED_TWAP_USERS)
+        for addr in candidates:
+            if SHUTDOWN.is_set():
+                break
+            if addr in confirmed_for_snapshot:
+                continue  # active TWAP保有userは上の60秒毎スナップショットでカバー済み
+            last = CANDIDATE_SNAPSHOT_LAST_CHECK.get(addr, 0)
+            if now - last >= CANDIDATE_SNAPSHOT_INTERVAL_S:
+                CANDIDATE_SNAPSHOT_LAST_CHECK[addr] = now
+                futures.append(executor.submit(snapshot_position, conn, addr))
 
         # 候補パージ
         if now >= next_purge:
@@ -1301,6 +1326,235 @@ def render_section5(conn, coins, lines):
     )
 
 
+
+# ---------------------------------------------------------------------------
+# levels: 価格帯別清算ウォール (OI様ラダー)
+# ---------------------------------------------------------------------------
+def compute_liq_levels(conn, coin, mark, band_pct, range_pct, min_usd, fresh_min, now):
+    """coin の清算ウォールをバケット集計する。
+
+    watch_positions の各(user,coin)最新スナップショット (fresh_min分以内、liq_px NOT NULL、
+    position_value >= min_usd) を対象に、ロングは mark 下方・ショートは mark 上方のバケットへ分類する。
+
+    戻り値: dict
+      buckets_down / buckets_up: [{"lo_pct","hi_pct","lo_px","hi_px","notional","count","twap_notional"}]
+                                  (mark に近い順)
+      outside_notional / outside_count: range_pct 圏外の合計
+      n_addr: 対象化されたポジション件数
+      total_notional: 対象化された観測総ノーショナル$
+      excluded_null_liq: liq_px NULL で除外した件数
+    """
+    fresh_cutoff = now - fresh_min * 60 * 1000
+    rows = conn.execute(
+        """
+        SELECT wp.user, wp.szi, wp.position_value, wp.liq_px
+        FROM watch_positions wp
+        INNER JOIN (
+            SELECT user, coin, MAX(ts) AS max_ts FROM watch_positions
+            WHERE coin=? GROUP BY user, coin
+        ) latest ON wp.user=latest.user AND wp.coin=latest.coin AND wp.ts=latest.max_ts
+        WHERE wp.coin=? AND wp.ts >= ?
+        """,
+        (coin, coin, fresh_cutoff),
+    ).fetchall()
+
+    n_bands = max(int(round(range_pct / band_pct)), 1)
+    buckets_down = [
+        {"lo_pct": -(i + 1) * band_pct, "hi_pct": -i * band_pct, "notional": 0.0, "count": 0, "twap_notional": 0.0}
+        for i in range(n_bands)
+    ]
+    buckets_up = [
+        {"lo_pct": i * band_pct, "hi_pct": (i + 1) * band_pct, "notional": 0.0, "count": 0, "twap_notional": 0.0}
+        for i in range(n_bands)
+    ]
+    outside_notional = 0.0
+    outside_count = 0
+    n_addr = 0
+    total_notional = 0.0
+    excluded_null_liq = 0
+
+    for user, szi, position_value, liq_px in rows:
+        if liq_px is None:
+            excluded_null_liq += 1
+            continue
+        if position_value is None or position_value < min_usd:
+            continue
+        if not mark or mark <= 0:
+            continue
+        szi = szi or 0.0
+        is_long = szi > 0
+        is_short = szi < 0
+        if not is_long and not is_short:
+            continue
+        # ロング: liq_px は mark 下方が正常。ショート: liq_px は mark 上方が正常。
+        pct = (liq_px - mark) / mark * 100.0
+        if is_long and pct >= 0:
+            continue  # 想定外方向 (データ異常/一時的な逆転) はスキップ
+        if is_short and pct <= 0:
+            continue
+
+        n_addr += 1
+        total_notional += position_value
+
+        has_active_twap = conn.execute(
+            "SELECT 1 FROM twap_orders WHERE user=? AND coin=? AND status='active' LIMIT 1",
+            (user, coin),
+        ).fetchone()
+
+        abs_pct = abs(pct)
+        if abs_pct > range_pct:
+            outside_notional += position_value
+            outside_count += 1
+            continue
+
+        idx = min(int(abs_pct / band_pct), n_bands - 1)
+        bucket = buckets_down[idx] if is_long else buckets_up[idx]
+        bucket["notional"] += position_value
+        bucket["count"] += 1
+        if has_active_twap:
+            bucket["twap_notional"] += position_value
+
+    return {
+        "coin": coin,
+        "mark": mark,
+        "buckets_down": buckets_down,
+        "buckets_up": buckets_up,
+        "outside_notional": outside_notional,
+        "outside_count": outside_count,
+        "n_addr": n_addr,
+        "total_notional": total_notional,
+        "excluded_null_liq": excluded_null_liq,
+        "band_pct": band_pct,
+        "range_pct": range_pct,
+    }
+
+
+def render_liq_levels_ladder(levels, lines):
+    """compute_liq_levels() の結果を1コイン分のフルラダーとして lines に追記する。"""
+    coin = levels["coin"]
+    mark = levels["mark"]
+    lines.append(f"  {coin}  mark=${mark:,.2f}")
+    lines.append("  " + "-" * 74)
+
+    max_notional = max(
+        [b["notional"] for b in levels["buckets_down"] + levels["buckets_up"]] + [1.0]
+    )
+
+    def fmt_row(b, cum, danger):
+        width = int(round(b["notional"] / max_notional * LEVELS_BAR_MAX_WIDTH)) if b["notional"] > 0 else 0
+        bar = "█" * width
+        mark_flag = "!" if danger else " "
+        price_lo = mark * (1 + b["lo_pct"] / 100.0)
+        price_hi = mark * (1 + b["hi_pct"] / 100.0)
+        row = (
+            f"  {mark_flag}{b['lo_pct']:+6.1f}%〜{b['hi_pct']:+6.1f}% "
+            f"(${price_lo:,.2f}〜${price_hi:,.2f})  ${b['notional']:>12,.0f} ({b['count']:>3}件)"
+            f"  累積${cum:>12,.0f}  {bar}"
+        )
+        if b["twap_notional"] > 0:
+            row += f"   ★${b['twap_notional']:,.0f} ← TWAP実行中userの清算ノーショナル"
+        return row
+
+    lines.append("  [上方 (ショート清算)]")
+    cum = 0.0
+    for b in reversed(levels["buckets_up"]):
+        cum += b["notional"]
+        danger = b["hi_pct"] <= LEVELS_DANGER_BAND_PCT
+        lines.append(fmt_row(b, cum, danger))
+    lines.append(f"  {'':>1}--- mark=${mark:,.2f} ---")
+    cum = 0.0
+    for b in levels["buckets_down"]:
+        cum += b["notional"]
+        danger = abs(b["lo_pct"]) <= LEVELS_DANGER_BAND_PCT
+        lines.append(fmt_row(b, cum, danger))
+    lines.append("  [下方 (ロング清算)]")
+
+    lines.append(
+        f"  圏外(|距離|>{levels['range_pct']:.0f}%): 累積${levels['outside_notional']:,.0f} "
+        f"({levels['outside_count']}件)"
+    )
+    lines.append(
+        f"  対象アドレス数={levels['n_addr']}  観測総ノーショナル=${levels['total_notional']:,.0f}  "
+        f"liq_px NULL除外={levels['excluded_null_liq']}件"
+    )
+    lines.append(
+        "  ※ これは観測サンプル(発見済みアドレス)ベースであり市場全体のOIではない"
+    )
+
+
+def liq_levels_summary_line(levels):
+    """§3.5 用の1-2行サマリ文字列を生成する。"""
+    coin = levels["coin"]
+    down_5 = sum(b["notional"] for b in levels["buckets_down"] if abs(b["lo_pct"]) <= 5.0)
+    down_5_n = sum(b["count"] for b in levels["buckets_down"] if abs(b["lo_pct"]) <= 5.0)
+    up_5 = sum(b["notional"] for b in levels["buckets_up"] if b["hi_pct"] <= 5.0)
+    up_5_n = sum(b["count"] for b in levels["buckets_up"] if b["hi_pct"] <= 5.0)
+
+    all_buckets = [(-abs((b["lo_pct"] + b["hi_pct"]) / 2.0), b) for b in levels["buckets_down"]]
+    all_buckets += [((b["lo_pct"] + b["hi_pct"]) / 2.0, b) for b in levels["buckets_up"]]
+    thickest = max(all_buckets, key=lambda t: t[1]["notional"], default=None)
+
+    if thickest is None or thickest[1]["notional"] <= 0:
+        thickest_str = "該当なし"
+    else:
+        mid_pct, b = thickest
+        thickest_str = f"{mid_pct:+.1f}%に${b['notional']:,.0f}"
+
+    return (
+        f"  {coin:<5} 下方5%以内 累積${down_5:,.0f} ({down_5_n}件) / "
+        f"上方5%以内 累積${up_5:,.0f} ({up_5_n}件)、最厚帯: {thickest_str}"
+    )
+
+
+def cmd_levels(args):
+    coins = [c.strip().upper() for c in args.coins.split(",") if c.strip()]
+    conn = get_conn()
+    now = now_ms()
+    mids = fetch_all_mids()
+
+    lines = []
+    lines.append("=" * 78)
+    lines.append("価格帯別 清算ウォール (OI様ラダー)")
+    lines.append("=" * 78)
+
+    for coin in coins:
+        mark = mids.get(coin)
+        if mark is None:
+            lines.append(f"  {coin}: mid価格取得不可のためスキップ (allMids に {coin} が見つからない)")
+            lines.append("")
+            continue
+        levels = compute_liq_levels(
+            conn, coin, mark, args.band_pct, args.range_pct, args.min_usd, args.fresh_min, now
+        )
+        render_liq_levels_ladder(levels, lines)
+        lines.append("")
+
+    print("\n".join(lines))
+    conn.close()
+
+
+def render_section3_5(conn, coins, mids, now, lines):
+    lines.append("")
+    lines.append("=" * 78)
+    lines.append("§3.5 清算ウォール要約")
+    lines.append("=" * 78)
+    any_coin = False
+    for coin in coins:
+        mark = mids.get(coin)
+        if mark is None:
+            continue
+        any_coin = True
+        levels = compute_liq_levels(
+            conn, coin, mark,
+            LEVELS_DEFAULT_BAND_PCT, LEVELS_DEFAULT_RANGE_PCT, LEVELS_DEFAULT_MIN_USD,
+            LEVELS_DEFAULT_FRESH_MIN, now,
+        )
+        lines.append(liq_levels_summary_line(levels))
+    if not any_coin:
+        lines.append("  対象コインなし (mid価格取得不可)")
+    lines.append("  フルラダーは `hl_watch.py levels` コマンドを参照。")
+
+
 def cmd_analyze(args):
     coins = [c.strip().upper() for c in args.coins.split(",") if c.strip()]
 
@@ -1322,6 +1576,7 @@ def cmd_analyze(args):
     summaries = render_section1(conn, coins, mids, now, lines)
     render_section2(conn, coins, mids, now, lines)
     near_liq = render_section3(conn, coins, now, lines)
+    render_section3_5(conn, coins, mids, now, lines)
     render_section4(conn, coins, mids, summaries, near_liq, lines)
     render_section5(conn, coins, lines)
 
@@ -1366,6 +1621,18 @@ def main():
     p_analyze.add_argument("--no-collect", action="store_true",
                             help="収集バーストを完全にスキップする")
     p_analyze.set_defaults(func=cmd_analyze)
+
+    p_levels = sub.add_parser("levels", help="価格帯別 清算ウォール (OI様ラダー) を表示")
+    p_levels.add_argument("--coins", default=",".join(DEFAULT_COINS))
+    p_levels.add_argument("--band-pct", type=float, default=LEVELS_DEFAULT_BAND_PCT,
+                           help=f"バケット刻み幅 (mark比 %%, 既定{LEVELS_DEFAULT_BAND_PCT})")
+    p_levels.add_argument("--range-pct", type=float, default=LEVELS_DEFAULT_RANGE_PCT,
+                           help=f"集計対象範囲 (mark比 ±%%, 既定{LEVELS_DEFAULT_RANGE_PCT})")
+    p_levels.add_argument("--min-usd", type=float, default=LEVELS_DEFAULT_MIN_USD,
+                           help=f"対象化する position_value 下限 ($, 既定{LEVELS_DEFAULT_MIN_USD})")
+    p_levels.add_argument("--fresh-min", type=float, default=LEVELS_DEFAULT_FRESH_MIN,
+                           help=f"watch_positions 鮮度閾値 (分, 既定{LEVELS_DEFAULT_FRESH_MIN})")
+    p_levels.set_defaults(func=cmd_levels)
 
     args = ap.parse_args()
     args.func(args)
