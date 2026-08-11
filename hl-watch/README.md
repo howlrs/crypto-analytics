@@ -171,7 +171,7 @@ mark±5%以内の帯には危険帯として `!` フラグが付き、TWAP実行
 
 - `twap_orders`: 525 rows / `twap_fills`: 70,643 rows / `watch_positions`: 389 rows /
   `twap_flow`: 20 rows (4コイン×5分)
-- `status` で `0xc79bcc10d7b040547cfc9b30b1fbf163199a3aeb` の BTC buy TWAP
+- `status` で `0xc79b...a3aeb (第三者の公開オンチェーンアドレス例・短縮表記)` の BTC buy TWAP
   (`declared_sz=40.0, declared_minutes=2771, reduce_only=1`) と、その user の BTC ポジション
   (`liqPx=115595.78, lev=20.0`) を含む JOIN 表示を確認
 - `PRAGMA integrity_check` = `ok`
