@@ -1,0 +1,121 @@
+{
+  "generated_at": "2026-09-04T05:58:12.967573+00:00",
+  "database": "/mnt/e/Datas/market/market.db",
+  "price_source": {
+    "venue": "binance",
+    "market": "perp"
+  },
+  "configuration": {
+    "trend_days": 90,
+    "vol_days": 30,
+    "threshold_lookback_days": 730,
+    "threshold_min_history_days": 252,
+    "vol_quantile": 0.5,
+    "bootstrap_samples": 2000,
+    "block_days": 14,
+    "hac_lags": 5,
+    "min_observations": 30,
+    "seed": 20260904
+  },
+  "coverage": {
+    "crypto": {
+      "BTCUSDT": {
+        "loaded_start": "2021-01-01T00:00:00+00:00",
+        "loaded_end": "2026-07-31T00:00:00+00:00",
+        "analysis_start": "2021-01-01T00:00:00+00:00",
+        "analysis_end": "2026-07-31T00:00:00+00:00",
+        "calendar_analysis_days": 2038,
+        "observed_analysis_days": 2038,
+        "missing_analysis_days": 0,
+        "classified_days": 1756
+      },
+      "ETHUSDT": {
+        "loaded_start": "2021-01-01T00:00:00+00:00",
+        "loaded_end": "2026-07-31T00:00:00+00:00",
+        "analysis_start": "2021-01-01T00:00:00+00:00",
+        "analysis_end": "2026-07-31T00:00:00+00:00",
+        "calendar_analysis_days": 2038,
+        "observed_analysis_days": 2038,
+        "missing_analysis_days": 0,
+        "classified_days": 1756
+      }
+    },
+    "indexes": {
+      "DJIA": {
+        "start": "2016-08-11T00:00:00+00:00",
+        "end": "2026-08-10T00:00:00+00:00",
+        "observations": 2512
+      },
+      "NASDAQ100": {
+        "start": "1986-01-02T00:00:00+00:00",
+        "end": "2026-08-07T00:00:00+00:00",
+        "observations": 10230
+      },
+      "NIKKEI225": {
+        "start": "1949-05-16T00:00:00+00:00",
+        "end": "2026-08-10T00:00:00+00:00",
+        "observations": 19176
+      },
+      "SP500": {
+        "start": "2016-08-11T00:00:00+00:00",
+        "end": "2026-08-10T00:00:00+00:00",
+        "observations": 2512
+      }
+    }
+  },
+  "methodology": {
+    "daily_close": "last 1m bar at 23:59 UTC; incomplete UTC days are excluded",
+    "decision_timing": "regime uses data through UTC close t; outcome is close t to close t+1",
+    "trend": "trailing 90-calendar-day close return",
+    "volatility": "annualized standard deviation of 30 daily log returns",
+    "volatility_boundary": "50% quantile of prior volatility estimates over at most 730 days; shifted one day",
+    "regime_inference": "2000-draw circular moving-block bootstrap, 14-day blocks; regime-centred two-sided null",
+    "dependence_inference": "pair-matched forward close intervals conditioned on the prior calendar day's regime; OLS beta with Newey-West/HAC covariance over 5 consecutive common-return intervals",
+    "multiple_testing": "Benjamini-Hochberg FDR within regime and dependence test families",
+    "tail_definition": "asset-specific bottom decile within each reported pair/regime sample",
+    "regime_only_strategy": "hypothetical close-to-close exposure only after the named regime, cash otherwise; CAGR uses elapsed calendar time and includes no costs"
+  },
+  "limitations": [
+    "Regimes are deterministic diagnostics, not latent-state estimates or trading recommendations.",
+    "Index returns exist only on their source trading dates; crypto-index comparisons use overlapping dates.",
+    "Daily closes occur at different clock times across venues, so same-date cross-market dependence is not fully synchronous.",
+    "Tail estimates can be noisy in short regimes; sample counts and FDR-adjusted q-values must be inspected.",
+    "HAC p-values use an asymptotic approximation and should be treated cautiously in short regimes.",
+    "Daily closes do not model fees, slippage, intraday path, or liquidation constraints."
+  ],
+  "findings": [
+    {
+      "type": "best_mean_next_day_regime",
+      "symbol": "BTCUSDT",
+      "regime": "uptrend_high_vol",
+      "mean_next_return_bp": 25.615420222152075,
+      "fdr_q_value": 0.5717141429285357
+    },
+    {
+      "type": "worst_expected_shortfall_regime",
+      "symbol": "BTCUSDT",
+      "regime": "downtrend_low_vol",
+      "expected_shortfall_5pct_bp": -689.1721071640711
+    },
+    {
+      "type": "best_mean_next_day_regime",
+      "symbol": "ETHUSDT",
+      "regime": "uptrend_low_vol",
+      "mean_next_return_bp": 16.733874536865528,
+      "fdr_q_value": 0.88055972013993
+    },
+    {
+      "type": "worst_expected_shortfall_regime",
+      "symbol": "ETHUSDT",
+      "regime": "downtrend_high_vol",
+      "expected_shortfall_5pct_bp": -965.0225847435447
+    },
+    {
+      "type": "btc_eth_dependence",
+      "pearson_correlation": 0.813587357861732,
+      "lower_tail_probability_y_given_x": 0.6813725490196079,
+      "lower_tail_lift_vs_independence": 6.813725490196078
+    }
+  ],
+  "elapsed_seconds": 16.48197781899944
+}

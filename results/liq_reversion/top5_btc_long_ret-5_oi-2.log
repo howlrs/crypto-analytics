@@ -1,10 +1,11 @@
 Top-5 largest-drawdown BTC events, ret60<=-5% AND oi_chg60<=-2%
+decision timestamps are each detection bar's close (open_time + 1 minute).
 Eyeball check against known real events (2024-08-05 carry-trade unwind/global
 equity selloff, 2025 crash events, etc.) -- approximate timing match only,
 no strict verification performed.
 
-#1 2023-08-17 21:45:00 UTC | 60m_ret=-6.97% | px(-6h)=28080.0 px(detect)=25787.0 px(+24h)=26085.0 | chg_-6h_to_detect=-8.17% chg_detect_to_+24h=1.16%
-#2 2025-10-10 21:16:00 UTC | 60m_ret=-6.81% | px(-6h)=120195.1 px(detect)=108905.4 px(+24h)=110388.3 | chg_-6h_to_detect=-9.39% chg_detect_to_+24h=1.36%
-#3 2023-10-16 14:30:00 UTC | 60m_ret=-6.02% | px(-6h)=27811.0 px(detect)=28294.6 px(+24h)=28357.3 | chg_-6h_to_detect=1.74% chg_detect_to_+24h=0.22%
-#4 2024-01-03 12:01:00 UTC | 60m_ret=-5.79% | px(-6h)=45223.1 px(detect)=42584.3 px(+24h)=43224.6 | chg_-6h_to_detect=-5.84% chg_detect_to_+24h=1.50%
-#5 2024-08-05 01:08:00 UTC | 60m_ret=-5.75% | px(-6h)=58802.9 px(detect)=54602.2 px(+24h)=55980.0 | chg_-6h_to_detect=-7.14% chg_detect_to_+24h=2.52%
+#1 decision=2023-08-17 21:46:00 UTC | 60m_ret=-6.97% | px(-6h)=28080.0 px(detect)=25787.0 px(+24h)=26085.0 | chg_-6h_to_detect=-8.17% chg_detect_to_+24h=1.16%
+#2 decision=2025-10-10 21:17:00 UTC | 60m_ret=-6.81% | px(-6h)=120195.1 px(detect)=108905.4 px(+24h)=110388.3 | chg_-6h_to_detect=-9.39% chg_detect_to_+24h=1.36%
+#3 decision=2023-10-16 14:31:00 UTC | 60m_ret=-6.02% | px(-6h)=27811.0 px(detect)=28294.6 px(+24h)=28357.3 | chg_-6h_to_detect=1.74% chg_detect_to_+24h=0.22%
+#4 decision=2024-01-03 12:02:00 UTC | 60m_ret=-5.79% | px(-6h)=45223.1 px(detect)=42584.3 px(+24h)=43224.6 | chg_-6h_to_detect=-5.84% chg_detect_to_+24h=1.50%
+#5 decision=2024-08-05 01:09:00 UTC | 60m_ret=-5.75% | px(-6h)=58802.9 px(detect)=54602.2 px(+24h)=55980.0 | chg_-6h_to_detect=-7.14% chg_detect_to_+24h=2.52%

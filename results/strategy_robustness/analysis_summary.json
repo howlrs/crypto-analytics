@@ -1,0 +1,110 @@
+{
+  "config": {
+    "train_start": "2023-01-01",
+    "formal_year": 2025,
+    "monitoring_year": 2026,
+    "bootstrap_samples": 2000,
+    "seed": 20260904,
+    "min_train_events": 30,
+    "min_train_months": 12,
+    "min_test_events": 10,
+    "min_test_months": 5,
+    "selection_fdr": 0.1
+  },
+  "source_event_files": 342,
+  "normalized_strategies": 346,
+  "analyzed_nonempty_strategies": 346,
+  "family_inventory": {
+    "crowding_A2": {
+      "normalized_strategies": 4,
+      "events_raw": 5741,
+      "events_kept": 2064,
+      "events_purged": 3677,
+      "purge_rate": 0.640480752482146
+    },
+    "crowding_A3": {
+      "normalized_strategies": 4,
+      "events_raw": 5741,
+      "events_kept": 2064,
+      "events_purged": 3677,
+      "purge_rate": 0.640480752482146
+    },
+    "crowding_B2": {
+      "normalized_strategies": 8,
+      "events_raw": 982,
+      "events_kept": 889,
+      "events_purged": 93,
+      "purge_rate": 0.09470468431771895
+    },
+    "crowding_B3": {
+      "normalized_strategies": 6,
+      "events_raw": 1165,
+      "events_kept": 355,
+      "events_purged": 810,
+      "purge_rate": 0.6952789699570815
+    },
+    "liq_reversion": {
+      "normalized_strategies": 324,
+      "events_raw": 67359,
+      "events_kept": 51741,
+      "events_purged": 15618,
+      "purge_rate": 0.23186211196722042
+    }
+  },
+  "folds": 692,
+  "formal_oos_year": 2025,
+  "monitoring_year": 2026,
+  "monitoring_disclaimer": "2026 results are monitoring only, not formal OOS confirmation.",
+  "overlap_purge": {
+    "events_raw": 80988,
+    "events_kept": 57113,
+    "events_purged": 23875
+  },
+  "overlap_purge_rate": 0.2947967600138292,
+  "formal_findings": {
+    "train_eligible_strategies": 208,
+    "test_eligible_strategies": 257,
+    "train_raw_p_le_0_05_positive": 44,
+    "train_global_bh_candidates": 6,
+    "train_global_by_selected": 0,
+    "train_min_global_bh_q": 0.051974012993503245,
+    "train_min_global_by_q": 0.307538325396625,
+    "test_positive_strategies": 83,
+    "test_global_bh_significant": 7,
+    "test_global_by_significant": 0,
+    "test_min_global_by_q": 0.13118079755489265,
+    "selected_with_positive_test": 0,
+    "selected_with_fdr_significant_test": 0
+  },
+  "monitoring_findings": {
+    "train_eligible_strategies": 251,
+    "test_eligible_strategies": 145,
+    "train_global_by_selected": 0,
+    "train_min_global_by_q": 0.10939312398140767,
+    "test_global_by_significant": 10,
+    "test_min_global_by_q": 0.0575299556901403
+  },
+  "regime_findings": {
+    "primary_eligible_rows": 574,
+    "primary_global_by_significant": 0,
+    "primary_min_global_by_q": 0.22090237769786947,
+    "exploratory_eligible_rows": 287,
+    "exploratory_global_by_significant": 0,
+    "exploratory_min_global_by_q": 0.2982562054622784
+  },
+  "formal_train_selected": 0,
+  "formal_selected_oos_positive": 0,
+  "formal_selected_oos_fdr_significant": 0,
+  "primary_rule": "eligible training rows, positive train mean, fold-global BY q <= 0.1",
+  "embargo_rule": "Two-sided strategy-horizon embargo: train exits before fold_start-horizon; test entries start at fold_start+horizon and test exits remain inside the fold year.",
+  "timing_rule": "Execution uses the first eligible bar open. entry_ts may equal detect_ts for liquidation events because detect_ts is the prior bar-close decision instant and the next bar opens at that same instant.",
+  "oos_design_note": "The year split is a retrospective chronological holdout, not a prospectively sealed experiment.",
+  "four_regime_note": "Four-regime results are exploratory because each split reduces event and month counts and expands the hypothesis family.",
+  "outputs": [
+    "strategy_inventory.csv",
+    "walk_forward_folds.csv",
+    "family_walk_forward.csv",
+    "formal_oos_by_regime.csv",
+    "analysis_summary.json"
+  ]
+}

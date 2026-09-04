@@ -25,12 +25,17 @@ DB is read-only (file:...?mode=ro). No write queries are issued anywhere.
 Run:
     python3 backtests/crowding_signals.py
 """
+import argparse
+import glob
+import hashlib
 import json
 import math
 import os
 import sqlite3
 import time as _time
 from datetime import datetime, timezone
+from pathlib import Path
+import unicodedata
 
 import numpy as np
 import pandas as pd
@@ -39,7 +44,7 @@ from scipy import stats
 DB_PATH = "/mnt/e/Datas/market/market.db"
 DB_URI = f"file:{DB_PATH}?mode=ro"
 OUT_DIR = "/home/o9oem/workspace/crypto/analytics/results/crowding"
-os.makedirs(OUT_DIR, exist_ok=True)
+REGISTRY_PATH = Path(__file__).resolve().parents[1] / "results/prospective_validation/registry.json"
 
 # ---------------------------------------------------------------------------
 # Cost convention -- IDENTICAL to backtests/liq_reversion.py
@@ -62,9 +67,201 @@ TS_OI_END = 1785542100000
 
 N_BOOTSTRAP = 200
 RNG_SEED = 20260811
+INFERENCE_SCOPE = "exploratory_uncorrected"
 
 HOUR_MS = 3600 * 1000
 DAY_MS = 24 * HOUR_MS
+
+
+def _canonical_registry_value(value):
+    """Match the registry's canonical JSON domain without importing its evaluator."""
+    if isinstance(value, str):
+        return unicodedata.normalize("NFC", value)
+    if isinstance(value, float):
+        return None if not math.isfinite(value) else value.hex()
+    if isinstance(value, dict):
+        return {str(_canonical_registry_value(k)): _canonical_registry_value(v)
+                for k, v in sorted(value.items(), key=lambda item: str(item[0]))}
+    if isinstance(value, list):
+        return [_canonical_registry_value(item) for item in value]
+    if value is None or isinstance(value, (bool, int)):
+        return value
+    raise ValueError("registry contains an unsupported canonical JSON value")
+
+
+def _canonical_registry_bytes(registry, *, include_integrity=False):
+    payload = dict(registry)
+    if not include_integrity:
+        payload.pop("integrity", None)
+    return (json.dumps(_canonical_registry_value(payload), ensure_ascii=False,
+                       sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+
+
+def _registry_timestamp_ms(value, name):
+    if not isinstance(value, str):
+        raise ValueError(f"registry {name} must be an ISO-8601 string")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"registry {name} is not a valid timestamp") from exc
+    if parsed.tzinfo is None:
+        raise ValueError(f"registry {name} must include a timezone")
+    return int(parsed.astimezone(timezone.utc).timestamp() * 1000)
+
+
+def enforce_prospective_seal(analysis_end_ts, *, registry_path=REGISTRY_PATH, now=None):
+    """Refuse prospective source refreshes until the sealed follow-up completes."""
+    registry_path = Path(registry_path)
+    sidecar_path = registry_path.with_name(registry_path.name + ".sha256")
+    if not registry_path.is_file() or not sidecar_path.is_file():
+        raise RuntimeError("sealed prospective registry or its SHA-256 sidecar is missing")
+    try:
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        if registry_path.read_bytes() != _canonical_registry_bytes(registry, include_integrity=True):
+            raise ValueError("registry is not canonical JSON")
+        expected = registry.get("integrity", {}).get("registry_sha256")
+        actual = hashlib.sha256(_canonical_registry_bytes(registry)).hexdigest()
+        sidecar = sidecar_path.read_text(encoding="ascii").strip()
+        if not isinstance(expected, str) or expected != actual or sidecar != actual:
+            raise ValueError("registry integrity hash mismatch")
+        evaluation_start_ms = _registry_timestamp_ms(registry["evaluation_start"], "evaluation_start")
+        followup_end_ms = _registry_timestamp_ms(registry["followup_end"], "followup_end")
+    except (KeyError, OSError, UnicodeError, TypeError, ValueError, json.JSONDecodeError) as exc:
+        raise RuntimeError("sealed prospective registry is malformed or fails integrity verification") from exc
+    if now is None:
+        now_ms = int(_time.time() * 1000)
+    elif isinstance(now, (int, float)):
+        now_ms = int(now)
+    elif isinstance(now, datetime):
+        now_ms = int(now.astimezone(timezone.utc).timestamp() * 1000) if now.tzinfo else int(now.replace(tzinfo=timezone.utc).timestamp() * 1000)
+    else:
+        raise TypeError("now must be epoch milliseconds or a datetime")
+    if now_ms < followup_end_ms and int(analysis_end_ts) >= evaluation_start_ms:
+        raise RuntimeError(
+            "sealed prospective validation is active: source refresh at/after "
+            "evaluation_start is prohibited until followup_end"
+        )
+
+
+def mark_exploratory_inference(frame):
+    """Label every persisted inferential table as exploratory and uncorrected."""
+    frame = frame.copy()
+    frame["inference_scope"] = INFERENCE_SCOPE
+    return frame
+
+
+def parse_end_ts(value):
+    """Parse the CLI end bound: an integer millisecond timestamp or ``latest``."""
+    if value == "latest":
+        return "latest"
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError) as exc:
+        raise argparse.ArgumentTypeError("--end-ts must be an integer millisecond timestamp or 'latest'") from exc
+    if parsed < TS_FULL_START:
+        raise argparse.ArgumentTypeError(f"--end-ts must be >= {TS_FULL_START}")
+    return parsed
+
+
+def last_complete_minute_open(now_ms=None):
+    """Open timestamp of the latest fully closed UTC minute."""
+    current_ms = int(_time.time() * 1000) if now_ms is None else int(now_ms)
+    return current_ms // 60_000 * 60_000 - 60_000
+
+
+def resolve_latest_end_ts(conn, now_ms=None):
+    """Return the common latest Binance-perp 1m bar open across required symbols."""
+    q = """
+        SELECT symbol, MAX(ts) AS max_ts
+        FROM klines
+        WHERE venue=? AND market=? AND symbol IN (?, ?) AND ts<=?
+        GROUP BY symbol
+    """
+    rows = conn.execute(
+        q, (VENUE, MARKET, *SYMBOLS, last_complete_minute_open(now_ms))
+    ).fetchall()
+    maxima = {symbol: max_ts for symbol, max_ts in rows}
+    missing = [symbol for symbol in SYMBOLS if maxima.get(symbol) is None]
+    if missing:
+        raise ValueError(f"cannot resolve latest: missing Binance perp klines for {', '.join(missing)}")
+    return int(min(maxima[symbol] for symbol in SYMBOLS))
+
+
+def resolve_analysis_end_ts(conn, requested_end):
+    """Resolve a parsed end request without mutating the read-only source DB."""
+    return resolve_latest_end_ts(conn) if requested_end == "latest" else int(requested_end)
+
+
+def oi_end_ts_for_run(analysis_end_ts):
+    """Keep the legacy default OI bound byte-for-byte compatible; future runs extend it."""
+    if analysis_end_ts <= TS_FULL_END:
+        return min(analysis_end_ts, TS_OI_END)
+    return analysis_end_ts
+
+
+def bootstrap_sample_end(analysis_end_ts, coverage_end_exclusive_ts, horizon_ms):
+    """Exclusive random-decision bound with enough loaded bars for the holding period."""
+    return min(analysis_end_ts - horizon_ms, coverage_end_exclusive_ts - horizon_ms)
+
+
+def frame_coverage(frame, coverage_interval_ms, *, maximum_expected_interval_ms=None,
+                   gap_tolerance_ms=0):
+    """JSON-safe min/max/count coverage for a loaded source frame."""
+    if frame.empty:
+        return {"min_ts": None, "max_ts": None, "count": 0,
+                "coverage_end_exclusive_ts": None, "unexpected_gap_count": 0,
+                "tail_contiguous_start_ts": None}
+    timestamps = np.sort(frame["ts"].astype(np.int64).unique())
+    max_ts = int(timestamps[-1])
+    expected = int(maximum_expected_interval_ms or coverage_interval_ms)
+    gaps = np.flatnonzero(np.diff(timestamps) > expected + int(gap_tolerance_ms))
+    tail_start = int(timestamps[gaps[-1] + 1]) if len(gaps) else int(timestamps[0])
+    return {
+        "min_ts": int(timestamps[0]),
+        "max_ts": max_ts,
+        "count": int(len(frame)),
+        "coverage_end_exclusive_ts": max_ts + int(coverage_interval_ms),
+        "unexpected_gap_count": int(len(gaps)),
+        "tail_contiguous_start_ts": tail_start,
+    }
+
+
+def script_sha256():
+    with open(__file__, "rb") as f:
+        return hashlib.sha256(f.read()).hexdigest()
+
+
+def build_run_manifest(*, requested_end, analysis_end_ts, kline_data, source_coverage,
+                       source_event_file_count, event_file_sha256=None,
+                       generated_at_utc=None):
+    """Build the provenance record separately so its invariants are unit-testable."""
+    kline_maxima = [data["coverage"]["max_ts"] for data in kline_data.values()]
+    if any(value is None for value in kline_maxima):
+        coverage_end = None
+    else:
+        coverage_end = int(min(kline_maxima) + 60_000)
+    return {
+        "schema_version": 1,
+        "script": "backtests/crowding_signals.py",
+        "statistical_warning": (
+            "Raw t-statistics, p-values, and null percentiles are non-confirmatory; "
+            "strategy_robustness.py global-BY output is authoritative for inference."
+        ),
+        "generated_at_utc": generated_at_utc or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "requested_end": requested_end,
+        "analysis_end_ts": int(analysis_end_ts),
+        "coverage_end_exclusive_ts": coverage_end,
+        "sources": source_coverage,
+        "event_schema": {
+            "event_columns": ["ts", "entry_ts", "exit_ts", "net_bp", "year"],
+            "timing": "entry is the first 1m bar open strictly after decision ts; exit is at/after actual entry plus horizon",
+            "oi_funding_asof": "OI snapshot timestamp is backward-as-of joined (oi_signal_ts <= funding ts)",
+            "c_trial_strategy": "disabled: current-settlement funding percentile is unavailable before settlement",
+        },
+        "source_event_file_count": int(source_event_file_count),
+        "event_file_sha256": dict(sorted((event_file_sha256 or {}).items())),
+        "script_sha256": script_sha256(),
+    }
 
 
 def log(msg):
@@ -113,33 +310,51 @@ def load_oi(conn, venue, symbol, ts_start, ts_end):
 
 
 # ---------------------------------------------------------------------------
-# Price lookup helper (as-of, nearest 1m bar at/after target ts)
+# Price lookup helpers
 # ---------------------------------------------------------------------------
-def asof_price_forward(kline_ts, kline_close, target_ts):
-    """For each target_ts, find close price of first bar with ts >= target_ts.
+def asof_price_forward(kline_ts, kline_open, target_ts, *, strictly_after=False):
+    """For each target timestamp, find an eligible 1m-bar OPEN price.
+
+    ``strictly_after=True`` selects the first bar whose open timestamp is
+    strictly after the target (for decisions made at a timestamp).  The
+    default permits an exact timestamp match (for the holding-period exit).
     Returns (price array, actual bar ts array, valid mask)."""
     n = len(kline_ts)
-    pos = np.searchsorted(kline_ts, target_ts, side="left")
+    pos = np.searchsorted(kline_ts, target_ts, side="right" if strictly_after else "left")
     valid = pos < n
     px = np.full(len(target_ts), np.nan)
     actual_ts = np.full(len(target_ts), -1, dtype=np.int64)
-    px[valid] = kline_close[pos[valid]]
+    px[valid] = kline_open[pos[valid]]
     actual_ts[valid] = kline_ts[pos[valid]]
     return px, actual_ts, valid
 
 
-def forward_return(kline_ts, kline_close, base_ts, horizon_ms):
-    """Return forward log-free simple return from price at/after base_ts to
-    price at/after base_ts+horizon_ms. base_ts is the DECISION timestamp
-    (e.g. funding settlement ts); entry price uses the bar at/after base_ts
-    itself (no look-back), exit uses bar at/after base_ts+horizon."""
-    entry_px, entry_ts, v1 = asof_price_forward(kline_ts, kline_close, base_ts)
-    exit_target = base_ts + horizon_ms
-    exit_px, exit_ts, v2 = asof_price_forward(kline_ts, kline_close, exit_target)
+def forward_return(kline_ts, kline_open, base_ts, horizon_ms):
+    """Return from the first eligible OPEN after a decision to an exit OPEN.
+
+    A decision at ``base_ts`` cannot trade the bar that opened at that same
+    timestamp, so entry is the first 1m bar OPEN strictly after it.  The exit
+    is the first bar OPEN at or after the *actual* entry timestamp plus the
+    holding horizon.  This preserves the requested holding period when bars
+    are missing.
+    """
+    base_ts = np.asarray(base_ts, dtype=np.int64)
+    entry_px, entry_ts, v1 = asof_price_forward(
+        kline_ts, kline_open, base_ts, strictly_after=True
+    )
+    exit_target = entry_ts + horizon_ms
+    exit_px, exit_ts, v2 = asof_price_forward(kline_ts, kline_open, exit_target)
     valid = v1 & v2
     ret = np.full(len(base_ts), np.nan)
     ret[valid] = exit_px[valid] / entry_px[valid] - 1.0
     return ret, entry_px, entry_ts, exit_px, exit_ts, valid
+
+
+def asof_backward_index(source_ts, target_ts):
+    """Index of the latest source timestamp <= each target, or -1 if absent."""
+    source_ts = np.asarray(source_ts, dtype=np.int64)
+    target_ts = np.asarray(target_ts, dtype=np.int64)
+    return np.searchsorted(source_ts, target_ts, side="right") - 1
 
 
 # ---------------------------------------------------------------------------
@@ -220,7 +435,7 @@ def net_return_bp_directional(gross_ret, direction):
 
 
 def bootstrap_null_mean(all_ts, all_fwd_ret_lookup_fn, n_events, direction, sample_start, sample_end,
-                         horizon_ms, kline_ts, kline_close, rng):
+                         horizon_ms, kline_ts, kline_open, rng):
     """Draw N_BOOTSTRAP samples of n_events random decision timestamps
     uniformly in [sample_start, sample_end), compute the same net_bp metric
     the real strategy would get, return array of length N_BOOTSTRAP of the
@@ -229,7 +444,7 @@ def bootstrap_null_mean(all_ts, all_fwd_ret_lookup_fn, n_events, direction, samp
     for b in range(N_BOOTSTRAP):
         rand_ts = rng.integers(sample_start, sample_end, size=n_events, dtype=np.int64)
         rand_ts.sort()
-        ret, _, _, _, _, valid = forward_return(kline_ts, kline_close, rand_ts, horizon_ms)
+        ret, _, _, _, _, valid = forward_return(kline_ts, kline_open, rand_ts, horizon_ms)
         if valid.sum() == 0:
             means[b] = np.nan
             continue
@@ -252,10 +467,10 @@ def year_of(ts_ms):
 # ===========================================================================
 # VALIDATION A: funding extreme decile forward returns + strategy
 # ===========================================================================
-def run_validation_a(conn, kline_data, symbol, rng):
+def run_validation_a(conn, kline_data, symbol, rng, analysis_end_ts):
     log(f"=== Validation A ({symbol}): funding percentile decile analysis ===")
-    fund = load_funding(conn, VENUE, symbol, TS_FULL_START, TS_FULL_END)
-    kt, kc = kline_data["ts"], kline_data["close"]
+    fund = load_funding(conn, VENUE, symbol, TS_FULL_START, analysis_end_ts)
+    kt, ko = kline_data["ts"], kline_data["open"]
 
     # LOOKAHEAD-SAFE signal: percentile of funding rate at settlement i computed
     # against the trailing 90-observation (settlement-count) window STRICTLY
@@ -278,10 +493,10 @@ def run_validation_a(conn, kline_data, symbol, rng):
     decile_rows = []
     fwd_ret_by_h = {}
     for hlabel, hms in horizons.items():
-        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, kc, base_ts, hms)
-        # assert no lookahead: exit_ts must be > entry_ts, entry_ts must be >= base_ts (settlement)
-        assert np.all(entry_ts[valid] >= base_ts[valid]), "LOOKAHEAD: entry before settlement"
-        assert np.all(exit_ts[valid] > entry_ts[valid]), "LOOKAHEAD: exit not after entry"
+        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, ko, base_ts, hms)
+        # Entry is the next tradable bar OPEN; exit is after actual entry + hold.
+        assert np.all(entry_ts[valid] > base_ts[valid]), "LOOKAHEAD: entry not after decision"
+        assert np.all(exit_ts[valid] >= entry_ts[valid] + hms), "EXIT: holding horizon not met"
         fund[f"fwd_ret_{hlabel}"] = ret
         fwd_ret_by_h[hlabel] = ret
 
@@ -304,7 +519,7 @@ def run_validation_a(conn, kline_data, symbol, rng):
         tt["horizon"] = hlabel
         tt["mean_diff_top_minus_bottom"] = float(np.nanmean(top) - np.nanmean(bot))
         ttest_rows.append(tt)
-    ttest_df = pd.DataFrame(ttest_rows)
+    ttest_df = mark_exploratory_inference(pd.DataFrame(ttest_rows))
 
     decile_df.to_csv(os.path.join(OUT_DIR, f"A1_decile_table_{symbol}.csv"), index=False)
     ttest_df.to_csv(os.path.join(OUT_DIR, f"A1_ttest_top_vs_bottom_{symbol}.csv"), index=False)
@@ -320,9 +535,9 @@ def run_validation_a(conn, kline_data, symbol, rng):
         ("A3_momentum", "long", "short"),     # reverse
     ]:
         for hold_label, hold_ms in [("24h", 24 * HOUR_MS), ("72h", 72 * HOUR_MS)]:
-            ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, kc, base_ts, hold_ms)
-            assert np.all(entry_ts[valid] >= base_ts[valid])
-            assert np.all(exit_ts[valid] > entry_ts[valid])
+            ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, ko, base_ts, hold_ms)
+            assert np.all(entry_ts[valid] > base_ts[valid])
+            assert np.all(exit_ts[valid] >= entry_ts[valid] + hold_ms)
 
             top_mask = (fund["decile"].to_numpy() == 9) & valid
             bot_mask = (fund["decile"].to_numpy() == 0) & valid
@@ -331,10 +546,13 @@ def run_validation_a(conn, kline_data, symbol, rng):
             bot_net = net_return_bp_directional(ret[bot_mask], bot_dir)
             all_net = np.concatenate([top_net, bot_net])
             all_ts_combo = np.concatenate([base_ts[top_mask], base_ts[bot_mask]])
+            all_entry_ts = np.concatenate([entry_ts[top_mask], entry_ts[bot_mask]])
+            all_exit_ts = np.concatenate([exit_ts[top_mask], exit_ts[bot_mask]])
             all_dir = np.array(["top"] * len(top_net) + ["bottom"] * len(bot_net))
 
             events_df = pd.DataFrame({
-                "ts": all_ts_combo, "leg": all_dir, "net_bp": all_net,
+                "ts": all_ts_combo, "entry_ts": all_entry_ts, "exit_ts": all_exit_ts,
+                "leg": all_dir, "net_bp": all_net,
                 "year": year_of(all_ts_combo),
             }).sort_values("ts")
             events_df.to_csv(
@@ -359,11 +577,14 @@ def run_validation_a(conn, kline_data, symbol, rng):
             # direction mix exactly.)
             null_means = np.empty(N_BOOTSTRAP)
             for b in range(N_BOOTSTRAP):
-                rand_ts_top = rng.integers(TS_FULL_START, TS_FULL_END - hold_ms, size=top_mask.sum(), dtype=np.int64)
-                rand_ts_bot = rng.integers(TS_FULL_START, TS_FULL_END - hold_ms, size=bot_mask.sum(), dtype=np.int64)
+                sample_end = bootstrap_sample_end(
+                    analysis_end_ts, kline_data["coverage_end_exclusive_ts"], hold_ms
+                )
+                rand_ts_top = rng.integers(TS_FULL_START, sample_end, size=top_mask.sum(), dtype=np.int64)
+                rand_ts_bot = rng.integers(TS_FULL_START, sample_end, size=bot_mask.sum(), dtype=np.int64)
                 rand_ts_top.sort(); rand_ts_bot.sort()
-                rt, _, _, _, _, vt = forward_return(kt, kc, rand_ts_top, hold_ms)
-                rb, _, _, _, _, vb = forward_return(kt, kc, rand_ts_bot, hold_ms)
+                rt, _, _, _, _, vt = forward_return(kt, ko, rand_ts_top, hold_ms)
+                rb, _, _, _, _, vb = forward_return(kt, ko, rand_ts_bot, hold_ms)
                 nt = net_return_bp_directional(rt[vt], top_dir)
                 nb = net_return_bp_directional(rb[vb], bot_dir)
                 combo = np.concatenate([nt, nb])
@@ -382,7 +603,7 @@ def run_validation_a(conn, kline_data, symbol, rng):
                 os.path.join(OUT_DIR, f"{strat_name}_yearly_{symbol}_{hold_label}.csv"), index=False
             )
 
-    strategy_df = pd.DataFrame(strategy_rows)
+    strategy_df = mark_exploratory_inference(pd.DataFrame(strategy_rows))
     strategy_df.to_csv(os.path.join(OUT_DIR, f"A_strategy_summary_{symbol}.csv"), index=False)
 
     return dict(decile=decile_df, ttest=ttest_df, strategy=strategy_df)
@@ -391,16 +612,16 @@ def run_validation_a(conn, kline_data, symbol, rng):
 # ===========================================================================
 # VALIDATION B: OI crowding (2023-01+ only)
 # ===========================================================================
-def run_validation_b(conn, kline_data, symbol, rng):
+def run_validation_b(conn, kline_data, symbol, rng, analysis_end_ts, oi_end_ts):
     log(f"=== Validation B ({symbol}): OI crowding analysis (2023-01+) ===")
-    kt, kc = kline_data["ts"], kline_data["close"]
-    oi = load_oi(conn, VENUE, symbol, TS_OI_START, TS_OI_END)
-    fund = load_funding(conn, VENUE, symbol, TS_OI_START, TS_OI_END)
+    kt, ko = kline_data["ts"], kline_data["open"]
+    oi = load_oi(conn, VENUE, symbol, TS_OI_START, oi_end_ts)
+    fund = load_funding(conn, VENUE, symbol, TS_OI_START, oi_end_ts)
     log(f"  {symbol}: {len(oi)} OI rows, {len(fund)} funding rows in OI-coverage period")
 
-    # Resample OI to a regular daily grid at 00:00 UTC for change-rate signals
-    # (5-min native cadence, using as-of last value per day makes windows
-    # cleanly lookahead-safe with integer day steps).
+    # Collapse to one end-of-UTC-day OI snapshot while retaining the actual
+    # timestamp of that day's last native observation (normally 23:55 UTC).
+    # The actual timestamp is required for causal backward-as-of joins below.
     oi = oi.sort_values("ts").reset_index(drop=True)
     oi["day"] = oi["ts"] // DAY_MS
     daily_oi = oi.groupby("day").agg(ts=("ts", "last"), open_interest=("open_interest", "last")).reset_index()
@@ -427,9 +648,9 @@ def run_validation_b(conn, kline_data, symbol, rng):
     # --- Signal 1: decile table ---
     decile_rows = []
     for hlabel, hms in horizons_b1.items():
-        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, kc, base_ts, hms)
-        assert np.all(entry_ts[valid] >= base_ts[valid])
-        assert np.all(exit_ts[valid] > entry_ts[valid])
+        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, ko, base_ts, hms)
+        assert np.all(entry_ts[valid] > base_ts[valid])
+        assert np.all(exit_ts[valid] >= entry_ts[valid] + hms)
         daily_oi[f"fwd_ret_{hlabel}"] = ret
     for dec, g in daily_oi.groupby("decile"):
         row = dict(decile=int(dec), n=len(g))
@@ -451,12 +672,13 @@ def run_validation_b(conn, kline_data, symbol, rng):
         tt = ttest_top_vs_bottom(top, bot)
         tt["horizon"] = hlabel
         b1_ttest_rows.append(tt)
-    pd.DataFrame(b1_ttest_rows).to_csv(os.path.join(OUT_DIR, f"B1_ttest_top_vs_bottom_{symbol}.csv"), index=False)
+    b1_ttest_df = mark_exploratory_inference(pd.DataFrame(b1_ttest_rows))
+    b1_ttest_df.to_csv(os.path.join(OUT_DIR, f"B1_ttest_top_vs_bottom_{symbol}.csv"), index=False)
 
     # --- Signal 2: deleverage continuation events ---
-    # OI 24h change: uses daily_oi grid, shift(1) vs previous day (both known
-    # at day d's close -> no leakage). Event fires on day d, entry uses price
-    # at/after day d's ts (== the settlement/snapshot ts itself, forward only).
+    # OI 24h change compares the end-of-day snapshot with the prior day's
+    # snapshot. Event entry uses the first bar open strictly after the actual
+    # current snapshot timestamp, so both inputs are already observable.
     daily_oi["oi_chg_24h"] = daily_oi["open_interest"] / daily_oi["open_interest"].shift(1) - 1.0
 
     delevent_rows = []
@@ -472,16 +694,16 @@ def run_validation_b(conn, kline_data, symbol, rng):
                     mean_gross_bp=np.nan, mean_net_bp=np.nan, t_stat=np.nan,
                     null_mean_bp=np.nan, null_percentile=np.nan,
                 ))
-            pd.DataFrame(columns=["ts", "oi_chg_24h", "horizon", "gross_ret", "net_bp", "year"]).to_csv(
+            pd.DataFrame(columns=["ts", "entry_ts", "exit_ts", "oi_chg_24h", "horizon", "gross_ret", "net_bp", "year"]).to_csv(
                 os.path.join(OUT_DIR, f"B2_deleverage_events_{symbol}_{thresh_label}.csv"), index=False)
             continue
 
         ev_ts = ev["ts"].to_numpy()
         all_events_out = []
         for hlabel, hms in [("24h", 24 * HOUR_MS), ("72h", 72 * HOUR_MS)]:
-            ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, kc, ev_ts, hms)
-            assert np.all(entry_ts[valid] >= ev_ts[valid])
-            assert np.all(exit_ts[valid] > entry_ts[valid])
+            ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, ko, ev_ts, hms)
+            assert np.all(entry_ts[valid] > ev_ts[valid])
+            assert np.all(exit_ts[valid] >= entry_ts[valid] + hms)
             gross = ret[valid]
             # long-only interpretation (buy the dip / follow-through direction
             # unspecified by the spec; we report raw long-side forward return
@@ -489,8 +711,9 @@ def run_validation_b(conn, kline_data, symbol, rng):
             # cascade-end"), net cost applied assuming a long entry
             net_bp = net_return_bp_directional(gross, "long")
             ts_v = ev_ts[valid]
-            for t_, g_, n_ in zip(ts_v, gross, net_bp):
-                all_events_out.append(dict(ts=int(t_), oi_chg_24h=thresh_label, horizon=hlabel,
+            for t_, e_, x_, g_, n_ in zip(ts_v, entry_ts[valid], exit_ts[valid], gross, net_bp):
+                all_events_out.append(dict(ts=int(t_), entry_ts=int(e_), exit_ts=int(x_),
+                                            oi_chg_24h=thresh_label, horizon=hlabel,
                                             gross_ret=float(g_), net_bp=float(n_), year=int(year_of(t_))))
 
             mean_gross_bp = float(gross.mean() * 10000.0) if len(gross) else np.nan
@@ -499,8 +722,9 @@ def run_validation_b(conn, kline_data, symbol, rng):
             se = std_bp / math.sqrt(len(net_bp)) if len(net_bp) > 1 and std_bp > 0 else np.nan
             t_stat = mean_net_bp / se if se and not np.isnan(se) and se > 0 else np.nan
 
-            null_dist = bootstrap_null_mean(None, None, len(ts_v), "long", TS_OI_START, TS_OI_END - hms,
-                                             hms, kt, kc, rng)
+            null_dist = bootstrap_null_mean(None, None, len(ts_v), "long", TS_OI_START,
+                                             bootstrap_sample_end(oi_end_ts, kline_data["coverage_end_exclusive_ts"], hms),
+                                             hms, kt, ko, rng)
             null_mean = float(np.nanmean(null_dist))
             null_pctile = percentile_of_score(null_dist, mean_net_bp)
 
@@ -520,29 +744,30 @@ def run_validation_b(conn, kline_data, symbol, rng):
             yb_summary.to_csv(
                 os.path.join(OUT_DIR, f"B2_deleverage_yearly_{symbol}_{thresh_label}.csv"), index=False)
 
-    b2_df = pd.DataFrame(delevent_rows)
+    b2_df = mark_exploratory_inference(pd.DataFrame(delevent_rows))
     b2_df.to_csv(os.path.join(OUT_DIR, f"B2_deleverage_summary_{symbol}.csv"), index=False)
 
     # --- Signal 3: composite (funding pctile top quartile AND OI 7d-chg top quartile) ---
     # Build funding percentile on the SAME lookahead-safe basis as validation A,
     # restricted to the OI coverage window, then align funding settlements to
-    # the daily OI-decile grid by as-of (last known OI-signal day <= settlement day).
+    # the daily OI-decile grid by actual snapshot timestamp (not calendar day).
     window = 90 * 3
-    fund_full = load_funding(conn, VENUE, symbol, TS_FULL_START, TS_FULL_END)
+    fund_full = load_funding(conn, VENUE, symbol, TS_FULL_START, analysis_end_ts)
     fund_full["pctile"] = rolling_percentile_safe(fund_full["rate"], window)
-    fund_b = fund_full[(fund_full["ts"] >= TS_OI_START) & (fund_full["ts"] <= TS_OI_END)].dropna(
+    fund_b = fund_full[(fund_full["ts"] >= TS_OI_START) & (fund_full["ts"] <= oi_end_ts)].dropna(
         subset=["pctile"]).reset_index(drop=True)
 
-    oi_day = daily_oi["day"].to_numpy()
+    oi_ts = daily_oi["ts"].to_numpy()
     oi_pctile = daily_oi["oi_chg_7d_pctile"].to_numpy()
-    fund_b["day"] = fund_b["ts"] // DAY_MS
-    # as-of backward join: for each funding settlement day, use latest available
-    # oi_chg_7d_pctile with day <= settlement day (already known, no leakage)
-    idx = np.searchsorted(oi_day, fund_b["day"].to_numpy(), side="right") - 1
+    # Backward as-of join: an OI signal is eligible only when its actual
+    # snapshot timestamp is <= the funding decision timestamp.
+    idx = asof_backward_index(oi_ts, fund_b["ts"].to_numpy())
     valid_join = idx >= 0
     fund_b = fund_b.loc[valid_join].reset_index(drop=True)
     idx = idx[valid_join]
     fund_b["oi_chg_7d_pctile"] = oi_pctile[idx]
+    fund_b["oi_signal_ts"] = oi_ts[idx]
+    assert np.all(fund_b["oi_signal_ts"].to_numpy() <= fund_b["ts"].to_numpy())
 
     fund_ts = fund_b["ts"].to_numpy()
     f_pct = fund_b["pctile"].to_numpy()
@@ -557,9 +782,9 @@ def run_validation_b(conn, kline_data, symbol, rng):
 
     composite_rows = []
     for hlabel, hms in horizons_b1.items():
-        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, kc, fund_ts, hms)
-        assert np.all(entry_ts[valid] >= fund_ts[valid])
-        assert np.all(exit_ts[valid] > entry_ts[valid])
+        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, ko, fund_ts, hms)
+        assert np.all(entry_ts[valid] > fund_ts[valid])
+        assert np.all(exit_ts[valid] >= entry_ts[valid] + hms)
         for gname, gmask in groups.items():
             m = gmask & valid
             vals = ret[m]
@@ -572,7 +797,7 @@ def run_validation_b(conn, kline_data, symbol, rng):
                 group=gname, horizon=hlabel, n_events=n_ev, mean_gross_bp=mean_bp,
                 t_stat=t_stat,
             ))
-    composite_df = pd.DataFrame(composite_rows)
+    composite_df = mark_exploratory_inference(pd.DataFrame(composite_rows))
     composite_df.to_csv(os.path.join(OUT_DIR, f"B3_composite_signal_{symbol}.csv"), index=False)
 
     # net/cost + year + null for the double_overheat group specifically (the
@@ -580,13 +805,22 @@ def run_validation_b(conn, kline_data, symbol, rng):
     b3_strategy_rows = []
     dbl_mask = groups["double_overheat"]
     for hlabel, hms in horizons_b1.items():
-        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, kc, fund_ts, hms)
+        ret, entry_px, entry_ts, exit_px, exit_ts, valid = forward_return(kt, ko, fund_ts, hms)
+        assert np.all(entry_ts[valid] > fund_ts[valid])
+        assert np.all(exit_ts[valid] >= entry_ts[valid] + hms)
         m = dbl_mask & valid
         ts_v = fund_ts[m]
         gross_v = ret[m]
         net_bp = net_return_bp_directional(gross_v, "short")  # contrarian: short the double-overheat
         n_ev = len(net_bp)
-        events_out = pd.DataFrame({"ts": ts_v, "net_bp": net_bp, "year": year_of(ts_v)})
+        events_out = pd.DataFrame({
+            "ts": ts_v,
+            "oi_signal_ts": fund_b["oi_signal_ts"].to_numpy()[m],
+            "funding_pctile": f_pct[m],
+            "oi_chg_7d_pctile": o_pct[m],
+            "entry_ts": entry_ts[m], "exit_ts": exit_ts[m],
+            "net_bp": net_bp, "year": year_of(ts_v),
+        })
         events_out.to_csv(os.path.join(OUT_DIR, f"B3_double_overheat_events_{symbol}_{hlabel}.csv"), index=False)
 
         if n_ev == 0:
@@ -600,7 +834,9 @@ def run_validation_b(conn, kline_data, symbol, rng):
         se = std_bp / math.sqrt(n_ev) if n_ev > 1 and std_bp > 0 else np.nan
         t_stat = mean_bp / se if se and not np.isnan(se) and se > 0 else np.nan
 
-        null_dist = bootstrap_null_mean(None, None, n_ev, "short", TS_OI_START, TS_OI_END - hms, hms, kt, kc, rng)
+        null_dist = bootstrap_null_mean(None, None, n_ev, "short", TS_OI_START,
+                                        bootstrap_sample_end(oi_end_ts, kline_data["coverage_end_exclusive_ts"], hms),
+                                        hms, kt, ko, rng)
         null_mean = float(np.nanmean(null_dist))
         null_pctile = percentile_of_score(null_dist, mean_bp)
 
@@ -611,7 +847,8 @@ def run_validation_b(conn, kline_data, symbol, rng):
         yearly = events_out.groupby("year")["net_bp"].agg(["mean", "count"]).reset_index()
         yearly.to_csv(os.path.join(OUT_DIR, f"B3_double_overheat_yearly_{symbol}_{hlabel}.csv"), index=False)
 
-    pd.DataFrame(b3_strategy_rows).to_csv(os.path.join(OUT_DIR, f"B3_double_overheat_strategy_{symbol}.csv"), index=False)
+    b3_strategy_df = mark_exploratory_inference(pd.DataFrame(b3_strategy_rows))
+    b3_strategy_df.to_csv(os.path.join(OUT_DIR, f"B3_double_overheat_strategy_{symbol}.csv"), index=False)
 
     return dict(b1_decile=b1_decile_df, b2=b2_df, b3=composite_df)
 
@@ -619,12 +856,11 @@ def run_validation_b(conn, kline_data, symbol, rng):
 # ===========================================================================
 # VALIDATION C: settlement time-of-day effect
 # ===========================================================================
-def run_validation_c(conn, kline_data, symbol):
+def run_validation_c(conn, kline_data, symbol, analysis_end_ts):
     log(f"=== Validation C ({symbol}): settlement time-of-day event profile ===")
     kt, kc = kline_data["ts"], kline_data["close"]
-    ko = kline_data["open"]
 
-    fund = load_funding(conn, VENUE, symbol, TS_FULL_START, TS_FULL_END)
+    fund = load_funding(conn, VENUE, symbol, TS_FULL_START, analysis_end_ts)
     # settlement hours are 00/08/16 UTC by construction of binance funding;
     # verify empirically rather than assume
     fund["hour"] = pd.to_datetime(fund["ts"], unit="ms", utc=True).dt.hour
@@ -641,13 +877,11 @@ def run_validation_c(conn, kline_data, symbol):
     kt_arr = kt
     n = len(kt_arr)
 
-    # LOOKAHEAD note: this is a purely descriptive/diagnostic profile (not a
-    # forward-looking predictive signal at decision time) -- it aggregates
-    # returns symmetric around a KNOWN, already-scheduled settlement time
-    # (funding settlement times are fixed calendar events, publicly known in
-    # advance, so using ts both before and after the event for a retrospective
-    # profile is not lookahead bias in the predictive sense; no future FUNDING
-    # RATE VALUE is used, only calendar-clock timing which is deterministic).
+    # This is a purely retrospective profile, not a tradable decision rule. It
+    # uses both sides of a scheduled settlement and, below, stratifies them by
+    # the current settlement's realized funding-rate percentile. In particular,
+    # the pre-settlement leg cannot use that classification prospectively; the
+    # former trial strategy based on it is explicitly disabled below.
 
     def event_profile(event_ts_arr):
         # accumulate sum and count of ret_1m at each relative-minute offset
@@ -671,7 +905,9 @@ def run_validation_c(conn, kline_data, symbol):
     all_event_ts = fund["ts"].to_numpy()
     mean_all, cnt_all = event_profile(all_event_ts)
 
-    # funding percentile grouping (lookahead-safe, same construction as A)
+    # The percentile reference window excludes the current observation, as in
+    # A. The current rate still only becomes an actionable classifier at the
+    # settlement itself, so pre-settlement results remain descriptive.
     window = 90 * 3
     fund["pctile"] = rolling_percentile_safe(fund["rate"], window)
     fund_valid = fund.dropna(subset=["pctile"]).reset_index(drop=True)
@@ -713,54 +949,18 @@ def run_validation_c(conn, kline_data, symbol):
     )
     log(f"  {symbol} C diagnostic (sum of avg 1m rets, bp): {diag}")
 
-    # decide whether to trial a naive strategy: require |pre or post drift| > 3bp
-    # in at least one group as a minimal "systematic pattern" bar (informational
-    # heuristic chosen by us; not fit to the data post-hoc for cost-optimization)
     max_abs_signal_bp = max(abs(diag["pre30_top_bp"]), abs(diag["post30_top_bp"]),
                              abs(diag["pre30_bottom_bp"]), abs(diag["post30_bottom_bp"]))
-    trial_strategy = None
-    if max_abs_signal_bp > 3.0:
-        # naive strategy: enter 10 min before settlement, exit 20 min after,
-        # direction = sign of (post30_top - pre30_top) if that's the larger
-        # magnitude signal, else based on bottom-quartile group. We pick the
-        # single largest-magnitude leg among the four candidates.
-        candidates = {
-            "top_pre": diag["pre30_top_bp"], "top_post": diag["post30_top_bp"],
-            "bot_pre": diag["pre30_bottom_bp"], "bot_post": diag["post30_bottom_bp"],
-        }
-        best_key = max(candidates, key=lambda k: abs(candidates[k]))
-        direction = "long" if candidates[best_key] > 0 else "short"
-        group_ts = top_q if "top" in best_key else bot_q
-        entry_offset_min = -10
-        exit_offset_min = 20
-        entry_target = group_ts + entry_offset_min * 60 * 1000
-        exit_target = group_ts + exit_offset_min * 60 * 1000
-        entry_px, entry_ts_a, v1 = asof_price_forward(kt, kc, entry_target)
-        exit_px, exit_ts_a, v2 = asof_price_forward(kt, kc, exit_target)
-        valid = v1 & v2
-        assert np.all(exit_ts_a[valid] > entry_ts_a[valid]), "LOOKAHEAD: exit not after entry in C trial"
-        if direction == "long":
-            gross = exit_px[valid] / entry_px[valid] - 1.0
-        else:
-            gross = entry_px[valid] / exit_px[valid] - 1.0
-        gross_bp = gross * 10000.0
-        net_bp = gross_bp - ROUND_TRIP_COST_BP
-        trial_strategy = dict(
-            symbol=symbol, chosen_leg=best_key, direction=direction,
-            entry_offset_min=entry_offset_min, exit_offset_min=exit_offset_min,
-            n_events=int(valid.sum()),
-            mean_gross_bp=float(gross_bp.mean()) if valid.sum() else np.nan,
-            mean_net_bp=float(net_bp.mean()) if valid.sum() else np.nan,
-            pct_positive_net=float((net_bp > 0).mean() * 100) if valid.sum() else np.nan,
-        )
-        trial_events = pd.DataFrame({
-            "ts": group_ts[valid], "gross_bp": gross_bp, "net_bp": net_bp,
-        })
-        trial_events.to_csv(os.path.join(OUT_DIR, f"C_trial_strategy_events_{symbol}.csv"), index=False)
-        log(f"  {symbol} C trial strategy result: {trial_strategy}")
-    else:
-        log(f"  {symbol}: no systematic pattern found (max |signal| = {max_abs_signal_bp:.2f}bp <= 3bp bar); "
-            f"NOT trialing a strategy, per spec instruction to not force strategization on noise.")
+    # The descriptive profile remains useful, but a current-settlement funding
+    # percentile is not available before that settlement.  Any pre-settlement
+    # entry selected from it is therefore invalid and deliberately disabled.
+    trial_strategy = dict(
+        enabled=False,
+        reason=("disabled: a current-settlement funding percentile cannot be "
+                "known before settlement; pre-settlement entries would leak it"),
+        max_abs_descriptive_signal_bp=float(max_abs_signal_bp),
+    )
+    log(f"  {symbol}: C trial strategy disabled: {trial_strategy['reason']}")
 
     with open(os.path.join(OUT_DIR, f"C_diagnostic_{symbol}.json"), "w") as f:
         json.dump(dict(diagnostic=diag, trial_strategy=trial_strategy,
@@ -772,34 +972,100 @@ def run_validation_c(conn, kline_data, symbol):
 # ===========================================================================
 # Main
 # ===========================================================================
-def main():
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Validate crowding signals with causal execution timing.")
+    parser.add_argument(
+        "--end-ts", default=str(TS_FULL_END), type=parse_end_ts,
+        help="inclusive analysis end as epoch milliseconds, or 'latest' for the BTC/ETH common latest kline",
+    )
+    args = parser.parse_args(argv)
     t0 = _time.time()
     log("=== crowding_signals.py starting ===")
     conn = sqlite3.connect(DB_URI, uri=True)
 
+    requested_end = args.end_ts
+    analysis_end_ts = resolve_analysis_end_ts(conn, requested_end)
+    enforce_prospective_seal(analysis_end_ts)
+    os.makedirs(OUT_DIR, exist_ok=True)
+    latest_common_ts = resolve_latest_end_ts(conn)
+    if analysis_end_ts > latest_common_ts:
+        conn.close()
+        raise ValueError(
+            f"--end-ts {analysis_end_ts} exceeds common loaded BTC/ETH kline coverage "
+            f"({latest_common_ts}); use --end-ts latest or ingest both symbols first"
+        )
+    oi_end_ts = oi_end_ts_for_run(analysis_end_ts)
+    log(f"analysis end: requested={requested_end}, resolved={analysis_end_ts}, oi_end={oi_end_ts}")
+
     rng = np.random.default_rng(RNG_SEED)
 
     kline_data = {}
+    source_coverage = {}
     for sym in SYMBOLS:
         log(f"loading 1m klines for {sym} ...")
-        kl = load_klines_1m(conn, VENUE, MARKET, sym, TS_FULL_START, TS_FULL_END)
-        kline_data[sym] = dict(ts=kl["ts"].to_numpy(), close=kl["close"].to_numpy(), open=kl["open"].to_numpy())
+        kl = load_klines_1m(conn, VENUE, MARKET, sym, TS_FULL_START, analysis_end_ts)
+        coverage = frame_coverage(kl, 60_000)
+        kline_data[sym] = dict(
+            ts=kl["ts"].to_numpy(), close=kl["close"].to_numpy(), open=kl["open"].to_numpy(),
+            coverage=coverage, coverage_end_exclusive_ts=coverage["coverage_end_exclusive_ts"],
+        )
+        funding_for_manifest = load_funding(conn, VENUE, sym, TS_FULL_START, analysis_end_ts)
+        funding_interval_ms = (
+            int(funding_for_manifest["interval_hours"].iloc[-1]) * HOUR_MS
+            if not funding_for_manifest.empty else 0
+        )
+        maximum_funding_interval_ms = (
+            int(funding_for_manifest["interval_hours"].max()) * HOUR_MS
+            if not funding_for_manifest.empty else 0
+        )
+        oi_for_manifest = load_oi(conn, VENUE, sym, TS_OI_START, oi_end_ts)
+        source_coverage[sym] = {
+            "kline": coverage,
+            "funding": frame_coverage(
+                funding_for_manifest, funding_interval_ms,
+                maximum_expected_interval_ms=maximum_funding_interval_ms,
+                gap_tolerance_ms=60_000,
+            ),
+            "oi": frame_coverage(oi_for_manifest, 5 * 60_000),
+        }
         log(f"  {sym}: {len(kl)} klines, range {kl.ts.min()}..{kl.ts.max()}")
+
+    common_coverage_end = min(data["coverage_end_exclusive_ts"] for data in kline_data.values())
+    if analysis_end_ts >= common_coverage_end:
+        conn.close()
+        raise ValueError(f"analysis end {analysis_end_ts} has no loaded common kline coverage")
 
     results_a = {}
     results_b = {}
     results_c = {}
 
     for sym in SYMBOLS:
-        results_a[sym] = run_validation_a(conn, kline_data[sym], sym, rng)
+        results_a[sym] = run_validation_a(conn, kline_data[sym], sym, rng, analysis_end_ts)
 
     for sym in SYMBOLS:
-        results_b[sym] = run_validation_b(conn, kline_data[sym], sym, rng)
+        results_b[sym] = run_validation_b(conn, kline_data[sym], sym, rng, analysis_end_ts, oi_end_ts)
 
     for sym in SYMBOLS:
-        results_c[sym] = run_validation_c(conn, kline_data[sym], sym)
+        results_c[sym] = run_validation_c(conn, kline_data[sym], sym, analysis_end_ts)
 
     conn.close()
+
+    event_paths = sorted(glob.glob(os.path.join(OUT_DIR, "*_events_*.csv")))
+    event_hashes = {}
+    for path in event_paths:
+        with open(path, "rb") as f:
+            event_hashes[os.path.basename(path)] = hashlib.sha256(f.read()).hexdigest()
+    event_file_count = len(event_paths)
+    manifest = build_run_manifest(
+        requested_end=requested_end,
+        analysis_end_ts=analysis_end_ts,
+        kline_data=kline_data,
+        source_coverage=source_coverage,
+        source_event_file_count=event_file_count,
+        event_file_sha256=event_hashes,
+    )
+    with open(os.path.join(OUT_DIR, "run_manifest.json"), "w") as f:
+        json.dump(manifest, f, indent=2, sort_keys=True)
 
     # ---- console summary ----
     pd.set_option("display.width", 220)
