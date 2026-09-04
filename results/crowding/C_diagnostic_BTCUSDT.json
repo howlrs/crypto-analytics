@@ -8,7 +8,11 @@
     "pre30_bottom_bp": -0.5052292312475962,
     "post30_bottom_bp": 2.294153924765481
   },
-  "trial_strategy": null,
+  "trial_strategy": {
+    "enabled": false,
+    "reason": "disabled: a current-settlement funding percentile cannot be known before settlement; pre-settlement entries would leak it",
+    "max_abs_descriptive_signal_bp": 2.294153924765481
+  },
   "hour_distribution": {
     "0": 2038,
     "8": 2038,

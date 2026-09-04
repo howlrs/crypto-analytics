@@ -1,0 +1,97 @@
+{
+  "analysis_end_ts": 1785542340000,
+  "coverage_end_exclusive_ts": 1785542400000,
+  "event_file_sha256": {
+    "A2_contrarian_events_BTCUSDT_24h.csv": "f599a7949a4e7ace75ac9b6bfa82b2629efcc00d4ca61ecfd52fb11cb1fc37e5",
+    "A2_contrarian_events_BTCUSDT_72h.csv": "842cc93cf9c682e62dc24000fd23afd317625d36bd840867a9aba8dd979ff12a",
+    "A2_contrarian_events_ETHUSDT_24h.csv": "6f368760f4bc1840006e345431e4eee74633aff1a369cd9c06c9bc07de87059c",
+    "A2_contrarian_events_ETHUSDT_72h.csv": "fc55806ae7d4f8880edd8ef9bf00ed8de2ea0ccfc3d0faa3b31b6586f96f2c6a",
+    "A3_momentum_events_BTCUSDT_24h.csv": "ad3b7047eba2af389e8aa3a730573f0bec7ab856bbf4e957169e816f2e97bbb8",
+    "A3_momentum_events_BTCUSDT_72h.csv": "1fd8d332445b99c3664e48813c3ec09fc1e339e78ba17a1f75d2b8b1c9a83c01",
+    "A3_momentum_events_ETHUSDT_24h.csv": "36d6c662fc8ee1ee89251f125da9c078e7f9b93a8abf1396748c97d6457cd56f",
+    "A3_momentum_events_ETHUSDT_72h.csv": "46e46dd3951cfece66a8837caa8ad05b4c10ff1b97c6fc697210cfbce291d645",
+    "B2_deleverage_events_BTCUSDT_neg3pct.csv": "e49cbf2f1710f43bcea2f13001dacaf9537fae754a4a89446dd0232f208abf7f",
+    "B2_deleverage_events_BTCUSDT_neg5pct.csv": "390a19afc228f699bcbf7364faac963e3258039d5ebc26180ba73374ac5d1faf",
+    "B2_deleverage_events_ETHUSDT_neg3pct.csv": "40abfd5c75512d5a4bd6eaffad2d265ae0ce109632f4a623bb502712cd32acc8",
+    "B2_deleverage_events_ETHUSDT_neg5pct.csv": "d9abe3666d337766d03f7e37659bd772d99737fe5a13cd65b4d0f1fd456ddde0",
+    "B3_double_overheat_events_BTCUSDT_168h.csv": "62a587f69b535273b8c6208957eb99a8ef5d960d0c272fcb59475c678eff43c1",
+    "B3_double_overheat_events_BTCUSDT_24h.csv": "798c0ee3197970b8b47675a670b01fecc6a96b7985728aed455fddfbbfcbc845",
+    "B3_double_overheat_events_BTCUSDT_72h.csv": "f26850ef69e1f4d862a6feff06d1e4fb045ab6e96d48757100fcd12501824c15",
+    "B3_double_overheat_events_ETHUSDT_168h.csv": "2617f816a25bd7509ead34640ed76ddab45548e540705e584bf8872c8eb37927",
+    "B3_double_overheat_events_ETHUSDT_24h.csv": "8cb95c3727493d4d049da91d2de3852c10fec0e7f689cd25654d97360a5bdb71",
+    "B3_double_overheat_events_ETHUSDT_72h.csv": "648478c08d6c8f2518d289b7c3acfa4e7a0462127d815f341a5489735b0f6b93"
+  },
+  "event_schema": {
+    "c_trial_strategy": "disabled: current-settlement funding percentile is unavailable before settlement",
+    "event_columns": [
+      "ts",
+      "entry_ts",
+      "exit_ts",
+      "net_bp",
+      "year"
+    ],
+    "oi_funding_asof": "OI snapshot timestamp is backward-as-of joined (oi_signal_ts <= funding ts)",
+    "timing": "entry is the first 1m bar open strictly after decision ts; exit is at/after actual entry plus horizon"
+  },
+  "generated_at_utc": "2026-09-04T08:31:20Z",
+  "requested_end": 1785542340000,
+  "schema_version": 1,
+  "script": "backtests/crowding_signals.py",
+  "script_sha256": "4d13b3fe94c63d5005cae422a7373065a0bdb5c0b31bddb6ea7256300c934a8e",
+  "source_event_file_count": 18,
+  "sources": {
+    "BTCUSDT": {
+      "funding": {
+        "count": 6114,
+        "coverage_end_exclusive_ts": 1785542400000,
+        "max_ts": 1785513600000,
+        "min_ts": 1609459200002,
+        "tail_contiguous_start_ts": 1609459200002,
+        "unexpected_gap_count": 0
+      },
+      "kline": {
+        "count": 2934720,
+        "coverage_end_exclusive_ts": 1785542400000,
+        "max_ts": 1785542340000,
+        "min_ts": 1609459200000,
+        "tail_contiguous_start_ts": 1609459200000,
+        "unexpected_gap_count": 0
+      },
+      "oi": {
+        "count": 376567,
+        "coverage_end_exclusive_ts": 1785542400000,
+        "max_ts": 1785542100000,
+        "min_ts": 1672531200000,
+        "tail_contiguous_start_ts": 1781309100000,
+        "unexpected_gap_count": 156
+      }
+    },
+    "ETHUSDT": {
+      "funding": {
+        "count": 6114,
+        "coverage_end_exclusive_ts": 1785542400000,
+        "max_ts": 1785513600000,
+        "min_ts": 1609459200002,
+        "tail_contiguous_start_ts": 1609459200002,
+        "unexpected_gap_count": 0
+      },
+      "kline": {
+        "count": 2934720,
+        "coverage_end_exclusive_ts": 1785542400000,
+        "max_ts": 1785542340000,
+        "min_ts": 1609459200000,
+        "tail_contiguous_start_ts": 1609459200000,
+        "unexpected_gap_count": 0
+      },
+      "oi": {
+        "count": 376567,
+        "coverage_end_exclusive_ts": 1785542400000,
+        "max_ts": 1785542100000,
+        "min_ts": 1672531200000,
+        "tail_contiguous_start_ts": 1781309100000,
+        "unexpected_gap_count": 122
+      }
+    }
+  },
+  "statistical_warning": "Raw t-statistics, p-values, and null percentiles are non-confirmatory; strategy_robustness.py global-BY output is authoritative for inference."
+}

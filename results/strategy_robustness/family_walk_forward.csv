@@ -1,0 +1,11 @@
+fold_year,fold_type,family,variants,eligible_train_variants,eligible_test_variants,selected_variants,selected_with_positive_test,selected_with_fdr_test,median_train_mean_bp,median_test_mean_bp,monitoring_only
+2025,formal_oos,crowding_A2,4,4,4,0,0,0,16.88323158898605,-34.06856632678768,False
+2025,formal_oos,crowding_A3,4,4,4,0,0,0,-44.88323158898605,6.068566326787678,False
+2025,formal_oos,crowding_B2,8,8,8,0,0,0,52.317837416665384,-22.70544197466138,False
+2025,formal_oos,crowding_B3,6,0,4,0,0,0,-28.09141377650721,53.47187984354445,False
+2025,formal_oos,liq_reversion,324,192,237,0,0,0,-2.073991873505941,-29.811026743863863,False
+2026,monitoring_ytd,crowding_A2,4,4,4,0,0,0,0.6767316393369822,-4.781998622234317,True
+2026,monitoring_ytd,crowding_A3,4,4,4,0,0,0,-28.676731639336978,-23.21800137776568,True
+2026,monitoring_ytd,crowding_B2,8,8,6,0,0,0,28.558666722364343,-154.6698018658666,True
+2026,monitoring_ytd,crowding_B3,6,4,5,0,0,0,17.41611536626351,56.34144637936371,True
+2026,monitoring_ytd,liq_reversion,324,231,126,0,0,0,-15.923389243821113,-11.836739022934047,True
