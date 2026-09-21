@@ -1,4 +1,5 @@
 import unittest
+import sqlite3
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from contextlib import redirect_stderr
@@ -7,7 +8,7 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-from backtests.event_paths import MINUTE_MS, SUMMARY_COLUMNS, analyze_path, direction_for, main, write_outputs
+from backtests.event_paths import MINUTE_MS, SUMMARY_COLUMNS, analyze_path, audit_file, direction_for, main, write_outputs
 
 
 def bars(rows):
@@ -15,6 +16,17 @@ def bars(rows):
 
 
 class EventPathTests(unittest.TestCase):
+    def _db_with_simple_path(self, root: Path) -> Path:
+        db = root / "market.db"
+        with sqlite3.connect(db) as con:
+            con.execute("CREATE TABLE IF NOT EXISTS klines (venue, market, symbol, ts, open, high, low, close)")
+            con.executemany(
+                "INSERT INTO klines VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [("binance", "perp", "BTCUSDT", 0, 100, 101, 99, 100),
+                 ("binance", "perp", "BTCUSDT", MINUTE_MS, 101, 101, 101, 101)],
+            )
+        return db
+
     def test_short_excursions_use_linear_original_notional_math(self):
         data = bars([[0, 100, 110, 94, 105], [MINUTE_MS, 100, 100, 100, 100]])
         got = analyze_path(data, entry_ts=0, exit_ts=MINUTE_MS, direction="short", stop_bp=2_000, take_bp=2_000)
@@ -92,6 +104,50 @@ class EventPathTests(unittest.TestCase):
     def test_crowding_direction_mapping(self):
         self.assertEqual(direction_for(Path("A2_contrarian_events_BTCUSDT_24h.csv"), pd.Series({"leg": "top"})), "short")
         self.assertEqual(direction_for(Path("A3_momentum_events_ETHUSDT_24h.csv"), pd.Series({"leg": "bottom"})), "short")
+
+    def test_b2_row_horizons_are_separate_audit_and_summary_strategies(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "B2_deleverage_events_BTCUSDT_neg3pct.csv"
+            pd.DataFrame({"entry_ts": [0, 0], "exit_ts": [MINUTE_MS, MINUTE_MS],
+                          "horizon": ["24h", "72h"], "net_bp": [86.0, 86.0]}).to_csv(source, index=False)
+            ledger, rejected = audit_file(source, self._db_with_simple_path(root), 100, 100)
+            self.assertEqual(rejected, [])
+            self.assertEqual({row["strategy"] for row in ledger},
+                             {"B2_deleverage_BTCUSDT_neg3pct_24h", "B2_deleverage_BTCUSDT_neg3pct_72h"})
+            write_outputs(ledger, rejected, root / "report", inputs=[], db=Path(__file__), stop_bp=100, take_bp=100)
+            summary = pd.read_csv(root / "report" / "event_path_summary.csv")
+            self.assertEqual(set(summary.strategy), {row["strategy"] for row in ledger})
+            self.assertTrue((summary.events == 1).all())
+
+    def test_audit_rejects_bad_source_net_per_row_without_aborting_valid_rows(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "events_btc_long_x.csv"
+            pd.DataFrame({"entry_ts": [0] * 5, "exit_ts": [MINUTE_MS] * 5,
+                          "net_bp": ["", "nan", "inf", "not-a-number", "86"]}).to_csv(source, index=False)
+            ledger, rejected = audit_file(source, self._db_with_simple_path(root), 100, 100)
+            self.assertEqual(len(ledger), 5)
+            self.assertEqual(sum(row["path_complete"] for row in ledger), 1)
+            self.assertEqual({row["reason"] for row in rejected}, {"missing_source_net", "invalid_source_net"})
+            accepted = next(row for row in ledger if row["path_complete"])
+            self.assertEqual(accepted["source_net_bp"], "86")
+
+    def test_audit_rejects_missing_net_column_and_invalid_optional_source_price(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            no_net = root / "events_btc_long_missing.csv"
+            pd.DataFrame({"entry_ts": [0], "exit_ts": [MINUTE_MS]}).to_csv(no_net, index=False)
+            ledger, rejected = audit_file(no_net, self._db_with_simple_path(root), 100, 100)
+            self.assertEqual(ledger[0]["reason"], "missing_source_net")
+            self.assertEqual(rejected, ledger)
+
+            bad_price = root / "events_btc_long_bad-price.csv"
+            pd.DataFrame({"entry_ts": [0], "exit_ts": [MINUTE_MS], "net_bp": [86],
+                          "entry_px": ["not-a-price"]}).to_csv(bad_price, index=False)
+            ledger, rejected = audit_file(bad_price, self._db_with_simple_path(root), 100, 100)
+            self.assertEqual(ledger[0]["reason"], "invalid_source_entry_price")
+            self.assertEqual(rejected, ledger)
 
 
 if __name__ == "__main__":

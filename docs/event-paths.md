@@ -23,6 +23,10 @@ late, or incomplete rows are marked incomplete and recorded with a reason.
 When a source supplies `entry_px` and/or `exit_px`, those values must match the
 corresponding database opens. For a finite source net return, the reconstructed
 linear gross return must equal source net plus the source's 14bp round-trip cost.
+Every event must supply one finite numeric `net_bp` or `net_ret_bp`; missing,
+null, non-finite, or nonnumeric endpoint returns (and malformed optional endpoint
+prices) reject only that row, without preventing other rows in the same CSV from
+being audited.
 
 For both directions, excursion uses the source strategy's linear original-notional
 return: `sign * (price / entry - 1)`, where sign is +1 for long and -1 for short.
@@ -48,3 +52,7 @@ the rejected CSV is the reason-indexed subset. The manifest pins selected input
 file hashes and parameters, the database path/size/modification time, the script
 hash, and SHA-256 hashes of the generated CSV outputs. The output directory must
 be new or empty.
+
+B2 deleverage source files place 24h and 72h observations in one CSV. Their
+row-level `horizon` is appended to the audit strategy key, so its MAE/MFE,
+underwater, and barrier summaries remain separate by holding horizon.

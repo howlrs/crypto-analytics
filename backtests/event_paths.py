@@ -25,9 +25,21 @@ SUMMARY_COLUMNS = ["strategy", "symbol", "direction", "events", "valid_path_coun
                    "underwater_minutes_p50", "any_barrier_rate", "stop_rate", "take_rate", "ambiguous_rate"]
 
 
-def strategy_name(path: Path) -> str:
+def strategy_name(path: Path, row: pd.Series | None = None) -> str:
+    """Return a source strategy key, retaining a row-level horizon when needed.
+
+    B2 stores its 24h and 72h observations in the same filename.  Its horizon
+    is therefore part of the event identity, rather than merely display
+    metadata.  Other producers commonly encode the horizon in the filename;
+    avoid duplicating it when they also retain a ``horizon`` column.
+    """
     stem = path.stem
-    return stem.removeprefix("events_").replace("_events_", "_")
+    strategy = stem.removeprefix("events_").replace("_events_", "_")
+    if row is not None and "horizon" in row and pd.notna(row["horizon"]):
+        horizon = str(row["horizon"]).strip()
+        if horizon and horizon.lower() not in strategy.lower():
+            strategy = f"{strategy}_{horizon}"
+    return strategy
 
 
 def symbol_for(path: Path) -> str:
@@ -161,11 +173,32 @@ def load_bars(db: Path, symbol: str, start: int, end: int) -> pd.DataFrame:
         )
 
 
-def _source_net(row: pd.Series) -> float:
+def _source_net(row: pd.Series) -> tuple[object, float, str]:
+    """Read the source endpoint return without allowing a malformed row to abort a file."""
     for field in ("net_bp", "net_ret_bp"):
         if field in row and pd.notna(row[field]):
-            return float(row[field])
-    return np.nan
+            raw = row[field]
+            try:
+                value = float(raw)
+            except (TypeError, ValueError, OverflowError):
+                return raw, np.nan, "invalid_source_net"
+            if not np.isfinite(value):
+                return raw, np.nan, "invalid_source_net"
+            return raw, value, ""
+    return np.nan, np.nan, "missing_source_net"
+
+
+def _source_price(row: pd.Series, field: str, label: str) -> tuple[float, str]:
+    """Parse an optional source endpoint price, returning a row-level reason."""
+    if field not in row or pd.isna(row[field]):
+        return np.nan, ""
+    try:
+        value = float(row[field])
+    except (TypeError, ValueError, OverflowError):
+        return np.nan, f"invalid_source_{label}_price"
+    if not np.isfinite(value) or value <= 0:
+        return np.nan, f"invalid_source_{label}_price"
+    return value, ""
 
 
 def audit_file(path: Path, db: Path, stop_bp: float, take_bp: float) -> tuple[list[dict], list[dict]]:
@@ -184,10 +217,11 @@ def audit_file(path: Path, db: Path, stop_bp: float, take_bp: float) -> tuple[li
         record = record | {"path_complete": False, "reason": reason}
         metrics.append(record)
         rejected.append(record)
-    valid_rows: list[tuple[int, pd.Series, int, int, str]] = []
+    valid_rows: list[tuple[int, pd.Series, int, int, str, float, float, float]] = []
     for index, row in events.iterrows():
-        base = {"source_file": str(path), "strategy": strategy_name(path), "symbol": symbol,
-                "row_number": int(index), "source_net_bp": _source_net(row)}
+        source_net_raw, source_net, net_reason = _source_net(row)
+        base = {"source_file": str(path), "strategy": strategy_name(path, row), "symbol": symbol,
+                "row_number": int(index), "source_net_bp": source_net_raw}
         try:
             entry, exit_ = int(row.entry_ts), int(row.exit_ts)
         except (TypeError, ValueError, OverflowError):
@@ -201,29 +235,37 @@ def audit_file(path: Path, db: Path, stop_bp: float, take_bp: float) -> tuple[li
             reject(base | {"entry_ts": entry, "exit_ts": exit_}, "unaligned_timestamp"); continue
         if not direction:
             reject(base | {"entry_ts": entry, "exit_ts": exit_}, "unknown_direction"); continue
-        valid_rows.append((int(index), row, entry, exit_, direction))
+        if net_reason:
+            reject(base | {"entry_ts": entry, "exit_ts": exit_, "direction": direction}, net_reason); continue
+        source_entry_px, entry_price_reason = _source_price(row, "entry_px", "entry")
+        if entry_price_reason:
+            reject(base | {"entry_ts": entry, "exit_ts": exit_, "direction": direction}, entry_price_reason); continue
+        source_exit_px, exit_price_reason = _source_price(row, "exit_px", "exit")
+        if exit_price_reason:
+            reject(base | {"entry_ts": entry, "exit_ts": exit_, "direction": direction}, exit_price_reason); continue
+        valid_rows.append((int(index), row, entry, exit_, direction, source_net, source_entry_px, source_exit_px))
     if not valid_rows:
         return metrics, rejected
     bars = load_bars(db, symbol, min(x[2] for x in valid_rows), max(x[3] for x in valid_rows))
-    for index, row, entry, exit_, direction in valid_rows:
-        base = {"source_file": str(path), "strategy": strategy_name(path), "symbol": symbol,
+    for index, row, entry, exit_, direction, source_net, source_entry_px, source_exit_px in valid_rows:
+        source_net_raw, _, _ = _source_net(row)
+        base = {"source_file": str(path), "strategy": strategy_name(path, row), "symbol": symbol,
                 "row_number": index, "entry_ts": entry, "exit_ts": exit_, "direction": direction,
-                "source_net_bp": _source_net(row)}
+                "source_net_bp": source_net_raw}
         entry_open = bars.loc[bars.ts == entry, "open"]
         exit_open = bars.loc[bars.ts == exit_, "open"]
         if (len(entry_open) != 1 or len(exit_open) != 1 or not np.isfinite(entry_open.iloc[0]) or
                 not np.isfinite(exit_open.iloc[0]) or entry_open.iloc[0] <= 0 or exit_open.iloc[0] <= 0):
             reject(base, "missing_or_invalid_endpoint_open"); continue
-        for field, actual, label in (("entry_px", float(entry_open.iloc[0]), "entry"),
-                                     ("exit_px", float(exit_open.iloc[0]), "exit")):
-            if field in row and pd.notna(row[field]) and not np.isclose(float(row[field]), actual, rtol=0, atol=1e-9):
+        for source_price, actual, label in ((source_entry_px, float(entry_open.iloc[0]), "entry"),
+                                            (source_exit_px, float(exit_open.iloc[0]), "exit")):
+            if np.isfinite(source_price) and not np.isclose(source_price, actual, rtol=0, atol=1e-9):
                 reject(base | {"entry_px": float(entry_open.iloc[0]), "exit_open_px": float(exit_open.iloc[0])},
                        f"source_{label}_price_mismatch"); break
         else:
-            source_net = _source_net(row)
             sign = 1.0 if direction == "long" else -1.0
             reconstructed_gross_bp = sign * (float(exit_open.iloc[0]) / float(entry_open.iloc[0]) - 1.0) * 10_000.0
-            if np.isfinite(source_net) and not np.isclose(reconstructed_gross_bp, source_net + 14.0, rtol=0, atol=1e-6):
+            if not np.isclose(reconstructed_gross_bp, source_net + 14.0, rtol=0, atol=1e-6):
                 reject(base | {"entry_px": float(entry_open.iloc[0]), "exit_open_px": float(exit_open.iloc[0]),
                                "reconstructed_gross_bp": reconstructed_gross_bp}, "source_net_mismatch"); continue
             result = analyze_path(bars, entry_ts=entry, exit_ts=exit_, direction=direction,
