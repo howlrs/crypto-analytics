@@ -225,6 +225,70 @@ class ObservationHistoryTest(unittest.TestCase):
         self.assertFalse(result["reconciled"])
         self.assertEqual(result["known_subtotal_delta_notional"], 100)
 
+    def test_first_frame_has_no_invented_baseline_but_next_frame_is_comparable(self):
+        hl_watch.CANDIDATES.touch("same", "BTC")
+        self.observe("same", self.position(), 1000)
+        frame_id, first = self.freeze(2000)
+        d = first["coins"]["BTC"]["decomposition"]
+        self.assertFalse(d["comparison_available"])
+        self.assertEqual(d["comparison_unavailable_reason"], "no_previous_observation")
+        self.assertIsNone(d["delta_notional"])
+        self.assertIsNone(d["join_notional"])
+        self.assertFalse(d["reconciled"])
+        self.assertTrue(d["valuation_complete"])
+        self.assertEqual(d["unknown_valuation_count"], 0)
+        self.assertEqual(sum(first["coins"]["BTC"]["buckets"].values()), 1000)
+        self.assertFalse(first["cohort_changes"]["comparison_available"])
+        self.assertNotIn("joined", first["cohort_changes"])
+        output = io.StringIO()
+        with patch.object(hl_watch, "hl_info", side_effect=AssertionError("replay must not fetch")), contextlib.redirect_stdout(output):
+            hl_watch.cmd_replay(SimpleNamespace(frame_id=frame_id, json=False, include_addresses=False))
+        self.assertIn("comparison unavailable", output.getvalue())
+        _, second = self.freeze(3000)
+        d = second["coins"]["BTC"]["decomposition"]
+        self.assertTrue(d["comparison_available"])
+        self.assertEqual(d["delta_notional"], 0)
+        self.assertEqual(d["join_notional"], 0)
+        self.assertTrue(d["reconciled"])
+
+        unknown = hl_watch._frame_decomposition(None, [{"user": "unknown", "position_value": None}])
+        self.assertFalse(unknown["valuation_complete"])
+        self.assertEqual(unknown["unknown_valuation_count"], 1)
+        self.assertFalse(unknown["comparison_available"])
+        self.assertIsNone(unknown["delta_notional"])
+
+    def test_observed_empty_baseline_is_distinct_from_missing_history(self):
+        self.freeze(1000)
+        hl_watch.CANDIDATES.touch("new", "BTC")
+        self.observe("new", self.position(), 2000)
+        _, frame = self.freeze(3000)
+        d = frame["coins"]["BTC"]["decomposition"]
+        self.assertTrue(d["comparison_available"])
+        self.assertEqual(d["join_notional"], 1000)
+        self.assertEqual(d["delta_notional"], 1000)
+        self.assertTrue(d["reconciled"])
+
+    def test_coin_discovery_counts_and_new_coin_comparison_are_explicit(self):
+        hl_watch.CANDIDATES.touch("btc_user", "BTC")
+        hl_watch.CANDIDATES.touch("eth_user", "ETH")
+        self.observe("btc_user", self.position(), 1000)
+        self.observe("eth_user", None, 1000)
+        self.freeze(2000)
+        with patch.object(hl_watch, "now_ms", return_value=3000), patch.object(hl_watch, "fetch_all_mids", return_value={"BTC": 100., "ETH": 200.}):
+            hl_watch.aggregate_flow(self.conn, ["BTC", "ETH"])
+        frame = json.loads(self.conn.execute("SELECT frame_json FROM observation_frames ORDER BY frame_id DESC LIMIT 1").fetchone()[0])
+        public = hl_watch.public_observation_frame(frame)
+        for coin in ("BTC", "ETH"):
+            quality = public["coins"][coin]["freshness"]
+            self.assertEqual(quality["candidate_denominator"], 2)
+            self.assertEqual(quality["fresh_success_rate"], .5)
+            self.assertEqual(quality["discovery_candidate_count"], 1)
+        self.assertEqual(public["coins"]["BTC"]["freshness"]["discovery_fresh_success_rate"], 1)
+        self.assertEqual(public["coins"]["ETH"]["freshness"]["discovery_fresh_success_rate"], 0)
+        self.assertTrue(frame["coins"]["BTC"]["decomposition"]["comparison_available"])
+        self.assertFalse(frame["coins"]["ETH"]["decomposition"]["comparison_available"])
+        self.assertNotIn("btc_user", json.dumps(public))
+
 
 if __name__ == "__main__":
     unittest.main()

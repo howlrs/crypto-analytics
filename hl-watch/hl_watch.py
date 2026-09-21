@@ -828,6 +828,22 @@ def _frame_decomposition(previous, current, stale_users=(), common_cohort=(), ol
     Values are the API's reported positionValue. A common-position value change
     can include mark-to-market; it is not necessarily a trade or capital flow.
     """
+    # None means no saved baseline; [] means a genuinely observed empty one.
+    # Do not turn collection start (or a newly tracked coin) into invented flow.
+    if previous is None:
+        unknown_values = sum(p.get("position_value") is None or
+                             not math.isfinite(p["position_value"]) for p in current)
+        return {
+            "comparison_available": False, "comparison_unavailable_reason": "no_previous_observation",
+            "join_notional": None, "exit_notional": None, "stale_notional": None,
+            "common_cohort_position_change": None, "common_closed_count": None,
+            "bin_changed_count": None, "fixed_old_mid_bin_changed_count": None,
+            "repricing_bin_changed_count": None, "delta_notional": None,
+            "known_subtotal_delta_notional": None, "per_bin": {}, "residual_notional": None,
+            "price_comparison_available": False, "valuation_complete": not unknown_values,
+            "unknown_valuation_count": unknown_values,
+            "reconciled": False,
+        }
     old = {p["user"]: p for p in (previous or [])}
     new = {p["user"]: p for p in current}
     stale_users = set(stale_users)
@@ -868,6 +884,7 @@ def _frame_decomposition(previous, current, stale_users=(), common_cohort=(), ol
                          for p in [*old.values(), *new.values()])
     known_delta = sum(new_all.values()) - sum(old_all.values())
     return {
+        "comparison_available": True, "comparison_unavailable_reason": None,
         "join_notional": sum(joins.values()), "exit_notional": sum(exits.values()),
         "stale_notional": sum(stale.values()),
         "common_cohort_position_change": sum(common_new.values()) - sum(common_old.values()),
@@ -921,6 +938,7 @@ def save_observation_frame(conn, coins, ts_min, mids=None, mid_observed_ts=None)
             """, (coin,)).fetchall()
         # clearinghouseState observes every coin for each target address.
         candidate_users = [x["user"] for x in frame["cohort"]]
+        discovery_users = {x["user"] for x in frame["cohort"] if coin in x.get("coins", [])}
         statuses = {"success": 0, "empty": 0, "failure": 0, "unobserved": 0}
         candidate_states = []
         candidate_ages = []
@@ -983,6 +1001,11 @@ def save_observation_frame(conn, coins, ts_min, mids=None, mid_observed_ts=None)
             "mid": {"value": mark, "observed_ts": now if mark is not None else None, "price_type": "mid"},
             "freshness": {"candidate_denominator": len(candidate_users), "attempt_status": statuses,
                           "denominator_definition": "all current candidate addresses; every account request covers all coins",
+                          "discovery_candidate_count": len(discovery_users),
+                          "discovery_fresh_success_addresses": len(discovery_users & fresh_users),
+                          "discovery_fresh_success_rate": (len(discovery_users & fresh_users) / len(discovery_users)
+                                                           if discovery_users else None),
+                          "discovery_denominator_definition": "current candidates discovered for this coin; may overlap across coins",
                           "stale_candidates": sum(s["success_age_ms"] is not None and s["success_age_ms"] > config["fresh_min"] * 60 * 1000 for s in candidate_states),
                           "fresh_success_addresses": fresh_success_addresses,
                           "fresh_success_rate": fresh_success_addresses / len(candidate_users) if candidate_users else None,
@@ -1004,12 +1027,16 @@ def save_observation_frame(conn, coins, ts_min, mids=None, mid_observed_ts=None)
                 old_mid, mark, config, previous.get("ladder_config")),
         }
         frame["coins"][coin]["mid"]["observed_ts"] = (mid_observed_ts or now) if mark is not None else None
-    frame["cohort_changes"] = {"joined": sorted(cohort - old_cohort),
+    frame["cohort_changes"] = {"comparison_available": True, "joined": sorted(cohort - old_cohort),
                                 "exited": [{"user": user, "departure_observed_ts": now}
                                            for user in sorted((old_cohort - cohort) - stale)],
                                 "stale": [{"user": user, "departure_observed_ts": now} for user in sorted(stale)],
                                 "reconciled": len(cohort) == len(old_cohort) + len(cohort - old_cohort)
                                 - len((old_cohort - cohort) - stale) - len(stale)}
+    if previous_row is None:
+        frame["cohort_changes"] = {"comparison_available": False,
+                                   "comparison_unavailable_reason": "no_previous_observation",
+                                   "initial_cohort_count": len(cohort), "reconciled": False}
     conn.execute(
         "INSERT INTO observation_frames(ts_min, created_ts, coins_json, candidate_json, frame_json) VALUES (?,?,?,?,?)",
         (ts_min, now, json.dumps(coins, sort_keys=True), json.dumps(frame["cohort"], sort_keys=True),
@@ -1248,6 +1275,10 @@ def cmd_replay(args):
     print(frame.get("interpretation", "Distances use saved mid, not the liquidation-trigger mark."))
     for coin, data in frame.get("coins", {}).items():
         d = data["decomposition"]
+        if not d.get("comparison_available", True):
+            print(f"{coin}: mid={data['mid']} ladder={len(data['ladder_positions'])} "
+                  "comparison unavailable: no previous observation (current snapshot only)")
+            continue
         print(f"{coin}: mid={data['mid']} ladder={len(data['ladder_positions'])} "
               f"join={d['join_notional']:.2f} exit={d['exit_notional']:.2f} stale={d['stale_notional']:.2f} "
               f"bin_changes={d['bin_changed_count']} reconciled={d['reconciled']}")

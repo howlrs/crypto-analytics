@@ -28,6 +28,17 @@ JSON の既定出力は集計値です。候補アドレス、個別 ladder 入�
 
 再生用の bucket 差分は、まず前フレームの mid と設定に固定して cohort 加入、離脱、stale、共通コホートの reported position value 変化を加算し、次に新しい mid と設定への bin 再配置を加えます。各 bin は residual を持ち、加算の検算が可能です。共通候補アドレスでポジションが空になった場合は address の離脱ではなく共通コホートの position change です。
 
+初回フレーム、または前フレームに存在しなかったコインは `comparison_available=false` とし、
+変化額は `null` にします。観測開始前をゼロ残高や空コホートとみなして加入・増加を作りません。
+現在の snapshot/bucket 自体は表示できます。実際に保存した空の前フレームがある場合は、
+その空状態からの変化を比較できます。
+
+各コインの `discovery_candidate_count` は、そのコインで発見された現在候補の件数です。
+`discovery_fresh_success_addresses` と `discovery_fresh_success_rate` はその集合に限った鮮度指標です。
+一方、従来の `candidate_denominator` / `fresh_success_rate` は全候補アドレスを分母に維持します。
+1回の口座取得が全コインを観測するためで、両方の分母の定義を保存します。
+コイン別の発見集合は重複し得るため、件数の和を全候補数としてはいけません。
+
 `position_value` は API が報告する評価額です。共通コホートの value 変化には mark-to-market が含まれ得るため、純粋な売買数量や資金フローと解釈してはいけません。
 
 評価額が不明な入力があれば `valuation_complete=false` とし、全体の `delta_notional` は
