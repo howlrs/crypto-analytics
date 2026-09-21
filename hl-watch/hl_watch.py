@@ -22,6 +22,7 @@ import sqlite3
 import sys
 import threading
 import time
+import math
 import urllib.error
 import urllib.request
 from collections import OrderedDict
@@ -236,6 +237,24 @@ CREATE INDEX IF NOT EXISTS idx_twap_orders_user ON twap_orders(user);
 CREATE INDEX IF NOT EXISTS idx_twap_orders_status ON twap_orders(status);
 CREATE INDEX IF NOT EXISTS idx_twap_fills_twapid ON twap_fills(twap_id);
 CREATE INDEX IF NOT EXISTS idx_watch_positions_user ON watch_positions(user);
+-- Each clearinghouse request is retained, including successful empty results
+-- and failures.  A position row is current only if it belongs to the latest
+-- successful account attempt for that user.
+CREATE TABLE IF NOT EXISTS position_attempts(
+  attempt_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user TEXT NOT NULL, observed_ts INTEGER NOT NULL, api_ts INTEGER,
+  status TEXT NOT NULL CHECK(status IN ('success','empty','failure')),
+  error TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_position_attempts_user_ts ON position_attempts(user, observed_ts);
+-- Frozen, append-only inputs and outputs of every aggregation pass.  JSON is
+-- deliberate here: the frame can be replayed after live tables have changed.
+CREATE TABLE IF NOT EXISTS observation_frames(
+  frame_id INTEGER PRIMARY KEY AUTOINCREMENT,
+  ts_min INTEGER NOT NULL, created_ts INTEGER NOT NULL,
+  coins_json TEXT NOT NULL, candidate_json TEXT NOT NULL, frame_json TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_observation_frames_ts ON observation_frames(ts_min);
 """
 
 
@@ -298,13 +317,20 @@ class CandidateSet:
         self._ttl_s = ttl_s
         self._lock = threading.Lock()
         self._data = OrderedDict()  # addr -> last_seen_ts (epoch seconds)
+        self._recently_stale = set()
 
-    def touch(self, addr):
+    def touch(self, addr, coin=None):
         now = time.time()
         with self._lock:
+            self._recently_stale.discard(addr)
             if addr in self._data:
                 self._data.move_to_end(addr)
-            self._data[addr] = now
+            previous = self._data.get(addr)
+            coins = set(previous["coins"]) if isinstance(previous, dict) else set()
+            first_seen = previous["first_seen_ts"] if isinstance(previous, dict) else now
+            if coin:
+                coins.add(coin)
+            self._data[addr] = {"ts": now, "first_seen_ts": first_seen, "coins": coins}
             while len(self._data) > self._max_size:
                 self._data.popitem(last=False)
 
@@ -312,15 +338,27 @@ class CandidateSet:
         now = time.time()
         removed = 0
         with self._lock:
-            stale = [a for a, ts in self._data.items() if now - ts > self._ttl_s]
+            stale = [a for a, value in self._data.items() if now - value["ts"] > self._ttl_s]
             for a in stale:
                 del self._data[a]
+                self._recently_stale.add(a)
                 removed += 1
         return removed
 
     def snapshot(self):
         with self._lock:
             return list(self._data.keys())
+
+    def snapshot_with_coins(self):
+        with self._lock:
+            return [{"user": addr, "coins": sorted(value["coins"]), "first_seen_ts": value["first_seen_ts"], "last_seen_ts": value["ts"]}
+                    for addr, value in self._data.items()]
+
+    def drain_stale(self):
+        with self._lock:
+            stale = sorted(self._recently_stale)
+            self._recently_stale.clear()
+            return stale
 
 
 CANDIDATES = CandidateSet()
@@ -347,7 +385,7 @@ def discover_candidates(coin):
         for addr in users:
             if not addr:
                 continue
-            CANDIDATES.touch(addr)
+            CANDIDATES.touch(addr, coin)
             n += 1
     return n
 
@@ -542,11 +580,33 @@ def check_user_twaps(conn, user):
 # ステップ5: 対象者スナップショット (clearinghouseState)
 # ---------------------------------------------------------------------------
 def snapshot_position(conn, user):
-    resp = hl_info({"type": "clearinghouseState", "user": user})
-    if not resp:
-        return
+    try:
+        resp = hl_info({"type": "clearinghouseState", "user": user})
+    except Exception as exc:
+        resp = None
+        request_error = str(exc)
+    else:
+        request_error = "empty or invalid API response"
     ts = now_ms()
+    # A failed request must be distinguished from a confirmed empty account.
+    # It never invalidates the previous successful account observation.
+    if not isinstance(resp, dict) or not isinstance(resp.get("assetPositions"), list):
+        with DB_LOCK:
+            ts = next_position_attempt_ts(conn, user, ts)
+            conn.execute(
+                "INSERT INTO position_attempts(user, observed_ts, api_ts, status, error) VALUES (?,?,?,?,?)",
+                (user, ts, None, "failure", request_error),
+            )
+            conn.commit()
+        return
+    api_ts = resp.get("time") or resp.get("timestamp")
+    try:
+        api_ts = int(api_ts) if api_ts is not None else None
+    except (TypeError, ValueError):
+        api_ts = None
     margin = resp.get("marginSummary") or {}
+    if not isinstance(margin, dict):
+        margin = {}
     acct_value = margin.get("accountValue")
     try:
         acct_value = float(acct_value) if acct_value is not None else None
@@ -556,6 +616,14 @@ def snapshot_position(conn, user):
     positions = resp.get("assetPositions") or []
     rows = []
     for ap in positions:
+        if (not isinstance(ap, dict) or not isinstance(ap.get("position"), dict)
+                or not isinstance(ap["position"].get("coin"), str) or not ap["position"]["coin"]):
+            with DB_LOCK:
+                ts = next_position_attempt_ts(conn, user, ts)
+                conn.execute("INSERT INTO position_attempts(user, observed_ts, api_ts, status, error) VALUES (?,?,?,?,?)",
+                             (user, ts, api_ts, "failure", "malformed assetPositions entry"))
+                conn.commit()
+            return
         pos = ap.get("position") or {}
         coin = pos.get("coin")
         if not coin:
@@ -577,23 +645,73 @@ def snapshot_position(conn, user):
             liq_px = float(liq_px_raw) if liq_px_raw is not None else None
         except (TypeError, ValueError):
             liq_px = None
-        lev = (pos.get("leverage") or {}).get("value")
+        leverage = pos.get("leverage") or {}
+        if not isinstance(leverage, dict):
+            leverage = {}
+        lev = leverage.get("value")
         try:
             lev = float(lev) if lev is not None else None
         except (TypeError, ValueError):
             lev = None
-        lev_type = (pos.get("leverage") or {}).get("type")
+        lev_type = leverage.get("type")
+        szi, entry_px, position_value, liq_px, lev, acct_value = (
+            value if value is not None and math.isfinite(value) else None
+            for value in (szi, entry_px, position_value, liq_px, lev, acct_value)
+        )
+        if position_value is not None and position_value < 0:
+            position_value = None
+        if liq_px is not None and liq_px <= 0:
+            liq_px = None
         rows.append((user, ts, coin, szi, entry_px, position_value, liq_px, lev, lev_type, acct_value))
 
-    if not rows:
-        return
     with DB_LOCK:
-        conn.executemany(
-            "INSERT OR IGNORE INTO watch_positions(user, ts, coin, szi, entry_px, position_value, "
-            "liq_px, lev, lev_type, acct_value) VALUES (?,?,?,?,?,?,?,?,?,?)",
-            rows,
+        ts = next_position_attempt_ts(conn, user, ts)
+        # Keep the rows and their attempt in the same unique observation tick.
+        rows = [(user, ts, coin, szi, entry_px, position_value, liq_px, lev, lev_type, acct_value)
+                for _, _, coin, szi, entry_px, position_value, liq_px, lev, lev_type, acct_value in rows]
+        conn.execute(
+            "INSERT INTO position_attempts(user, observed_ts, api_ts, status) VALUES (?,?,?,?)",
+            (user, ts, api_ts, "success" if rows else "empty"),
         )
+        if rows:
+            conn.executemany(
+                "INSERT OR IGNORE INTO watch_positions(user, ts, coin, szi, entry_px, position_value, "
+                "liq_px, lev, lev_type, acct_value) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                rows,
+            )
         conn.commit()
+
+
+def next_position_attempt_ts(conn, user, proposed_ts):
+    """Avoid same-millisecond account reads reusing a position timestamp."""
+    row = conn.execute("SELECT MAX(observed_ts) FROM position_attempts WHERE user=?", (user,)).fetchone()
+    previous = row[0] if row else None
+    return max(proposed_ts, (previous + 1) if previous is not None else proposed_ts)
+
+
+def latest_position_cte():
+    """SQL CTE for positions from each user's latest successful account read.
+
+    A later success (including an empty account or one omitting a closed coin)
+    suppresses all older rows; failures intentionally do not.
+    """
+    return """
+        WITH latest_account AS (
+            SELECT user, MAX(observed_ts) AS observed_ts
+            FROM position_attempts WHERE status IN ('success', 'empty') GROUP BY user
+        ), attempted_positions AS (
+            SELECT wp.* FROM watch_positions wp
+            JOIN latest_account la ON la.user=wp.user AND la.observed_ts=wp.ts
+        ), legacy_positions AS (
+            SELECT wp.* FROM watch_positions wp
+            JOIN (SELECT user, coin, MAX(ts) AS ts FROM watch_positions GROUP BY user, coin) old
+              ON old.user=wp.user AND old.coin=wp.coin AND old.ts=wp.ts
+            WHERE NOT EXISTS (SELECT 1 FROM position_attempts pa WHERE pa.user=wp.user
+                              AND pa.status IN ('success', 'empty'))
+        ), latest_positions AS (
+            SELECT * FROM attempted_positions UNION ALL SELECT * FROM legacy_positions
+        )
+    """
 
 
 # ---------------------------------------------------------------------------
@@ -602,6 +720,13 @@ def snapshot_position(conn, user):
 def aggregate_flow(conn, coins):
     ts_min = (now_ms() // 60000) * 60000
     five_min_ago = now_ms() - 5 * 60 * 1000
+    # Price is an independently observed allMids input, never inferred from fills.
+    try:
+        mids = fetch_all_mids()
+    except Exception as exc:
+        log(f"allMids unavailable for observation: {type(exc).__name__}")
+        mids = {}
+    mid_observed_ts = now_ms()
     with DB_LOCK:
         for coin in coins:
             cur = conn.execute(
@@ -657,8 +782,266 @@ def aggregate_flow(conn, coins):
                     sell_remaining_usd if sell_has_declared else None,
                 ),
             )
+        save_observation_frame(conn, coins, ts_min, mids, mid_observed_ts)
         conn.commit()
     log(f"aggregated twap_flow for ts_min={ts_min} coins={coins}")
+
+
+def _frame_bin(szi, liq_px, mark, band_pct, range_pct):
+    """Return a replayable ladder bin label, or None when it is not eligible."""
+    if (not szi or liq_px is None or not mark or mark <= 0
+            or not all(math.isfinite(x) for x in (szi, liq_px, mark))):
+        return None
+    pct = (liq_px - mark) / mark * 100.0
+    if (szi > 0 and pct >= 0) or (szi < 0 and pct <= 0):
+        return None
+    if abs(pct) > range_pct:
+        return "outside"
+    index = min(int(abs(pct) / band_pct), max(int(round(range_pct / band_pct)), 1) - 1)
+    return f"{'down' if szi > 0 else 'up'}:{index}"
+
+
+def _frame_buckets(positions, mid, config):
+    """Include explicit exclusion buckets so notional never silently vanishes."""
+    totals = {}
+    for p in positions:
+        value = p.get("position_value")
+        if value is None or not math.isfinite(value) or value < 0:
+            continue  # Counted separately as an unknown valuation, never zero.
+        if value < config.get("min_usd", 0):
+            label = "excluded_below_minimum"
+        elif p.get("liq_px") is None:
+            label = "excluded_null_liquidation"
+        elif mid is None or not math.isfinite(mid) or mid <= 0:
+            label = "unknown_mid"
+        else:
+            label = _frame_bin(p.get("szi"), p.get("liq_px"), mid,
+                               config.get("band_pct", 1), config.get("range_pct", 30)) or "excluded_direction"
+        totals[label] = totals.get(label, 0.0) + value
+    return totals
+
+
+def _frame_decomposition(previous, current, stale_users=(), common_cohort=(), old_mark=None,
+                         new_mark=None, config=None, previous_config=None):
+    """Per-bin additive change: cohort/positions at old mid, then re-bin at new mid.
+
+    Values are the API's reported positionValue. A common-position value change
+    can include mark-to-market; it is not necessarily a trade or capital flow.
+    """
+    # None means no saved baseline; [] means a genuinely observed empty one.
+    # Do not turn collection start (or a newly tracked coin) into invented flow.
+    if previous is None:
+        unknown_values = sum(p.get("position_value") is None or
+                             not math.isfinite(p["position_value"]) for p in current)
+        return {
+            "comparison_available": False, "comparison_unavailable_reason": "no_previous_observation",
+            "join_notional": None, "exit_notional": None, "stale_notional": None,
+            "common_cohort_position_change": None, "common_closed_count": None,
+            "bin_changed_count": None, "fixed_old_mid_bin_changed_count": None,
+            "repricing_bin_changed_count": None, "delta_notional": None,
+            "known_subtotal_delta_notional": None, "per_bin": {}, "residual_notional": None,
+            "price_comparison_available": False, "valuation_complete": not unknown_values,
+            "unknown_valuation_count": unknown_values,
+            "reconciled": False,
+        }
+    old = {p["user"]: p for p in (previous or [])}
+    new = {p["user"]: p for p in current}
+    stale_users = set(stale_users)
+    common_cohort = set(common_cohort) - stale_users
+    config = config or {"band_pct": 1, "range_pct": 30, "min_usd": 0}
+    fixed = previous_config or config
+    def subset(mapping, users):
+        return [p for u, p in mapping.items() if u in users]
+    def amounts(mapping, users, mid, cfg):
+        return _frame_buckets(subset(mapping, users), mid, cfg)
+    old_all = _frame_buckets(old.values(), old_mark, fixed)
+    new_fixed = _frame_buckets(new.values(), old_mark, fixed)
+    new_all = _frame_buckets(new.values(), new_mark, config)
+    joins = amounts(new, set(new) - common_cohort, old_mark, fixed)
+    exits = amounts(old, set(old) - common_cohort - stale_users, old_mark, fixed)
+    stale = amounts(old, stale_users, old_mark, fixed)
+    common_old = amounts(old, common_cohort, old_mark, fixed)
+    common_new = amounts(new, common_cohort, old_mark, fixed)
+    per_bin = {}
+    for label in sorted(set(old_all) | set(new_fixed) | set(new_all)):
+        delta = new_all.get(label, 0) - old_all.get(label, 0)
+        parts = {"joins_or_refreshed": joins.get(label, 0), "departures": -exits.get(label, 0),
+                 "staleness": -stale.get(label, 0),
+                 "common_position_change_fixed_mid": common_new.get(label, 0) - common_old.get(label, 0),
+                 "mid_or_bin_change": new_all.get(label, 0) - new_fixed.get(label, 0)}
+        residual = delta - sum(parts.values())
+        per_bin[label] = {"old_notional": old_all.get(label, 0), "new_notional": new_all.get(label, 0),
+                          "delta_notional": delta, **parts, "residual_notional": residual}
+    retained = set(old) & set(new)
+    bin_changed = sum(_frame_buckets([old[u]], old_mark, fixed).keys() !=
+                      _frame_buckets([new[u]], new_mark, config).keys() for u in retained)
+    fixed_changed = sum(_frame_buckets([old[u]], old_mark, fixed).keys() !=
+                        _frame_buckets([new[u]], old_mark, fixed).keys() for u in retained)
+    repriced = sum(_frame_buckets([new[u]], old_mark, fixed).keys() !=
+                   _frame_buckets([new[u]], new_mark, config).keys() for u in retained)
+    residual = sum(p["residual_notional"] for p in per_bin.values())
+    unknown_values = sum(p.get("position_value") is None or not math.isfinite(p["position_value"])
+                         for p in [*old.values(), *new.values()])
+    known_delta = sum(new_all.values()) - sum(old_all.values())
+    return {
+        "comparison_available": True, "comparison_unavailable_reason": None,
+        "join_notional": sum(joins.values()), "exit_notional": sum(exits.values()),
+        "stale_notional": sum(stale.values()),
+        "common_cohort_position_change": sum(common_new.values()) - sum(common_old.values()),
+        "common_closed_count": len((set(old) - set(new)) & common_cohort),
+        "bin_changed_count": bin_changed, "fixed_old_mid_bin_changed_count": fixed_changed,
+        "repricing_bin_changed_count": repriced,
+        "delta_notional": known_delta if not unknown_values else None,
+        "known_subtotal_delta_notional": known_delta,
+        "per_bin": per_bin, "residual_notional": residual,
+        "price_comparison_available": bool(old_mark and new_mark),
+        "unknown_valuation_count": unknown_values,
+        "valuation_complete": not unknown_values,
+        "reconciled": not unknown_values and all(abs(p["residual_notional"]) < 1e-6 for p in per_bin.values()),
+    }
+
+
+def save_observation_frame(conn, coins, ts_min, mids=None, mid_observed_ts=None):
+    """Append one frozen aggregation frame; never synthesise missing history."""
+    config = {"band_pct": LEVELS_DEFAULT_BAND_PCT, "range_pct": LEVELS_DEFAULT_RANGE_PCT,
+              "min_usd": LEVELS_DEFAULT_MIN_USD, "fresh_min": LEVELS_DEFAULT_FRESH_MIN}
+    now = now_ms()
+    cutoff = now - int(config["fresh_min"] * 60 * 1000)
+    previous_row = conn.execute(
+        "SELECT frame_json FROM observation_frames ORDER BY frame_id DESC LIMIT 1"
+    ).fetchone()
+    previous = json.loads(previous_row[0]) if previous_row else {}
+    frame = {"version": 1, "ts_min": ts_min, "captured_ts": now, "ladder_config": config,
+             "interpretation": "Distance is relative to saved mid, not the liquidation-trigger mark. Observed cohort only; no market-wide coverage estimate.",
+             "coins": {}, "cohort": CANDIDATES.snapshot_with_coins()}
+    frame["attempt_cursor"] = conn.execute("SELECT COALESCE(MAX(attempt_id),0) FROM position_attempts").fetchone()[0]
+    frame["attempts_since_previous"] = {status: count for status, count in conn.execute(
+        "SELECT status,COUNT(*) FROM position_attempts WHERE attempt_id>? AND attempt_id<=? GROUP BY status",
+        (previous.get("attempt_cursor", 0), frame["attempt_cursor"])).fetchall()}
+    old_cohort = {x["user"] for x in previous.get("cohort", [])}
+    cohort = {x["user"] for x in frame["cohort"]}
+    # Drain once before decomposition so TTL removals have the same classification
+    # in the cohort metadata and every coin's notional-change ledger.
+    stale = set(CANDIDATES.drain_stale()) & (old_cohort - cohort)
+    mids = mids or {}
+    for coin in coins:
+        flow = conn.execute(
+            "SELECT active_buy, active_sell, buy_rate_usd_min, sell_rate_usd_min, "
+            "buy_remaining_usd, sell_remaining_usd FROM twap_flow WHERE coin=? AND ts_min=?",
+            (coin, ts_min),
+        ).fetchone()
+        mark = mids.get(coin)
+        if mark is not None and (not math.isfinite(mark) or mark <= 0):
+            mark = None
+        positions = conn.execute(latest_position_cte() + """
+            SELECT user, ts, szi, position_value, liq_px FROM latest_positions WHERE coin=?
+            """, (coin,)).fetchall()
+        # clearinghouseState observes every coin for each target address.
+        candidate_users = [x["user"] for x in frame["cohort"]]
+        discovery_users = {x["user"] for x in frame["cohort"] if coin in x.get("coins", [])}
+        statuses = {"success": 0, "empty": 0, "failure": 0, "unobserved": 0}
+        candidate_states = []
+        candidate_ages = []
+        success_ages = []
+        fresh_users = set()
+        for user in candidate_users:
+            attempt = conn.execute("SELECT observed_ts, status FROM position_attempts WHERE user=? ORDER BY attempt_id DESC LIMIT 1", (user,)).fetchone()
+            if attempt is None:
+                statuses["unobserved"] += 1
+                state = {"user": user, "status": "unobserved", "observed_ts": None}
+            else:
+                statuses[attempt[1]] += 1
+                state = {"user": user, "status": attempt[1], "observed_ts": attempt[0]}
+                candidate_ages.append(max(0, now - attempt[0]))
+            success = conn.execute("SELECT observed_ts, status FROM position_attempts WHERE user=? "
+                "AND status IN ('success','empty') ORDER BY attempt_id DESC LIMIT 1", (user,)).fetchone()
+            state["success_observed_ts"] = success[0] if success else None
+            state["success_status"] = success[1] if success else None
+            state["success_age_ms"] = max(0, now - success[0]) if success else None
+            state["fresh_success"] = bool(success and success[0] >= cutoff)
+            if success:
+                success_ages.append(state["success_age_ms"])
+            if state["fresh_success"]:
+                fresh_users.add(user)
+            candidate_states.append(state)
+        fresh = [row for row in positions if row[0] in fresh_users and row[1] >= cutoff]
+        stale_users = (set(candidate_users) - fresh_users) | stale
+        fresh_success_addresses = len(fresh_users)
+        ladder_inputs = [{"user": u, "ts": t, "szi": szi, "position_value": value, "liq_px": liq}
+                         for u, t, szi, value, liq in fresh]
+        frozen_positions = []
+        null_liq = 0
+        for user, ts, szi, value, liq_px in fresh:
+            if liq_px is None:
+                null_liq += 1
+            if value is None or value < config["min_usd"]:
+                continue
+            b = _frame_bin(szi, liq_px, mark, config["band_pct"], config["range_pct"])
+            if b is not None:
+                frozen_positions.append({"user": user, "ts": ts, "szi": szi,
+                                         "position_value": value, "liq_px": liq_px, "bin": b})
+        active, declared = conn.execute(
+            "SELECT COUNT(*), SUM(CASE WHEN declared_sz IS NOT NULL THEN 1 ELSE 0 END) "
+            "FROM twap_orders WHERE coin=? AND status='active'", (coin,)
+        ).fetchone()
+        orders = conn.execute(
+            "SELECT twap_id, user, side, declared_sz, declared_minutes, reduce_only, start_ts, cum_sz, cum_notional "
+            "FROM twap_orders WHERE coin=? AND status='active' ORDER BY twap_id", (coin,)
+        ).fetchall()
+        old_coin = (previous.get("coins") or {}).get(coin, {})
+        old_mid = old_coin.get("mid") or {}
+        old_mid = old_mid.get("value") if isinstance(old_mid, dict) else old_mid
+        frame["coins"][coin] = {
+            "twap": {"active": active, "declared": declared or 0,
+                     "declaration_rate": (declared or 0) / active if active else None,
+                     "flow": list(flow) if flow else None,
+                     "orders": [{"twap_id": row[0], "user": row[1], "side": row[2], "declared_sz": row[3],
+                                 "declared_minutes": row[4], "reduce_only": row[5], "start_ts": row[6],
+                                 "cum_sz": row[7], "cum_notional": row[8]} for row in orders]},
+            "mid": {"value": mark, "observed_ts": now if mark is not None else None, "price_type": "mid"},
+            "freshness": {"candidate_denominator": len(candidate_users), "attempt_status": statuses,
+                          "denominator_definition": "all current candidate addresses; every account request covers all coins",
+                          "discovery_candidate_count": len(discovery_users),
+                          "discovery_fresh_success_addresses": len(discovery_users & fresh_users),
+                          "discovery_fresh_success_rate": (len(discovery_users & fresh_users) / len(discovery_users)
+                                                           if discovery_users else None),
+                          "discovery_denominator_definition": "current candidates discovered for this coin; may overlap across coins",
+                          "stale_candidates": sum(s["success_age_ms"] is not None and s["success_age_ms"] > config["fresh_min"] * 60 * 1000 for s in candidate_states),
+                          "fresh_success_addresses": fresh_success_addresses,
+                          "fresh_success_rate": fresh_success_addresses / len(candidate_users) if candidate_users else None,
+                          "candidate_states": candidate_states,
+                          "age_ms_min": min(candidate_ages) if candidate_ages else None,
+                          "age_ms_p50": sorted(candidate_ages)[len(candidate_ages)//2] if candidate_ages else None,
+                          "age_ms_max": max(candidate_ages) if candidate_ages else None,
+                          "success_snapshot_age_ms_p50": sorted(success_ages)[len(success_ages)//2] if success_ages else None,
+                          "latest_positions": len(positions), "fresh_positions": len(fresh),
+                          "legacy_or_outside_cohort_positions": len(positions) - len(fresh),
+                          "unknown_position_value_count": sum(p["position_value"] is None for p in ladder_inputs),
+                          "null_liq": null_liq, "null_liq_rate": null_liq / len(fresh) if fresh else None},
+            "ladder_inputs": ladder_inputs,
+            "ladder_positions": frozen_positions,
+            "buckets": _frame_buckets(ladder_inputs, mark, config),
+            "decomposition": _frame_decomposition(old_coin.get("ladder_inputs", old_coin.get("ladder_positions")),
+                ladder_inputs, stale_users,
+                fresh_users & {s["user"] for s in old_coin.get("freshness", {}).get("candidate_states", []) if s.get("fresh_success")},
+                old_mid, mark, config, previous.get("ladder_config")),
+        }
+        frame["coins"][coin]["mid"]["observed_ts"] = (mid_observed_ts or now) if mark is not None else None
+    frame["cohort_changes"] = {"comparison_available": True, "joined": sorted(cohort - old_cohort),
+                                "exited": [{"user": user, "departure_observed_ts": now}
+                                           for user in sorted((old_cohort - cohort) - stale)],
+                                "stale": [{"user": user, "departure_observed_ts": now} for user in sorted(stale)],
+                                "reconciled": len(cohort) == len(old_cohort) + len(cohort - old_cohort)
+                                - len((old_cohort - cohort) - stale) - len(stale)}
+    if previous_row is None:
+        frame["cohort_changes"] = {"comparison_available": False,
+                                   "comparison_unavailable_reason": "no_previous_observation",
+                                   "initial_cohort_count": len(cohort), "reconciled": False}
+    conn.execute(
+        "INSERT INTO observation_frames(ts_min, created_ts, coins_json, candidate_json, frame_json) VALUES (?,?,?,?,?)",
+        (ts_min, now, json.dumps(coins, sort_keys=True), json.dumps(frame["cohort"], sort_keys=True),
+         json.dumps(frame, sort_keys=True, separators=(",", ":"))),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -786,9 +1169,10 @@ def cmd_status(args):
         rate_usd_min = (cum_notional / elapsed_min) if elapsed_min > 0.01 else 0.0
         remaining = (declared_sz - cum_sz) if declared_sz is not None else None
 
-        pos = conn.execute(
-            "SELECT szi, entry_px, liq_px, lev FROM watch_positions "
-            "WHERE user=? AND coin=? ORDER BY ts DESC LIMIT 1",
+        pos = conn.execute(latest_position_cte() + """
+            SELECT szi, entry_px, liq_px, lev FROM latest_positions
+            WHERE user=? AND coin=? LIMIT 1
+            """,
             (user, coin),
         ).fetchone()
         szi, entry_px, liq_px, lev = pos if pos else (None, None, None, None)
@@ -841,6 +1225,88 @@ def cmd_flow(args):
     conn.close()
 
 
+def cmd_history(args):
+    """Show stored aggregate frames only; collection is deliberately never implied."""
+    conn = get_conn()
+    rows = conn.execute(
+        "SELECT frame_id, ts_min, frame_json FROM observation_frames ORDER BY frame_id DESC LIMIT ?",
+        (args.limit,),
+    ).fetchall()
+    if not rows:
+        print("No observation history collected yet. Run `hl-watch run` to collect frames.")
+        conn.close()
+        return
+    for frame_id, ts_min, payload in reversed(rows):
+        frame = json.loads(payload)
+        if args.coin and args.coin.upper() not in frame.get("coins", {}):
+            continue
+        if args.json:
+            print(json.dumps(public_observation_frame(frame, args.include_addresses) | {"frame_id": frame_id}, sort_keys=True))
+            continue
+        print(f"{frame_id}\t{ts_min}\tcohort={len(frame.get('cohort', []))}")
+        for coin, data in frame.get("coins", {}).items():
+            if args.coin and coin != args.coin.upper():
+                continue
+            quality = data["freshness"]
+            twap = data["twap"]
+            print(f"  {coin}: mid={data['mid']} active={twap['active']} declared={twap['declaration_rate']} "
+                  f"fresh_success={quality['fresh_success_addresses']}/{quality['candidate_denominator']} "
+                  f"null_liq={quality['null_liq_rate']}")
+    conn.close()
+
+
+def cmd_replay(args):
+    """Render a frozen frame, using no live price, account, or API data."""
+    conn = get_conn()
+    if args.frame_id is None:
+        row = conn.execute("SELECT frame_id, frame_json FROM observation_frames ORDER BY frame_id DESC LIMIT 1").fetchone()
+    else:
+        row = conn.execute("SELECT frame_id, frame_json FROM observation_frames WHERE frame_id=?", (args.frame_id,)).fetchone()
+    conn.close()
+    if not row:
+        print("No matching observation frame. Replay requires collected history.")
+        return
+    frame_id, payload = row
+    frame = json.loads(payload)
+    if args.json:
+        print(json.dumps(public_observation_frame(frame, args.include_addresses) | {"frame_id": frame_id}, sort_keys=True))
+        return
+    print(f"replay frame={frame_id} ts_min={frame['ts_min']} config={frame['ladder_config']}")
+    print(frame.get("interpretation", "Distances use saved mid, not the liquidation-trigger mark."))
+    for coin, data in frame.get("coins", {}).items():
+        d = data["decomposition"]
+        if not d.get("comparison_available", True):
+            print(f"{coin}: mid={data['mid']} ladder={len(data['ladder_positions'])} "
+                  "comparison unavailable: no previous observation (current snapshot only)")
+            continue
+        print(f"{coin}: mid={data['mid']} ladder={len(data['ladder_positions'])} "
+              f"join={d['join_notional']:.2f} exit={d['exit_notional']:.2f} stale={d['stale_notional']:.2f} "
+              f"bin_changes={d['bin_changed_count']} reconciled={d['reconciled']}")
+        for bucket, change in d.get("per_bin", {}).items():
+            if change["delta_notional"] or change["mid_or_bin_change"]:
+                print(f"  {bucket}: delta={change['delta_notional']:.2f} "
+                      f"common_fixed_mid={change['common_position_change_fixed_mid']:.2f} "
+                      f"mid/bin={change['mid_or_bin_change']:.2f} residual={change['residual_notional']:.2f}")
+
+
+def public_observation_frame(frame, include_addresses=False):
+    """Aggregate output defaults to counts; raw cohorts require an explicit flag."""
+    if include_addresses:
+        return frame
+    result = json.loads(json.dumps(frame))
+    result["cohort_count"] = len(result.pop("cohort", []))
+    for key in ("joined", "exited", "stale"):
+        changes = result.get("cohort_changes", {})
+        if key in changes:
+            changes[key + "_count"] = len(changes.pop(key))
+    for coin in result.get("coins", {}).values():
+        coin["ladder_position_count"] = len(coin.pop("ladder_positions", []))
+        coin.pop("ladder_inputs", None)
+        coin.get("freshness", {}).pop("candidate_states", None)
+        coin.get("twap", {}).pop("orders", None)
+    return result
+
+
 # ---------------------------------------------------------------------------
 # analyze: ヘルパー
 # ---------------------------------------------------------------------------
@@ -858,7 +1324,9 @@ def fetch_all_mids():
     out = {}
     for coin, px_str in resp.items():
         try:
-            out[coin] = float(px_str)
+            value = float(px_str)
+            if math.isfinite(value) and value > 0:
+                out[coin] = value
         except (TypeError, ValueError):
             continue
     return out
@@ -994,7 +1462,7 @@ def render_section1(conn, coins, mids, now, lines):
         rem_buy_str = f"${s['buy_remaining_usd']:,.0f}" if s["buy_remaining_usd"] is not None else "不明"
         rem_sell_str = f"${s['sell_remaining_usd']:,.0f}" if s["sell_remaining_usd"] is not None else "不明"
         lines.append(
-            f"  {coin:<5} mark=${mid:,.2f}  active TWAP buy={s['active_buy']}(うち新規{s['new_buy']}本) "
+            f"  {coin:<5} mid=${mid:,.2f}  active TWAP buy={s['active_buy']}(うち新規{s['new_buy']}本) "
             f"sell={s['active_sell']}(うち新規{s['new_sell']}本)"
         )
         lines.append(
@@ -1080,8 +1548,9 @@ def render_section2(conn, coins, mids, now, lines):
         prog_str = f"{r['progress_pct']:.1f}%" if r["progress_pct"] is not None else "不明"
         ro_str = "reduce_only" if r["reduce_only"] else "-"
 
-        pos = conn.execute(
-            "SELECT szi FROM watch_positions WHERE user=? AND coin=? ORDER BY ts DESC LIMIT 1",
+        pos = conn.execute(latest_position_cte() + """
+            SELECT szi FROM latest_positions WHERE user=? AND coin=? LIMIT 1
+            """,
             (r["user"], r["coin"]),
         ).fetchone()
         szi = pos[0] if pos and pos[0] is not None else None
@@ -1117,14 +1586,10 @@ def render_section3(conn, coins, now, lines):
         return []
     ph = ",".join("?" for _ in coins)
     rows = conn.execute(
-        f"""
+        latest_position_cte() + f"""
         SELECT wp.user, wp.coin, wp.szi, wp.entry_px, wp.position_value, wp.liq_px, wp.lev
-        FROM watch_positions wp
-        INNER JOIN (
-            SELECT user, coin, MAX(ts) AS max_ts FROM watch_positions
-            WHERE coin IN ({ph}) GROUP BY user, coin
-        ) latest ON wp.user=latest.user AND wp.coin=latest.coin AND wp.ts=latest.max_ts
-        WHERE wp.liq_px IS NOT NULL
+        FROM latest_positions wp
+        WHERE wp.coin IN ({ph}) AND wp.liq_px IS NOT NULL
         """,
         coins,
     ).fetchall()
@@ -1193,7 +1658,7 @@ def render_section4(conn, coins, mids, summaries, near_liq, lines):
                 signals.append(
                     f"  - ショートスクイーズ素地: {coin} buyレート${s['buy_rate']:,.0f}/min が "
                     f"sellレート${s['sell_rate']:,.0f}/min の{s['buy_rate']/s['sell_rate']:.1f}倍。"
-                    f"mark上方15%以内(${mid:,.2f}〜${band_hi:,.2f})に清算近接ショート合計"
+                    f"mid上方15%以内(${mid:,.2f}〜${band_hi:,.2f})に清算近接ショート合計"
                     f"${total_short_val:,.0f}"
                 )
 
@@ -1208,7 +1673,7 @@ def render_section4(conn, coins, mids, summaries, near_liq, lines):
                 signals.append(
                     f"  - ロングスクイーズ素地: {coin} sellレート${s['sell_rate']:,.0f}/min が "
                     f"buyレート${s['buy_rate']:,.0f}/min の{s['sell_rate']/s['buy_rate']:.1f}倍。"
-                    f"mark下方15%以内(${band_lo:,.2f}〜${mid:,.2f})に清算近接ロング合計"
+                    f"mid下方15%以内(${band_lo:,.2f}〜${mid:,.2f})に清算近接ロング合計"
                     f"${total_long_val:,.0f}"
                 )
 
@@ -1346,16 +1811,12 @@ def compute_liq_levels(conn, coin, mark, band_pct, range_pct, min_usd, fresh_min
     """
     fresh_cutoff = now - fresh_min * 60 * 1000
     rows = conn.execute(
-        """
+        latest_position_cte() + """
         SELECT wp.user, wp.szi, wp.position_value, wp.liq_px
-        FROM watch_positions wp
-        INNER JOIN (
-            SELECT user, coin, MAX(ts) AS max_ts FROM watch_positions
-            WHERE coin=? GROUP BY user, coin
-        ) latest ON wp.user=latest.user AND wp.coin=latest.coin AND wp.ts=latest.max_ts
+        FROM latest_positions wp
         WHERE wp.coin=? AND wp.ts >= ?
         """,
-        (coin, coin, fresh_cutoff),
+        (coin, fresh_cutoff),
     ).fetchall()
 
     n_bands = max(int(round(range_pct / band_pct)), 1)
@@ -1433,7 +1894,7 @@ def render_liq_levels_ladder(levels, lines):
     """compute_liq_levels() の結果を1コイン分のフルラダーとして lines に追記する。"""
     coin = levels["coin"]
     mark = levels["mark"]
-    lines.append(f"  {coin}  mark=${mark:,.2f}")
+    lines.append(f"  {coin}  mid=${mark:,.2f} (清算判定の mark/oracle とは異なる参照価格)")
     lines.append("  " + "-" * 74)
 
     max_notional = max(
@@ -1461,7 +1922,7 @@ def render_liq_levels_ladder(levels, lines):
         cum += b["notional"]
         danger = b["hi_pct"] <= LEVELS_DANGER_BAND_PCT
         lines.append(fmt_row(b, cum, danger))
-    lines.append(f"  {'':>1}--- mark=${mark:,.2f} ---")
+    lines.append(f"  {'':>1}--- mid=${mark:,.2f} ---")
     cum = 0.0
     for b in levels["buckets_down"]:
         cum += b["notional"]
@@ -1613,6 +2074,19 @@ def main():
     p_flow.add_argument("--limit", type=int, default=60)
     p_flow.set_defaults(func=cmd_flow)
 
+    p_history = sub.add_parser("history", help="収集済みの集計観測履歴を表示")
+    p_history.add_argument("--coin", default=None)
+    p_history.add_argument("--limit", type=int, default=60)
+    p_history.add_argument("--json", action="store_true", help="凍結フレームを JSON で出力")
+    p_history.add_argument("--include-addresses", action="store_true", help="JSON に生のアドレスを含める")
+    p_history.set_defaults(func=cmd_history)
+
+    p_replay = sub.add_parser("replay", help="凍結した観測フレームをライブデータなしで再生")
+    p_replay.add_argument("--frame-id", type=int, default=None, help="既定は最新フレーム")
+    p_replay.add_argument("--json", action="store_true", help="凍結フレームを JSON で出力")
+    p_replay.add_argument("--include-addresses", action="store_true", help="JSON に生のアドレスを含める")
+    p_replay.set_defaults(func=cmd_replay)
+
     p_analyze = sub.add_parser("analyze", help="需給・清算近接・複合シグナルを解析表示")
     p_analyze.add_argument("--coins", default=",".join(DEFAULT_COINS))
     p_analyze.add_argument("--fresh", type=int, default=ANALYZE_DEFAULT_BURST_MIN,
@@ -1625,9 +2099,9 @@ def main():
     p_levels = sub.add_parser("levels", help="価格帯別 清算ウォール (OI様ラダー) を表示")
     p_levels.add_argument("--coins", default=",".join(DEFAULT_COINS))
     p_levels.add_argument("--band-pct", type=float, default=LEVELS_DEFAULT_BAND_PCT,
-                           help=f"バケット刻み幅 (mark比 %%, 既定{LEVELS_DEFAULT_BAND_PCT})")
+                           help=f"バケット刻み幅 (mid比 %%, 既定{LEVELS_DEFAULT_BAND_PCT})")
     p_levels.add_argument("--range-pct", type=float, default=LEVELS_DEFAULT_RANGE_PCT,
-                           help=f"集計対象範囲 (mark比 ±%%, 既定{LEVELS_DEFAULT_RANGE_PCT})")
+                           help=f"集計対象範囲 (mid比 ±%%, 既定{LEVELS_DEFAULT_RANGE_PCT})")
     p_levels.add_argument("--min-usd", type=float, default=LEVELS_DEFAULT_MIN_USD,
                            help=f"対象化する position_value 下限 ($, 既定{LEVELS_DEFAULT_MIN_USD})")
     p_levels.add_argument("--fresh-min", type=float, default=LEVELS_DEFAULT_FRESH_MIN,
