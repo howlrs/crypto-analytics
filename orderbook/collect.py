@@ -24,6 +24,7 @@ import math
 import random
 import shutil
 import socket
+import sqlite3
 import ssl
 import struct
 import subprocess
@@ -558,6 +559,26 @@ def estimate(streams: Sequence[Stream], cfg: CaptureConfig, fetch, *, interval_s
             "transport_error": None if fatal is None else str(fatal)}
 
 
+def backup(db: Path, output: Path) -> dict:
+    """Consistent single-file copy of a (possibly live, WAL-mode) database via SQLite's backup API."""
+    if output.exists():
+        raise ValueError(f"output already exists: {output}")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    partial = output.with_name(output.name + ".partial")
+    partial.unlink(missing_ok=True)
+    with closing(connect_reader(db)) as source, closing(sqlite3.connect(partial)) as target:
+        source.backup(target)
+        target.execute("PRAGMA journal_mode=DELETE")
+        rows = target.execute("SELECT COUNT(*), COALESCE(MAX(received_ms), 0) FROM snapshots").fetchone()
+        check = target.execute("PRAGMA integrity_check").fetchone()[0]
+    if check != "ok":
+        partial.unlink(missing_ok=True)
+        raise ValueError(f"integrity check failed: {check}")
+    partial.replace(output)
+    return {"db": str(db), "output": str(output), "snapshots": rows[0], "last_received_ms": rows[1],
+            "bytes": output.stat().st_size}
+
+
 def status(db: Path) -> dict:
     with closing(connect_reader(db)) as conn:
         streams = [dict(zip(("venue", "market", "symbol", "aggregation", "snapshots", "first_ms", "last_ms",
@@ -612,6 +633,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     est_p.add_argument("--db", type=Path, help="target database, for disk and budget figures")
     stat_p = sub.add_parser("status", help="summarise an existing database (read-only)")
     stat_p.add_argument("--db", type=Path, required=True)
+    backup_p = sub.add_parser("backup", help="write a consistent single-file copy of a database (read-only source)")
+    backup_p.add_argument("--db", type=Path, required=True)
+    backup_p.add_argument("--output", type=Path, required=True)
     return parser.parse_args(argv)
 
 
@@ -620,6 +644,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "status":
             print(json.dumps(status(args.db), indent=2, default=str))
+            return 0
+        if args.command == "backup":
+            print(json.dumps(backup(args.db, args.output), indent=2))
             return 0
         streams = [Stream.parse(x) for x in args.streams.split(",") if x.strip()]
         if not streams or len({s.key for s in streams}) != len(streams):

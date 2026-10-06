@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from orderbook.collect import CaptureConfig, Stream, TransportError
-from orderbook.supervise import BACKOFF_SEC, chunk_minutes, month_db, next_month_start, supervise
+from orderbook.supervise import BACKOFF_SEC, chunk_minutes, next_period_start, period_db, supervise
 
 
 def ts(text):
@@ -59,9 +59,12 @@ class Harness:
 
 class SupervisorTests(unittest.TestCase):
     def test_month_helpers(self):
-        self.assertEqual(month_db(Path("/d"), ts("2026-12-31T23:59:00")).name, "orderbook-2026-12.db")
-        self.assertEqual(next_month_start(ts("2026-12-31T23:59:00")), ts("2027-01-01T00:00:00"))
+        self.assertEqual(period_db(Path("/d"), ts("2026-12-31T23:59:00")).name, "orderbook-2026-12.db")
+        self.assertEqual(period_db(Path("/d"), ts("2026-12-31T23:59:00"), "day").name, "orderbook-2026-12-31.db")
+        self.assertEqual(next_period_start(ts("2026-12-31T23:59:00")), ts("2027-01-01T00:00:00"))
+        self.assertEqual(next_period_start(ts("2026-10-06T13:00:00"), "day"), ts("2026-10-07T00:00:00"))
         self.assertEqual(chunk_minutes(ts("2026-10-31T23:00:00"), 360, None), 60)
+        self.assertEqual(chunk_minutes(ts("2026-10-06T22:00:00"), 360, None, "day"), 120)
         self.assertEqual(chunk_minutes(ts("2026-10-06T00:00:00"), 360, ts("2026-10-06T01:30:00")), 90)
 
     def test_chunks_roll_over_months_and_stop_at_until(self):
@@ -70,6 +73,11 @@ class SupervisorTests(unittest.TestCase):
         self.assertEqual(reason, "until_reached")
         self.assertEqual(h.chunks, [("orderbook-2026-10.db", 240), ("orderbook-2026-11.db", 360),
                                     ("orderbook-2026-11.db", 120)])
+
+    def test_daily_databases_split_at_utc_midnight(self):
+        h = Harness(ts("2026-10-06T20:00:00"), [])
+        h.run(until=ts("2026-10-07T03:00:00"), period="day")
+        self.assertEqual(h.chunks, [("orderbook-2026-10-06.db", 240), ("orderbook-2026-10-07.db", 180)])
 
     def test_backoff_by_stop_reason_and_terminal_storage_limit(self):
         h = Harness(ts("2026-10-06T00:00:00"), ["transport_unavailable: route lost", "rate_limited: 429",

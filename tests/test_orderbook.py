@@ -18,7 +18,7 @@ from orderbook.analyze import (
     AnalysisConfig, WallTracker, cross_venue, impact_quantile, imbalance_forward, main as analyze_main,
 )
 from orderbook.collect import (
-    CaptureConfig, RateLimited, Stream, Transport, TransportError, capture, collect, parse_dns_a,
+    CaptureConfig, RateLimited, Stream, Transport, TransportError, backup, capture, collect, parse_dns_a,
     parse_response, request_for, status,
 )
 from orderbook.store import decode_book, encode_levels
@@ -227,6 +227,17 @@ class CollectLoopTests(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             dead = self._collect(Path(tmp), fake_fetch(fail_symbol="BTCUSDT"), count=10)
             self.assertEqual((dead["ticks"], dead["stop_reason"]), (3, "all_streams_failing"))
+
+    def test_backup_is_a_consistent_copy_and_never_overwrites(self):
+        with TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._collect(root, fake_fetch())
+            result = backup(root / "ob.db", root / "copy" / "ob.db")
+            self.assertEqual(result["snapshots"], 6)
+            self.assertFalse(Path(f"{root / 'copy' / 'ob.db'}-wal").exists())
+            self.assertEqual(status(root / "copy" / "ob.db")["streams"][0]["snapshots"], 3)
+            with self.assertRaises(ValueError):
+                backup(root / "ob.db", root / "copy" / "ob.db")
 
     def test_unexpected_error_is_recorded_not_reported_as_completed(self):
         with TemporaryDirectory() as tmp:

@@ -169,6 +169,40 @@ systemctl --user restart orderbook-collector
 （見込み約 1.8GB）。延長するときは、インストール済みユニットの `--until` を書き換えて
 `daemon-reload` と `restart` を行う。
 
+### GCE で動かす
+
+WSL の稼働や VPN 断に左右されないよう、GCE の東京リージョン（`asia-northeast1`）でも動かせる。
+米国リージョンからは Binance・Bybit の API が制限されるため使わない。構成と手順は
+`orderbook/deploy/gce/` にある。
+
+- **リソース**: 専用の VPC とサブネット。受け付ける通信は IAP 経由の SSH（35.235.240.0/20 → tcp:22）だけ。
+- **VM**: e2-micro、Ubuntu 24.04、20GB pd-balanced、Shielded VM、OS Login。
+- **権限**: サービスアカウントは保存用バケット 1 つに対して、オブジェクトの作成と読み取りだけを許可する（削除・上書きは不可）。
+- **起動時の処理**（`startup.sh`）: メタデータの `orderbook-commit` で指定したコミットを GitHub から取得し、
+  `/opt/orderbook/<commit>` に置く。そのうえで collector とアップロードのタイマーを systemd に登録する。
+- **収集**: `--allow-default-route --db-period day --min-free-gb 3` で、UTC の日ごとに
+  `/var/lib/orderbook/data/orderbook-YYYY-MM-DD.db` へ保存する。
+  VM の IP は利用者の IP ではないので、VPN への固定は使わない。
+- **転送**: 毎時 20 分に、締まった日の DB を `collect backup` で整合の取れた 1 ファイルにして、
+  `gs://<bucket>/orderbook/` へ 1 回だけ上げる（`upload-closed.sh`）。日単位なので、手元への取り込みは差分だけで済む。
+
+```bash
+# 作成（既存のリソースは変更しない）
+PROJECT=<project> COMMIT=<sha> orderbook/deploy/gce/provision.sh
+
+# 手元（WSL）への取り込みと分析
+gcloud --configuration=gonumb storage rsync gs://<project>-orderbook/orderbook /mnt/e/Datas/market/orderbook-gce
+python3 -m orderbook.analyze $(printf -- '--db %s ' /mnt/e/Datas/market/orderbook-gce/orderbook-*.db) --output-dir /tmp/ob
+
+# VM の状態確認（IAP 経由 SSH）
+gcloud --configuration=gonumb --project=<project> compute ssh orderbook-collector --zone=asia-northeast1-b \
+  --tunnel-through-iap --command='systemctl status orderbook-collector --no-pager; journalctl -u orderbook-collector -n 20'
+```
+
+コードを更新するときは、メタデータの `orderbook-commit` を書き換えて VM を再起動する。
+同じ時刻を WSL と GCE の両方で集めると、分析で二重に数えられる。両方の DB を分析に渡すときは、
+`--start` / `--end` で期間を分けるか、どちらか一方だけを使う。
+
 ## 分析
 
 ```bash
