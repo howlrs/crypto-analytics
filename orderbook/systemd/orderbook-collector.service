@@ -1,0 +1,28 @@
+# Template for a systemd user service; values below are for the author's WSL + ExpressVPN setup.
+# Install: see docs/orderbook.md "継続収集". The installed copy runs a pinned git worktree, not
+# the development checkout, so switching branches cannot change the running code.
+[Unit]
+Description=Order-book snapshot collector (crypto-analytics orderbook.supervise)
+Documentation=https://github.com/howlrs/crypto-analytics/blob/main/docs/orderbook.md
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/crypto-analytics/orderbook-collector
+ExecStart=/usr/bin/python3 -m orderbook.supervise \
+  --data-dir /mnt/e/Datas/market \
+  --streams hyperliquid:perp:BTC,hyperliquid:perp:BTC:4,binance:perp:BTCUSDT,binance:spot:BTCUSDT,hyperliquid:perp:ETH,binance:perp:ETHUSDT,binance:spot:ETHUSDT,hyperliquid:perp:HYPE,hyperliquid:perp:HYPE:4,bybit:perp:HYPEUSDT,bybit:spot:HYPEUSDT \
+  --interval-sec 60 --chunk-min 360 --until 2026-11-06T00:00:00Z \
+  --source-interface eth1 --dns-server 100.64.100.1
+Environment=PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin PYTHONUNBUFFERED=1
+Restart=on-failure
+RestartSec=60
+# Exit status 3 means a storage limit was reached: wait for a human decision instead of restarting.
+RestartPreventExitStatus=3
+TimeoutStopSec=60
+StandardOutput=append:%h/.local/state/crypto-analytics/orderbook-collector.log
+StandardError=append:%h/.local/state/crypto-analytics/orderbook-collector.log
+
+[Install]
+WantedBy=default.target

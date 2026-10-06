@@ -65,7 +65,7 @@ python3 -m orderbook.collect status --db /mnt/e/Datas/market/orderbook-2026-10.d
 - 停止理由は `runs.stop_reason` に残る（`completed`、`interrupted`、`rate_limited: 詳細`、
   `transport_unavailable: 詳細`、`all_streams_failing`、`db_budget_reached`、`free_space_floor_reached`、
   想定外の例外は `error: ...`）。件数はその時刻の書き込みが確定してから数える。
-- 常駐・自動起動はしない。継続収集するときは `--duration-min` で区切って都度起動する。
+- `collect run` 自体は常駐しない。継続収集は下記の `orderbook.supervise` が上限つきの実行を繰り返す。
 
 ### 通信経路（VPN）
 
@@ -122,6 +122,52 @@ Binance の 1000 段で決まり、間隔を 10 秒にすると約 6 倍にな�
 `estimate` は 1 回分の実測から日量、30 日量、上限までの日数を出す。
 DB を `orderbook-YYYY-MM.db` のように月ごとに分けると、保管・削除を月単位で行える。分析は `--db` を複数受け取り、
 ストリームごとに時刻順に統合するので、月をまたぐ壁も 1 つのエピソードとして追える。
+
+## 継続収集
+
+`python3 -m orderbook.supervise` は `collect` を `--chunk-min`（既定 360 分）ずつ繰り返し、UTC の月ごとに
+`<data-dir>/orderbook-YYYY-MM.db` へ保存する。1 回の実行は月の境界をまたがない。
+
+停止理由ごとに、次の実行までの待ち時間を変える。
+
+| 停止理由 | 次の実行 |
+|---|---|
+| `completed` | すぐ |
+| `transport_unavailable`（VPN 断など） | 2 分後（インターフェースが戻るまで既定経路は使わない） |
+| `rate_limited` | 30 分後 |
+| `all_streams_failing` | 10 分後 |
+| 想定外の例外 | 5 分後 |
+| 容量上限（`db_budget_reached` / `free_space_floor_reached`） | 停止。終了コード 3 で、systemd も再起動しない |
+| `--until` の時刻 | 終了 |
+
+この環境では systemd のユーザーサービスとして動かす。テンプレートは
+`orderbook/systemd/orderbook-collector.service`。コードはリポジトリの作業ツリーではなく、
+特定のコミットに固定した worktree（`~/.local/share/crypto-analytics/orderbook-collector`）から実行する。
+このため、開発中にブランチを切り替えても収集中のコードは変わらない。
+
+```bash
+# 導入（コミットを固定した worktree とユニット）
+git -C ~/workspace/crypto/analytics worktree add --detach ~/.local/share/crypto-analytics/orderbook-collector <commit>
+mkdir -p ~/.local/state/crypto-analytics
+cp ~/.local/share/crypto-analytics/orderbook-collector/orderbook/systemd/orderbook-collector.service ~/.config/systemd/user/
+systemctl --user daemon-reload && systemctl --user enable --now orderbook-collector
+
+# 状態・ログ・保存状況
+systemctl --user status orderbook-collector
+tail ~/.local/state/crypto-analytics/orderbook-collector.log          # 実行ごとに 1 行の JSON
+python3 -m orderbook.collect status --db /mnt/e/Datas/market/orderbook-2026-10.db
+
+# 停止（実行中の回は interrupted として記録される）
+systemctl --user disable --now orderbook-collector
+
+# コードの更新（PR のマージ後など）
+git -C ~/.local/share/crypto-analytics/orderbook-collector checkout --detach <new-commit>
+systemctl --user restart orderbook-collector
+```
+
+2026-10-06 から 11 ストリーム・60 秒間隔で、`--until 2026-11-06T00:00:00Z` までの 1 か月を試行として収集する
+（見込み約 1.8GB）。延長するときは、インストール済みユニットの `--until` を書き換えて
+`daemon-reload` と `restart` を行う。
 
 ## 分析
 
