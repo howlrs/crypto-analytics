@@ -165,9 +165,8 @@ git -C ~/.local/share/crypto-analytics/orderbook-collector checkout --detach <ne
 systemctl --user restart orderbook-collector
 ```
 
-2026-10-06 から 11 ストリーム・60 秒間隔で、`--until 2026-11-06T00:00:00Z` までの 1 か月を試行として収集する
-（見込み約 1.8GB）。延長するときは、インストール済みユニットの `--until` を書き換えて
-`daemon-reload` と `restart` を行う。
+2026-10-06 の 01:27〜01:57 UTC にこの WSL 構成で 31 時刻・341 件を収集した（`orderbook-2026-10.db`）。
+同日に下記の GCE へ移したので、WSL のサービスは停止済み。
 
 ### GCE で動かす
 
@@ -199,7 +198,12 @@ gcloud --configuration=gonumb --project=<project> compute ssh orderbook-collecto
   --tunnel-through-iap --command='systemctl status orderbook-collector --no-pager; journalctl -u orderbook-collector -n 20'
 ```
 
-コードを更新するときは、メタデータの `orderbook-commit` を書き換えて VM を再起動する。
+2026-10-06 01:47 UTC から、プロジェクト `crypto-bitflyer-418902` の VM `orderbook-collector` で稼働している。
+対象は 11 ストリーム・60 秒間隔で、`--until 2026-11-06T00:00:00Z` までの 1 か月を試行とする（見込み約 1.8GB）。
+延長するときは `startup.sh` の `--until`（メタデータ `orderbook-until`）を変更する。
+
+コードを更新するときは、メタデータの `orderbook-commit` を書き換えて、VM を再起動するか、
+VM 上で `sudo google_metadata_script_runner startup` を実行する。
 同じ時刻を WSL と GCE の両方で集めると、分析で二重に数えられる。両方の DB を分析に渡すときは、
 `--start` / `--end` で期間を分けるか、どちらか一方だけを使う。
 
