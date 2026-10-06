@@ -11,18 +11,20 @@ set -euo pipefail
 
 PROJECT=${PROJECT:?set PROJECT}
 COMMIT=${COMMIT:?set COMMIT to the git commit the VM should run}
-GCLOUD_CONFIG=${GCLOUD_CONFIG:-gonumb}
-REGION=${REGION:-asia-northeast1}
-ZONE=${ZONE:-asia-northeast1-b}
-NAME=${NAME:-orderbook-collector}
-NETWORK=${NETWORK:-orderbook-net}
-SUBNET=${SUBNET:-orderbook-subnet}
-SUBNET_RANGE=${SUBNET_RANGE:-10.20.0.0/24}
-BUCKET=${BUCKET:-${PROJECT}-orderbook}
-UNTIL=${UNTIL:-2026-11-06T00:00:00Z}
-MACHINE_TYPE=${MACHINE_TYPE:-e2-micro}
-DISK_GB=${DISK_GB:-20}
-SA_NAME=${SA_NAME:-orderbook-collector}
+# Optional overrides use an ORDERBOOK_ prefix so generic shell variables (WSL sets NAME to the
+# host name, for example) can never leak into resource names.
+GCLOUD_CONFIG=${ORDERBOOK_GCLOUD_CONFIG:-gonumb}
+REGION=${ORDERBOOK_REGION:-asia-northeast1}
+ZONE=${ORDERBOOK_ZONE:-asia-northeast1-b}
+NAME=${ORDERBOOK_INSTANCE:-orderbook-collector}
+NETWORK=${ORDERBOOK_NETWORK:-orderbook-net}
+SUBNET=${ORDERBOOK_SUBNET:-orderbook-subnet}
+SUBNET_RANGE=${ORDERBOOK_SUBNET_RANGE:-10.20.0.0/24}
+BUCKET=${ORDERBOOK_BUCKET:-${PROJECT}-orderbook}
+UNTIL=${ORDERBOOK_UNTIL:-2026-11-06T00:00:00Z}
+MACHINE_TYPE=${ORDERBOOK_MACHINE_TYPE:-e2-micro}
+DISK_GB=${ORDERBOOK_DISK_GB:-20}
+SA_NAME=${ORDERBOOK_SERVICE_ACCOUNT:-orderbook-collector}
 SA="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
 HERE=$(cd "$(dirname "$0")" && pwd)
 
