@@ -344,6 +344,25 @@ class NewestFileTest(unittest.TestCase):
                 fj.build(Path(tmp))
 
 
+    def test_republished_investor_week_keeps_both_publications(self):
+        fields = ["PubDate", "StDate", "EnDate", "Section"] + [f"{g}{k}" for g in fj._INVESTOR_GROUPS
+                                                               for k in ("Sell", "Buy", "Tot", "Bal")]
+
+        def week(pub, frgn):
+            row = {name: "1" for name in fields}
+            row.update({"PubDate": pub, "StDate": "2024-08-26", "EnDate": "2024-08-30", "Section": "TokyoNagoya",
+                        "FrgnBal": frgn})
+            return row
+        key = "equities/investor-types/historical/2024/i_202409.csv.gz"
+        files = {key: (T1, gz_csv(fields, [week("2024-09-05", "-5"), week("2024-09-10", "-6")]))}
+        with tempfile.TemporaryDirectory() as tmp:
+            fj.sync(FakeBulk(files), Path(tmp), ["investor_types"], "2016-10", None)
+            fj.build(Path(tmp))
+            with sqlite3.connect(Path(tmp) / "jquants.db") as conn:
+                rows = conn.execute("SELECT pub_date, frgn_bal FROM investor_types ORDER BY pub_date").fetchall()
+            self.assertEqual(rows, [("2024-09-05", -5.0), ("2024-09-10", -6.0)])
+
+
 class FredTest(unittest.TestCase):
     def test_validate_rejects_bad_series(self):
         good = b"observation_date,VIXCLS\n2026-10-15,16.46\n2026-10-16,\n"

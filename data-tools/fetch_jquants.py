@@ -88,7 +88,7 @@ PLAIN_TABLES = {
     "equities_daily": ("equities_daily", "Date", [
         ("Date", "date", False), ("Code", "code", False), ("O", "open", True), ("H", "high", True),
         ("L", "low", True), ("C", "close", True), ("Vo", "volume", True), ("Va", "turnover", True),
-        ("AdjFactor", "adj_factor", True), ("AdjC", "adj_close", True)], ("date", "code")),
+        ("AdjFactor", "adj_factor", True), ("MktCap", "market_cap", True)], ("date", "code")),
     "indices_daily": ("indices_daily", "Date", [
         ("Date", "date", False), ("Code", "code", False), ("O", "open", True), ("H", "high", True),
         ("L", "low", True), ("C", "close", True)], ("date", "code")),
@@ -104,7 +104,8 @@ PLAIN_TABLES = {
     "investor_types": ("investor_types", "EnDate", [
         ("PubDate", "pub_date", False), ("StDate", "st_date", False), ("EnDate", "en_date", False),
         ("Section", "section", False)] + [(f"{g}{k}", _snake(f"{g}{k}"), True) for g in _INVESTOR_GROUPS
-                                          for k in ("Sell", "Buy", "Tot", "Bal")], ("en_date", "section")),
+                                          for k in ("Sell", "Buy", "Tot", "Bal")],
+                       ("en_date", "section", "pub_date")),  # a week can be republished with a later PubDate
 }
 
 

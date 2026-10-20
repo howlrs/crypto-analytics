@@ -79,10 +79,13 @@ def stem(coin: str) -> str:
 
 def load_funding(path: Path) -> pd.DataFrame:
     raw = pd.DataFrame(json.loads(Path(path).read_text()))
-    frame = pd.DataFrame({"time": raw.time.astype(np.int64), "rate": pd.to_numeric(raw.fundingRate),
+    t = raw.time.astype(np.int64)
+    if (t % HOUR >= 60_000).any():  # settlements land a few milliseconds after the hour
+        raise ValueError(f"{path}: funding times must be within a minute after the hour")
+    frame = pd.DataFrame({"time": t // HOUR * HOUR, "rate": pd.to_numeric(raw.fundingRate),
                           "premium": pd.to_numeric(raw.premium)}).sort_values("time")
-    if frame.time.duplicated().any() or (frame.time % HOUR != 0).any():
-        raise ValueError(f"{path}: funding times must be unique hour marks")
+    if frame.time.duplicated().any():
+        raise ValueError(f"{path}: two funding settlements in one hour")
     return frame.reset_index(drop=True)
 
 

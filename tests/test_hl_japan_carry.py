@@ -1,12 +1,15 @@
 """Close-time sampling, carry accounting and split handling for the xyz Japan perp diagnostics."""
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 from backtests.hl_japan_carry import (
     CLOSE_OFFSET, DAY, HOUR, ROOT, Config, daily_panel, dn_summary, funding_phases, liquidation_room,
-    outside_repo, price_at_close, window_sum,
+    load_funding, outside_repo, price_at_close, window_sum,
 )
 
 D0 = int(np.datetime64("2026-07-06", "D").astype(np.int64))  # a Monday
@@ -44,6 +47,20 @@ class SamplingTest(unittest.TestCase):
         price, source, _ = price_at_close(np.array([D0 + 9]), m15, h1)
         self.assertTrue(np.isnan(price[0]))
         self.assertEqual(source[0], "missing")
+
+    def test_funding_settlement_jitter_is_floored_to_the_hour(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "f.json"
+            rows = [{"time": D0 * DAY + HOUR + 117, "fundingRate": "0.0001", "premium": "0"},
+                    {"time": D0 * DAY + 2 * HOUR + 36, "fundingRate": "0.0002", "premium": "0"}]
+            path.write_text(json.dumps(rows))
+            self.assertEqual(list(load_funding(path).time), [D0 * DAY + HOUR, D0 * DAY + 2 * HOUR])
+            path.write_text(json.dumps(rows + [{"time": D0 * DAY + 2 * HOUR + 500, "fundingRate": "0", "premium": "0"}]))
+            with self.assertRaisesRegex(ValueError, "two funding settlements"):
+                load_funding(path)
+            path.write_text(json.dumps([{"time": D0 * DAY + HOUR + 90_000, "fundingRate": "0", "premium": "0"}]))
+            with self.assertRaisesRegex(ValueError, "within a minute"):
+                load_funding(path)
 
     def test_window_sum_is_left_open_right_closed(self):
         t = np.array([10, 20, 30], np.int64)
