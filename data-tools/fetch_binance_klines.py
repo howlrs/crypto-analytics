@@ -4,6 +4,9 @@
 Idempotent: skips months whose extracted CSV already exists (unless --force).
 Usage:
   python3 fetch_binance_klines.py --market spot --symbol BTCUSDT --start 2021-01 --end 2026-07
+  # held-out history kept away from the directories load_to_sqlite.py ingests:
+  python3 fetch_binance_klines.py --market spot --symbol BTCUSDT --start 2017-08 --end 2020-12 \
+      --base /mnt/e/Datas/market/holdout_pre2021
   python3 fetch_binance_klines.py --market perp --symbol ETHUSDT --start 2021-01 --end 2026-07
 """
 import argparse
@@ -26,16 +29,16 @@ MARKET_DIR = {
 }
 
 
-def out_dir(market, symbol):
-    d = os.path.join(BASE, MARKET_DIR[market], symbol)
+def out_dir(market, symbol, base=BASE):
+    d = os.path.join(base, MARKET_DIR[market], symbol)
     os.makedirs(d, exist_ok=True)
     return d
 
 
-def fetch_one(market, symbol, year, month, force=False):
+def fetch_one(market, symbol, year, month, force=False, base=BASE):
     ym = f"{year:04d}-{month:02d}"
     url = MARKET_URL[market].format(symbol=symbol, ym=ym)
-    csv_path = os.path.join(out_dir(market, symbol), f"{symbol}-1m-{ym}.csv")
+    csv_path = os.path.join(out_dir(market, symbol, base), f"{symbol}-1m-{ym}.csv")
     if os.path.exists(csv_path) and not force:
         return ym, "skip_exists", True
 
@@ -71,6 +74,7 @@ def main():
     ap.add_argument("--end", required=True, help="YYYY-MM")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--base", default=BASE, help="data root (default: the market.db source tree)")
     args = ap.parse_args()
 
     sy, sm = map(int, args.start.split("-"))
@@ -83,7 +87,7 @@ def main():
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as ex:
         futs = {
-            ex.submit(fetch_one, args.market, args.symbol, y, m, args.force): (y, m)
+            ex.submit(fetch_one, args.market, args.symbol, y, m, args.force, args.base): (y, m)
             for y, m in months
         }
         for fut in concurrent.futures.as_completed(futs):
