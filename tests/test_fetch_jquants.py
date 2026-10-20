@@ -308,6 +308,42 @@ class NewestFileTest(unittest.TestCase):
             self.assertEqual([p.name for p in Path(tmp).glob(".jquants.db.tmp-*")], [])
 
 
+    def test_plain_tables_replace_dates_and_reject_schema_changes(self):
+        fields = ["PubDate", "Date", "Code", "IssType", "ShrtVol", "LongVol", "ShrtNegVol", "LongNegVol",
+                  "ShrtStdVol", "LongStdVol", "ShrtVal", "LongVal"]
+
+        def margin(day, code, long, pub=""):
+            return {"PubDate": pub, "Date": day, "Code": code, "IssType": "2", "ShrtVol": "10", "LongVol": long,
+                    "ShrtNegVol": "0", "LongNegVol": "0", "ShrtStdVol": "10", "LongStdVol": long,
+                    "ShrtVal": "", "LongVal": ""}
+        hist = "markets/margin-interest/historical/2024/m_202408.csv.gz"
+        live = "markets/margin-interest/live/m_20240816.csv.gz"
+        files = {
+            hist: (T1, gz_csv(fields, [margin("2024-08-09", "13010", "100"), margin("2024-08-16", "13010", "1"),
+                                       margin("2024-08-16", "13050", "1")])),
+            live: (T2, gz_csv(fields, [margin("2024-08-16", "13010", "200", pub="2024-08-20")])),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            fj.sync(FakeBulk(files), Path(tmp), ["margin_weekly"], "2016-10", None)
+            stats = fj.build(Path(tmp))
+            with sqlite3.connect(Path(tmp) / "jquants.db") as conn:
+                rows = conn.execute("SELECT date, code, pub_date, long_shares, short_value FROM margin_weekly "
+                                    "ORDER BY date, code").fetchall()
+            # The newer live file replaces the whole 08-16 date, so 13050 from the older file is dropped.
+            self.assertEqual(rows, [("2024-08-09", "13010", None, 100.0, None),
+                                    ("2024-08-16", "13010", "2024-08-20", 200.0, None)])
+            self.assertEqual((stats["margin_weekly_rows"], stats["overridden_dates"]), (2, 1))
+            files[live] = (T3, gz_csv([f for f in fields if f != "LongVol"],
+                                      [{k: v for k, v in margin("2024-08-16", "13010", "1").items() if k != "LongVol"}]))
+            fj.sync(FakeBulk(files), Path(tmp), ["margin_weekly"], "2016-10", None)
+            with self.assertRaisesRegex(fj.JQuantsError, "missing columns"):
+                fj.build(Path(tmp))
+            files[live] = (T4, gz_csv(fields, [margin("2024-08-16", "13010", "1")] * 2))
+            fj.sync(FakeBulk(files), Path(tmp), ["margin_weekly"], "2016-10", None)
+            with self.assertRaisesRegex(fj.JQuantsError, "duplicate"):
+                fj.build(Path(tmp))
+
+
 class FredTest(unittest.TestCase):
     def test_validate_rejects_bad_series(self):
         good = b"observation_date,VIXCLS\n2026-10-15,16.46\n2026-10-16,\n"

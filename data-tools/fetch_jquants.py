@@ -49,6 +49,15 @@ DATASETS = {
     "topix": "/indices/bars/daily/topix",
     "options225": "/derivatives/bars/daily/options/225",
     "calendar": "/markets/calendar",
+    # Standard plan, checked 2026-10-20 (futures, dividends, breakdown and AM bars return 403)
+    "equities_daily": "/equities/bars/daily",
+    "equities_master": "/equities/master",
+    "indices_daily": "/indices/bars/daily",
+    "margin_weekly": "/markets/margin-interest",
+    "margin_alert": "/markets/margin-alert",
+    "short_ratio": "/markets/short-ratio",
+    "short_positions": "/markets/short-sale-report",
+    "investor_types": "/equities/investor-types",
 }
 PERIOD = re.compile(r"_(\d{6}|\d{8})\.csv\.gz$")
 SCHEMA = """
@@ -64,6 +73,44 @@ CREATE TABLE n225_option_atm (date TEXT NOT NULL, sqd TEXT NOT NULL, ltd TEXT, c
   PRIMARY KEY (date, sqd));
 CREATE TABLE build_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 """
+_INVESTOR_GROUPS = ("Prop", "Brk", "Tot", "Ind", "Frgn", "SecCo", "InvTr", "BusCo", "OthCo", "InsCo", "Bank",
+                    "TrstBnk", "OthFin")
+
+
+def _snake(name: str) -> str:
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower()
+
+
+# Datasets loaded as plain tables: (table, date column, [(source, target, numeric)], key targets).
+# A file with a newer LastModified replaces every date it contains, as for TOPIX and options.
+# equities_master, margin_alert and short_positions are mirrored but not loaded yet.
+PLAIN_TABLES = {
+    "equities_daily": ("equities_daily", "Date", [
+        ("Date", "date", False), ("Code", "code", False), ("O", "open", True), ("H", "high", True),
+        ("L", "low", True), ("C", "close", True), ("Vo", "volume", True), ("Va", "turnover", True),
+        ("AdjFactor", "adj_factor", True), ("AdjC", "adj_close", True)], ("date", "code")),
+    "indices_daily": ("indices_daily", "Date", [
+        ("Date", "date", False), ("Code", "code", False), ("O", "open", True), ("H", "high", True),
+        ("L", "low", True), ("C", "close", True)], ("date", "code")),
+    "margin_weekly": ("margin_weekly", "Date", [
+        ("Date", "date", False), ("Code", "code", False), ("PubDate", "pub_date", False), ("IssType", "iss_type", False),
+        ("LongVol", "long_shares", True), ("ShrtVol", "short_shares", True),
+        ("LongNegVol", "long_neg_shares", True), ("ShrtNegVol", "short_neg_shares", True),
+        ("LongStdVol", "long_std_shares", True), ("ShrtStdVol", "short_std_shares", True),
+        ("LongVal", "long_value", True), ("ShrtVal", "short_value", True)], ("date", "code")),
+    "short_ratio": ("short_ratio", "Date", [
+        ("Date", "date", False), ("S33", "s33", False), ("SellExShortVa", "sell_ex_short_va", True),
+        ("ShrtWithResVa", "short_with_res_va", True), ("ShrtNoResVa", "short_no_res_va", True)], ("date", "s33")),
+    "investor_types": ("investor_types", "EnDate", [
+        ("PubDate", "pub_date", False), ("StDate", "st_date", False), ("EnDate", "en_date", False),
+        ("Section", "section", False)] + [(f"{g}{k}", _snake(f"{g}{k}"), True) for g in _INVESTOR_GROUPS
+                                          for k in ("Sell", "Buy", "Tot", "Bal")], ("en_date", "section")),
+}
+
+
+def _plain_schema(table: str, columns: list, keys: tuple) -> str:
+    cols = ", ".join(f"{target} {'REAL' if numeric else 'TEXT'}" for _, target, numeric in columns)
+    return f"CREATE TABLE {table} ({cols}, source_key TEXT NOT NULL, PRIMARY KEY ({', '.join(keys)}));\n"
 
 
 class JQuantsError(RuntimeError):
@@ -361,12 +408,35 @@ def _modified(entry: dict) -> datetime:
     return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
 
+def _load_plain(store: dict, rows: list[dict], header, dataset: str, source_key: str) -> int:
+    """Replace every date in this file; returns how many stored dates it overrode."""
+    _, date_col, columns, keys = PLAIN_TABLES[dataset]
+    missing = [src for src, _, _ in columns if src not in (header or ())]
+    if missing:
+        raise JQuantsError(f"{source_key}: missing columns {missing}; check the schema")
+    key_idx = [i for i, (_, target, _) in enumerate(columns) if target in keys]
+    fresh: dict[str, dict[tuple, tuple]] = defaultdict(dict)
+    for row in rows:
+        values = tuple(_number(row[src]) if numeric else (row[src] or None) for src, _, numeric in columns)
+        key = tuple(values[i] for i in key_idx)
+        day = row[date_col]
+        if not day or any(k is None for k in key):
+            raise JQuantsError(f"{source_key}: row without date or key")
+        if key in fresh[day]:
+            raise JQuantsError(f"{source_key}: duplicate {dataset} row {key}")
+        fresh[day][key] = values + (source_key,)
+    overridden = len(store.keys() & fresh.keys())
+    store.update({day: list(by_key.values()) for day, by_key in fresh.items()})
+    return overridden
+
+
 def build(data_dir: Path) -> dict:
     """Rebuild jquants.db. A file with a newer LastModified replaces every date it contains."""
     root = outside_repo(data_dir)
     manifest = _read_manifest(root / "raw" / "manifest.json")
     files = sorted(manifest["files"].values(), key=lambda x: (_modified(x), x["key"]))
     topix, calendar, options = {}, {}, {}
+    plain = {name: {} for name in PLAIN_TABLES}  # dataset -> {date: [row tuples]}
     stats = {"files": len(files), "overridden_dates": 0, "inconsistent_option_groups": 0,
              "topix_without_close": 0, "option_dates_without_atm": 0}
     for entry in files:
@@ -374,8 +444,13 @@ def build(data_dir: Path) -> dict:
         data = path.read_bytes() if path.exists() else None
         if data is None or hashlib.sha256(data).hexdigest() != entry["sha256"]:
             raise JQuantsError(f"{entry['key']}: raw file missing or SHA-256 mismatch; run sync")
-        rows = list(_csv_rows(data))
-        if entry["dataset"] == "topix":
+        reader = _csv_rows(data)
+        rows = list(reader)
+        if entry["dataset"] in PLAIN_TABLES:
+            if rows:
+                stats["overridden_dates"] += _load_plain(plain[entry["dataset"]], rows, reader.fieldnames,
+                                                         entry["dataset"], entry["key"])
+        elif entry["dataset"] == "topix":
             for row in rows:
                 stats["overridden_dates"] += row["Date"] in topix
                 close = _number(row.get("C"))
@@ -415,6 +490,12 @@ def build(data_dir: Path) -> dict:
                        "call_volume", "base_vol", "source_key")
             conn.executemany(f"INSERT INTO n225_option_atm VALUES ({','.join('?' * len(columns))})",
                              [tuple(options[k][c] for c in columns) for k in sorted(options)])
+            for name, (table, _, columns, keys) in PLAIN_TABLES.items():
+                conn.executescript(_plain_schema(table, columns, keys))
+                conn.executemany(f"INSERT INTO {table} VALUES ({','.join('?' * (len(columns) + 1))})",
+                                 (row for day in sorted(plain[name]) for row in plain[name][day]))
+                stats[f"{table}_rows"] = sum(len(v) for v in plain[name].values())
+            conn.execute("CREATE INDEX equities_daily_code ON equities_daily (code, date)")
             stats.update({"topix_rows": len(topix), "calendar_rows": len(calendar), "option_atm_rows": len(options),
                           "built_at": now_iso()})
             conn.executemany("INSERT INTO build_meta VALUES (?,?)", [(k, json.dumps(v)) for k, v in stats.items()])
