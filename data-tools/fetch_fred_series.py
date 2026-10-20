@@ -20,6 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import log, sha256_hex
 
 BASE = "/mnt/e/Datas/market/indices"
+REPO = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id={}"
 
 
@@ -52,10 +53,13 @@ def main(argv=None):
     parser.add_argument("--out-dir", default=BASE)
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args(argv)
+    out_dir = os.path.realpath(args.out_dir)
+    if os.path.commonpath([out_dir, REPO]) == REPO:  # series such as VIXCLS are third-party copyrighted
+        raise SystemExit("--out-dir must be outside the public repository")
     failed = []
     for series in args.series.split(","):
         try:
-            fetch(series, args.out_dir, args.force)
+            fetch(series, out_dir, args.force)
         except (ValueError, OSError) as exc:
             log(f"{series}: {exc}")
             failed.append(series)

@@ -88,20 +88,28 @@ class KeyTest(unittest.TestCase):
                 fj.load_api_key(Path(tmp) / "missing", environ={})
 
 
+PRESIGNED = "https://acct.r2.cloudflarestorage.com/x.csv.gz?sig=1"
+
+
 class ClientTest(unittest.TestCase):
     def test_key_only_goes_to_api_and_never_to_presigned_url(self):
-        c, opener = client([json.dumps({"url": "https://files.example/x.csv.gz?sig=1"}).encode(), b"payload"])
+        c, opener = client([json.dumps({"url": PRESIGNED}).encode(), b"payload"])
         self.assertEqual(c.download("indices/bars/daily/topix/x.csv.gz"), b"payload")
         api, presigned = opener.requests
         self.assertTrue(api.full_url.startswith("https://api.jquants.com/v2/bulk/get?"))
         self.assertEqual(api.get_header("X-api-key"), SECRET)
-        self.assertEqual(presigned.full_url, "https://files.example/x.csv.gz?sig=1")
+        self.assertEqual(presigned.full_url, PRESIGNED)
         self.assertIsNone(presigned.get_header("X-api-key"))
 
     def test_unsafe_url_and_errors_do_not_leak(self):
-        c, _ = client([json.dumps({"url": "http://user:pw@files.example/x"}).encode()])
-        with self.assertRaises(fj.JQuantsError):
-            c.download("k")
+        for url in ("http://acct.r2.cloudflarestorage.com/x", "https://user:pw@acct.r2.cloudflarestorage.com/x",
+                    "https://acct.r2.cloudflarestorage.com:8443/x", "https://files.example/x",
+                    "https://r2.cloudflarestorage.com.evil.example/x", "https://169.254.169.254/x"):
+            c, opener = client([json.dumps({"url": url}).encode()])
+            with self.assertRaises(fj.JQuantsError) as ctx:
+                c.download("k")
+            self.assertEqual(len(opener.requests), 1, url)  # refused before any download request
+            self.assertNotIn("/x", str(ctx.exception))
         c, _ = client([HTTPError("https://api.jquants.com/v2/x", 403, "Forbidden", {}, None)])
         with self.assertRaises(fj.JQuantsError) as ctx:
             c.api("/x", {})
@@ -237,6 +245,19 @@ class MirrorAndBuildTest(unittest.TestCase):
             fj.sync(bulk, ROOT / "results" / "jq", ["topix"], "2016-10", None)
         self.assertEqual(fj.main(["build", "--data-dir", str(ROOT / "results")]), 1)
 
+    def test_symlink_below_raw_into_repository_is_refused(self):
+        key = "indices/bars/daily/topix/historical/2024/t_202408.csv.gz"
+        bulk = FakeBulk({key: (T1, gz_csv(["Date"], [{"Date": "2024-08-01"}]))})
+        with tempfile.TemporaryDirectory() as tmp:
+            repo, data = Path(tmp, "repo").resolve(), Path(tmp, "data")
+            (repo / "docs").mkdir(parents=True)
+            (data / "raw").mkdir(parents=True)
+            (data / "raw" / "indices").symlink_to(repo / "docs", target_is_directory=True)
+            with mock.patch.object(fj, "REPO", repo), self.assertRaises(ValueError):
+                fj.sync(bulk, data, ["topix"], "2016-10", None)
+            self.assertEqual(bulk.downloads, [])
+            self.assertEqual(list((repo / "docs").iterdir()), [])
+
     def test_manifest_records_digest(self):
         key = "indices/bars/daily/topix/historical/2024/t_202408.csv.gz"
         data = gz_csv(["Date", "O", "H", "L", "C"], [{"Date": "2024-08-01", "O": "", "H": "", "L": "", "C": "1"}])
@@ -301,6 +322,12 @@ class FredTest(unittest.TestCase):
         old = b"observation_date,VIXCLS\n2026-10-15,16.46\n"
         self.assertTrue(fred.extends(old, old + b"2026-10-16,19.99\n"))
         self.assertFalse(fred.extends(old, b"observation_date,VIXCLS\n2026-10-15,17.00\n"))
+
+    def test_repository_out_dir_is_refused_before_download(self):
+        with mock.patch.object(fred.subprocess, "run", side_effect=AssertionError("network")):
+            with self.assertRaises(SystemExit) as ctx:
+                fred.main(["--series", "VIXCLS", "--out-dir", str(ROOT / "results")])
+        self.assertIn("outside the public repository", str(ctx.exception))
 
 
 if __name__ == "__main__":

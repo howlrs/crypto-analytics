@@ -41,6 +41,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from common import log, now_iso
 
 API_BASE = "https://api.jquants.com/v2"
+DOWNLOAD_HOST_SUFFIX = ".r2.cloudflarestorage.com"  # where bulk/get pointed as of 2026-10-20
 REPO = Path(__file__).resolve().parents[1]
 DEFAULT_DIR = Path("/mnt/e/Datas/market/jquants")
 KEY_NAMES = ("JQUANTS_API_KEY", "JQUANTS_APIKEY")  # official CLI name first, legacy .env name second
@@ -191,8 +192,12 @@ class Client:
     def download(self, key: str) -> bytes:
         url = self.api("/bulk/get", {"key": key}).get("url")
         split = urlsplit(url) if isinstance(url, str) else None
-        if not split or split.scheme != "https" or not split.hostname or split.username or split.password:
+        # The netloc must be the bare host: no userinfo and no port.
+        if not split or split.scheme != "https" or not split.hostname or split.netloc.lower() != split.hostname:
             raise JQuantsError("bulk/get returned an unsafe download URL")
+        if not split.hostname.endswith(DOWNLOAD_HOST_SUFFIX):
+            raise JQuantsError(f"bulk/get returned an unexpected download host {split.hostname}; "
+                               "check J-Quants and update DOWNLOAD_HOST_SUFFIX")
         return self._read(Request(url, headers={"Accept": "application/gzip"}), "bulk download")
 
 
@@ -264,6 +269,7 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
             log(f"{name}: {len(listed)} bulk files in range")
             for item in sorted(listed, key=lambda x: x["key"]):
                 path, entry = raw / item["key"], manifest["files"].get(item["key"])
+                outside_repo(path)  # a symlink below raw/ must not lead into the repository
                 if (entry and entry["last_modified"] == item["last_modified"] and entry["size"] == item["size"]
                         and path.exists() and sha256_file(path) == entry["sha256"]):
                     counts["skipped"] += 1
@@ -280,6 +286,7 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
                 if previous is not None and previous != digest:
                     # Corrections are kept, never silently overwritten, even without a manifest entry.
                     old = raw / "_superseded" / f"{item['key']}.{previous[:12]}"
+                    outside_repo(old)
                     old.parent.mkdir(parents=True, exist_ok=True)
                     os.replace(path, old)
                     counts["superseded"] += 1

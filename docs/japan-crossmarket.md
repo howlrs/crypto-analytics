@@ -179,10 +179,14 @@ J-Quants は個人の私的利用が前提で、生データや元データを�
 本リポジトリは公開リポジトリなので、次を機械的に守ります。
 
 - 原本・SQLite・分析結果は既定で `/mnt/e/Datas/market/jquants/` に置き、**リポジトリ内への出力は拒否**します。
+  `raw/` 以下のシンボリックリンクがリポジトリ内を指す場合も、書き込み前に拒否します。
+  FRED の出力先も同様です（VIXCLS は CBOE の著作物で、再配布しません）。
 - 日次の特徴量（JIV 等）を含む CSV はコミットしません。リポジトリにはコード、合成データのテスト、この文書の集計値だけを置きます。
 - APIキーはプロセス環境変数 `JQUANTS_API_KEY`、なければリポジトリ直下 `.env` の `JQUANTS_API_KEY`
   （旧名 `JQUANTS_APIKEY` も可、後の行が優先）から読みます。`.env` は `.gitignore` 対象です。
   キーは `api.jquants.com` への要求だけに付け、リダイレクトを追わず、署名付きダウンロードURLには付けません。
+  署名付きURLは、2026-10-20 時点の配信元である Cloudflare R2（`*.r2.cloudflarestorage.com`）のホストに限って取得します。
+  配信元が変わると `sync` は止まるので、J-Quants 側を確認してから `DOWNLOAD_HOST_SUFFIX` を更新します。
 - 解約・ダウングレード時は `/mnt/e/Datas/market/jquants/` 全体（raw、`_superseded`、`jquants.db`、results）を削除対象とします。
   バックアップを作った場合はそれも含めます。
 
