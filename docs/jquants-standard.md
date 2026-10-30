@@ -18,7 +18,15 @@ PR #14（`docs/japan-crossmarket.md`）で、J-Quants の日本 IV・TOPIX は B
 | 空売り残高報告（0.5%以上の報告） | `/markets/short-sale-report` | 2016-10〜 | 取得のみ |
 | 投資部門別売買状況（週次、公表日つき） | `/equities/investor-types` | 2016-10〜 | 分析B |
 | 決算短信サマリー | `/fins/summary` | 2016-10〜 | 2026-10-30 に取得開始（開示日時で決算ジャンプを測る。`docs/japan-perp-forward.md` §2） |
-| 先物・オプション全般、配当、売買内訳、前場四本値 | — | — | **403/400（Standard 対象外）** |
+| 株価指標（EPS・予想EPS・BPS・ROE・PER・PBR・時価総額、日次） | `/equities/valuation` | 2016-10〜 | 2026-10-31 に取得開始（取得のみ） |
+| 決算発表予定日（予定日と、その公表日） | `/fins/earnings-date` | 2016-10〜 | 2026-10-31 に取得開始（取得のみ） |
+| 翌営業日の決算発表予定 | `/equities/earnings-calendar` | API のみ | 保存しない（2026-10-31 に照合し、`/fins/earnings-date` に全件含まれていた。独自の列は業種名・市場区分だけで、マスタから引ける） |
+| 先物・オプション全般、配当、売買内訳、前場四本値、分足、財務諸表の詳細 | — | — | **403（Standard 対象外、2026-10-31 に再確認）** |
+
+**2026-10-31 の追記**: 上の表は当初、`/equities/valuation` と `/fins/earnings-date` が抜けていた（候補を手で挙げて確かめたため）。
+`/bulk/list?date=` で日付ごとに全エンドポイントのファイルを列挙できることが分かったので、直近21日分で網羅を確かめた。
+一括ファイルがあるのは上の13本と取引カレンダー（日付なしの1ファイル）で、すべて取得している。3週間に一度も更新のない
+エンドポイントがあれば、この方法では見つからない。DB（`jquants.db`）にはすべての列を取り込む（`fetch_jquants.py` の `TABLES`）。
 
 TOPIX、日経225オプション、取引カレンダーは PR #14 で取得済み。日経225の指数値は J-Quants にないため、
 オプションの原資産価格（`UnderPx`）を使う。取得は `data-tools/fetch_jquants.py sync`（既定で全データセット）。
@@ -213,12 +221,45 @@ funding（毎時の実績、年率換算。正は perp の売り側が受け取�
 
 ```bash
 cd /home/o9oem/workspace/crypto/analytics
-python3 data-tools/fetch_jquants.py sync       # 外部通信。既定で全データセット、差分のみ（初回は約1,050ファイル・770MB）
-python3 data-tools/fetch_jquants.py build      # 通信なし。jquants.db（約2.1GB）を再構築
-python3 data-tools/fetch_hl_xyz.py             # 外部通信（公開API）。funding と足を保存分へ統合
+data-tools/update_japan.sh --force   # 外部通信。経路確認 → fetch_hl_xyz → sync → build → japan_forward status
+data-tools/update_japan.sh --check   # 通信なし。VPN 経路の確認だけ
 python3 backtests/hl_japan_carry.py            # 通信なし。出力は /mnt/e/Datas/market/jquants/results/hl_japan_carry
 python3 backtests/japan_positioning.py         # 通信なし。market.db は read-only。出力は .../results/japan_positioning
 ```
 
+- `update_japan.sh` は外部通信の前に、ホスト側 VPN の分割経路（0.0.0.0/1 と 128.0.0.0/1）が同じデバイスにあり、
+  取得先がそこを通ることを読み取りだけで確かめ、満たさなければ何も取得せずに止まる。名前解決は IPv4 に固定する
+  （`data-tools/ipv4_run.py`。この WSL では IPv6 だけが VPN を通らない）。引数なしなら前回成功から6日未満は何もしない。
+  ログは `/mnt/e/Datas/market/jquants/logs/`。
+- 個別に動かすときは `python3 data-tools/ipv4_run.py data-tools/fetch_jquants.py sync`、
+  `python3 data-tools/fetch_jquants.py build --work-dir ~/.cache/jquants-build`。
+  `--work-dir` に Linux 側のディレクトリを渡すと、/mnt/e に直接書くより速い（2026-10-31 の実測で 7分 対 24分）。
+
 両分析スクリプトは入力と出力の SHA-256 を `manifest.json` に残す。出力には J-Quants 由来の日次・週次の値が入るので、
 リポジトリには置かない（コードで拒否）。解約時は `/mnt/e/Datas/market/jquants/` 全体を削除対象とする。
+
+## 8. DB の構成（2026-10-31 から）
+
+`jquants.db`（約5GB）には、取得しているすべてのデータセットの全列が入る。定義は `fetch_jquants.py` の `TABLES`。
+
+| 表 | 中身 | 主キー |
+|---|---|---|
+| `equities_daily` / `equities_valuation` | 株価日足（ストップ高安フラグ・`ExRT` を含む）/ 株価指標 | (date, code)、索引 (code, date) |
+| `equities_master_history` と view `equities_master` | 銘柄マスタ。日次スナップショット1,022万行を、属性が変わるか欠けるたびに区切る有効期間 15,849行に圧縮。view は元の (date, code) 行をそのまま再現する | (code, valid_from) |
+| `n225_options` / `n225_option_atm` | 日経225オプションの全行（緊急取引証拠金の発動日は 001 と 002 の両方）/ 満期ごとの ATM | (date, code, em_mrgn_trg_div) / (date, sqd) |
+| `fins_summary` | 決算短信サマリー全111列。開示時刻は `HH:MM:SS` にそろえる（2018-03 までは `HH:MM`）、真偽値は 1/0 | (code, disc_no) |
+| `fins_earnings_date` | 決算発表予定日。予定日が未定の公表（577行）も残す | なし |
+| `margin_weekly` / `margin_alert` | 信用週末残（金額列を含む）/ 日々公表（公表理由の辞書を理由ごとの 0/1 列に展開） | (date, code) / (pub_date, code, app_date) |
+| `short_positions` | 空売り残高報告。同じファイル内でまったく同じ報告が並ぶ例（184件）も残す | なし |
+| `topix_daily`・`indices_daily`・`short_ratio`・`investor_types`・`trading_calendar` | 従来どおり（全列） | 従来どおり |
+| `source_files`・`build_meta`・`build_quality` | 原本ファイル（行の `source_id` が参照）、作成時の集計、数値にできず NULL にした値の件数 | — |
+
+- 既存の表名・列名は変えていない。新しい列は J-Quants V2 の列名の snake_case。
+- 数値にできなかった値は捨てずに `build_quality` に数える（2026-10-31 時点では日々公表の `*`（比率算出不能）と `-`（前回なし）だけ）。
+- 副索引を持つ表は rowid 表にし、`ANALYZE` もしない。WITHOUT ROWID 表に副索引があると、SQLite は
+  `japan_positioning.py` の結合を「副索引の全走査 + 1行ごとの本体参照」で計画し、1,000万回のランダム読み込みで終わらなくなった。
+  副索引のない表だけ WITHOUT ROWID にしている。
+- 作り直しの検証（2026-10-31）: 全14データセットで、原本から独立に数えた行数（同じ日付は新しいファイルが置き換える）と一致した。
+  分析が読む列は旧 DB と差分ゼロで、`hl_japan_carry.py` と `japan_positioning.py` の出力はバイト単位で同じだった。
+- `sync` は一覧から消えたファイルを手元から消さない。Standard の提供範囲は過去10年なので、古い月が順に一覧から外れると
+  見込まれ、その後は手元の原本（約1.1GB）が唯一の写しになる。

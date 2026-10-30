@@ -13,6 +13,7 @@
 | H2 のシグナル | 業種別空売り比率 | 前回の棚卸しで Standard 固有とした需給データ |
 | H2 の目的変数 | 日経225オプションの原資産価格（日経225の指数値は J-Quants にない） | PR #14 から使用 |
 | 確認して使わなかったもの | 日々公表信用取引残高（規制区分つき）、空売り残高報告 | §6 |
+| 取得のみ（2026-10-31 に追加） | 株価指標（`/equities/valuation`）、決算発表予定日（`/fins/earnings-date`） | 本書の判定には使わない |
 
 プランごとの提供範囲は変わることがあるので、契約変更を考えるときは公式の料金表で確かめること。
 
@@ -35,8 +36,11 @@ xyz では、東証終値時点（15:30 JST）の間の perp の1時間足高値
   前回の目安（KIOXIA 2倍、SOFTBANK 3倍）と同じになった。
 - 東証の日次は値幅制限で上限が切られるが、perp には制限がない。KIOXIA の xyz 上の +32.2% は東証の動きを上回った
   （前回 `docs/jquants-standard.md` の 2026-07-31 の例）。
+- 2026-10-31 の再計算（開示時刻の形式をそろえた DB で、`results/japan_earnings_risk_2026-10-31b`）: SoftBank の決算日の平均絶対変化が 5.0% → 4.8% になった以外は同じで、レバレッジも変わらない。
 - 直近の決算: KIOXIA は 2026-10-30 18:45 JST に2Q を開示し、xyz では同夜に約 −10%（perp 売り側に有利）。
-  この開示は J-Quants の日次 bulk（18:02 JST 生成）に入っておらず、次の更新で入る。追跡の開始前なので評価には入らない。
+  この開示は J-Quants の日次 bulk の初版（18:02 JST 生成）になく、同夜 00:30 JST の再生成版で入った（`sync` は訂正版として扱い、
+  旧版を `_superseded` に残す）。追跡の開始前なので評価には入らない。次の定期開示は SoftBank の2Q（2026-11-10 予定、
+  `fins_earnings_date` で 2026-10-05 に公表）で、H1 の期間に入る。
 
 ## 3. H1: 日本株 perp の funding キャリー（主仮説）
 
@@ -86,10 +90,12 @@ BTC/ETH の funding capture（年率 8〜10%）を上回るか。清算なしで
 
 ```bash
 cd /home/o9oem/workspace/crypto/analytics
-python3 data-tools/fetch_jquants.py sync && python3 data-tools/fetch_jquants.py build   # 週1回。外部通信
-python3 data-tools/fetch_hl_xyz.py                                                     # 週1回、遅くとも50日以内。外部通信
-python3 backtests/japan_forward.py status                                             # 通信なし。出力は /mnt/e/Datas/market/jquants/results/japan_forward
+data-tools/update_japan.sh --force          # 外部通信。経路確認 → fetch_hl_xyz → sync → build → status（約10分）
+python3 backtests/japan_forward.py status   # 通信なし。出力は /mnt/e/Datas/market/jquants/results/japan_forward
 ```
+
+- `update_japan.sh` はユーザーの crontab から毎時呼ばれ、前回成功から6日以上たっていれば実行する（WSL が止まっていた週も
+  次に起動した時点で追いつく）。VPN 経路を確かめられなければ何も取得せずに止まる。詳細は `docs/jquants-standard.md` §7。
 
 - xyz の15分足は API が直近約52日分しか返さない。間隔が空くと終値時点の価格が1時間足の代用（30分遅れ）になり、清算判定も
   1時間足になる。
@@ -117,3 +123,11 @@ python3 backtests/japan_forward.py status                                       
 ## 8. 変更ログ
 
 （登録後の変更はここに、日付・理由・影響する期間を書く）
+
+- 2026-10-31（規則の変更なし）: `fetch_jquants.py` で J-Quants の全データセット・全列を DB に取り込むように作り直した。
+  決算短信の開示時刻は 2018-03 まで `HH:MM`、以後 `HH:MM:SS` だったので、DB 側で `HH:MM:SS` にそろえた。
+  これにより `japan_earnings_risk.py` の反応セッションの判定が、旧形式の「15:00」ちょうどの開示（SoftBank に6件）で
+  当日扱いから翌営業日扱いに変わる。§2 のレバレッジは全日の最大上昇で決めているので変わらない
+  （再計算の結果は §2 の後ろに追記し、登録時の設計入力 `results/japan_earnings_risk/` は上書きしない）。
+  H1・H2 の評価に使う列（株価日足の終値・調整係数、オプションの原資産価格、空売り比率）の値は旧 DB と差分ゼロで、
+  `japan_forward.py status` の出力（H2 の最新シグナルと空白期間の値）も登録直後と同じだった。
