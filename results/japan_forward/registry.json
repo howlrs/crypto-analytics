@@ -1,0 +1,93 @@
+{
+ "anchor_tag": "japan-forward-2026-11-02-v1",
+ "code_sha256": {
+  "backtests/hl_japan_carry.py": "834b2e747ca28a9d1e59c58a2e20f1c8b16c9e56e8b1bc075928165d86dfd393",
+  "backtests/japan_earnings_risk.py": "aa9055c33d9ee5bd709d3b5151bd237ea23b817da94aedcc8ea92b649f447987",
+  "backtests/japan_forward.py": "144feb2a278fab4feb0791f4d1c4b1ed7ffeebb969946879912808b55703fde5",
+  "backtests/japan_positioning.py": "22e6273092ba79753109ba6849879959c708db1a1fb8b102b1af1a169394a5a3"
+ },
+ "design_input_sha256": {
+  "japan_earnings_risk/summary.json": "d9fce014048d43063ced524d4678a97cc854245b5505d58a7bc3e21e5a905edf"
+ },
+ "h1_carry": {
+  "capital_per_notional": "1 (TSE spot bought with cash) + 1/leverage (isolated perp margin)",
+  "cost_events": "one full round trip at open+close; a perp round trip per TSE split (AdjFactor != 1) and per liquidation",
+  "costs_bp_one_way": {
+   "fx": 5.0,
+   "perp_fee": 0.9,
+   "perp_slippage": 1.0,
+   "spot": 5.0
+  },
+  "criteria": {
+   "alpha_one_sided": 0.05,
+   "hac_lags_days": 5,
+   "max_liquidations": 0,
+   "min_annual_return_on_capital_after_costs": 0.08,
+   "min_valid_share": 0.9
+  },
+  "final_close": "2027-10-29",
+  "instruments": {
+   "xyz:KIOXIA": {
+    "leverage": 2.0,
+    "tse_code": "285A0"
+   },
+   "xyz:SOFTBANK": {
+    "leverage": 3.0,
+    "tse_code": "99840"
+   }
+  },
+  "leverage_source": "backtests/japan_earnings_risk.py: largest of 1.5/2/3/4x whose liquidation room is >= 1.25 x the worst rise between closes (TSE since 2016-10 or listing, and xyz)",
+  "liquidation": "the perp's highest 15m high (else 1h) between two daily closes rises >= 1/L - 0.05 over the earlier close; that day the margin is lost: P&L = spot USD return - 1/L - perp round trip, and the short is reopened at the close with margin reset to 1/L",
+  "open_close": "2026-11-02",
+  "question": "Does the funding received by shorting xyz Japanese stock perps against TSE spot beat the BTC/ETH funding capture after costs, without liquidation, over one year?",
+  "secondary_descriptive": {
+   "funding_exit_days": 10,
+   "funding_exit_rule": "flat after a close where the trailing 10 TSE days' funding sum is negative, back in when it is >= 0; each switch pays half a round trip",
+   "per_instrument": true
+  },
+  "valuation": "15:30 JST (06:30 UTC) each TSE day: perp = 15m open at 06:30 UTC (else 06:00 hourly close), fair = TSE raw close / xyz:JPY; daily P&L per notional = -d(basis) + funding received",
+  "verdicts": {
+   "confirmed": "all criteria hold",
+   "insufficient_data": "valid days below the minimum share for an instrument",
+   "not_confirmed": "no liquidation and coverage ok, but return or significance fails",
+   "rejected_for_risk": "a liquidation at the registered leverage"
+  },
+  "weights": "equal capital across instruments; the day's portfolio return averages the instruments measured"
+ },
+ "h2_short_ratio": {
+  "criteria": {
+   "alpha_one_sided": 0.05,
+   "hac_lags": 4,
+   "min_weeks": 90,
+   "rule_mean_weekly_positive": true
+  },
+  "expected_sign": 1,
+  "first_decision": "2026-11-06",
+  "gap_window": {
+   "first_decision": "2026-08-07",
+   "last_decision": "2026-10-30",
+   "use": "descriptive only: decided after the 2026-08-01 research boundary, computed only after registration, never pooled"
+  },
+  "last_decision": "2028-10-27",
+  "positioning_config": {
+   "alpha": 0.05,
+   "cost_bp": 3.0,
+   "hac_lags": 4,
+   "margin_publication_lag": 2,
+   "max_signal_age_days": 14,
+   "max_target_gap_days": 10,
+   "short_ratio_days": 5,
+   "split_date": "2022-01-01",
+   "z_min_finite": 45,
+   "z_window": 52
+  },
+  "power_note": "about 104 weeks: roughly 60% power for a weekly correlation of 0.2 and 25% for 0.1",
+  "question": "Does the J-Quants short-selling share (S3) predict the next-week Nikkei 225 out of sample?",
+  "signal": "s3_short_ratio"
+ },
+ "integrity": {
+  "registry_sha256": "18f5a14c2400e120ed5c5a271c53eb939072e0f3b25c57f7334aec2dead6ecf8"
+ },
+ "name": "japan-forward-v1",
+ "registered_at": "2026-10-30T15:33:30Z"
+}

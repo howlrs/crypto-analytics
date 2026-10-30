@@ -17,7 +17,7 @@ PR #14（`docs/japan-crossmarket.md`）で、J-Quants の日本 IV・TOPIX は B
 | 業種別空売り比率（日次・33業種） | `/markets/short-ratio` | 2016-10〜 | 分析B |
 | 空売り残高報告（0.5%以上の報告） | `/markets/short-sale-report` | 2016-10〜 | 取得のみ |
 | 投資部門別売買状況（週次、公表日つき） | `/equities/investor-types` | 2016-10〜 | 分析B |
-| 決算短信サマリー | `/fins/summary` | 2016-10〜 | 未取得（本プロジェクトの目的と遠い） |
+| 決算短信サマリー | `/fins/summary` | 2016-10〜 | 2026-10-30 に取得開始（開示日時で決算ジャンプを測る。`docs/japan-perp-forward.md` §2） |
 | 先物・オプション全般、配当、売買内訳、前場四本値 | — | — | **403/400（Standard 対象外）** |
 
 TOPIX、日経225オプション、取引カレンダーは PR #14 で取得済み。日経225の指数値は J-Quants にないため、
@@ -206,6 +206,8 @@ funding（毎時の実績、年率換算。正は perp の売り側が受け取�
    - Hyperliquid の HIP-3 株式 perp 全体（約115銘柄）で、上場直後の funding の符号と大きさを横断的に調べる。KIOXIA（正）と
      SOFTBANK（負）の違いが一般的な傾向か偶然かが分かる。J-Quants は日本銘柄の部分だけで使う。
    - 空売り比率（S3）の将来検証。2022年以降に偏った効果なので、事前確率は低い。
+
+   → 1番目と3番目は `docs/japan-perp-forward.md` で 2026-10-30 に事前登録した（2026-11-02 開始）。
 
 ## 7. 実行
 

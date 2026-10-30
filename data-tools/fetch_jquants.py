@@ -58,6 +58,7 @@ DATASETS = {
     "short_ratio": "/markets/short-ratio",
     "short_positions": "/markets/short-sale-report",
     "investor_types": "/equities/investor-types",
+    "fins_summary": "/fins/summary",  # disclosure dates and times: earnings-jump risk for the xyz stock perps
 }
 PERIOD = re.compile(r"_(\d{6}|\d{8})\.csv\.gz$")
 SCHEMA = """
@@ -106,6 +107,10 @@ PLAIN_TABLES = {
         ("Section", "section", False)] + [(f"{g}{k}", _snake(f"{g}{k}"), True) for g in _INVESTOR_GROUPS
                                           for k in ("Sell", "Buy", "Tot", "Bal")],
                        ("en_date", "section", "pub_date")),  # a week can be republished with a later PubDate
+    "fins_summary": ("fins_summary", "DiscDate", [
+        ("DiscDate", "disc_date", False), ("DiscTime", "disc_time", False), ("Code", "code", False),
+        ("DiscNo", "disc_no", False), ("DocType", "doc_type", False), ("CurPerType", "cur_per_type", False),
+        ("CurPerEn", "cur_per_end", False)], ("code", "disc_no")),
 }
 
 
