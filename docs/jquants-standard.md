@@ -291,11 +291,15 @@ J-Quants はデータ販売ではなく利用サービスなので、解約・�
   消すもの: `/mnt/e/Datas/market/jquants/`（原本・`jquants.db`・J-Quants 由来の値を含む results）、作りかけの DB、
   GCS の `jquants/` の全版（復元期間を先に無効にする）。残すもの: Hyperliquid のデータ（J-Quants ではない）、コード、文書、
   事前登録の registry（規則のみ）、文書中の集計値。
+- **自動削除（2026-10-31 に設定済み）**: `~/.cache/jquants-build/jquants-cancel-requested` があると、契約期間が終わって API が
+  拒否した最初の週次実行で `purge_jquants.sh --yes` まで行う（失敗したら毎時やり直す）。解約を取り消したり、プランを変えて
+  契約を続けたりする場合は、このファイルを消す。アクセスが戻れば（再契約）自動で消える。GCS の削除処理は 2026-10-31 に試験用の
+  場所で確かめた（全版が消え、復元待ちも残らない。バケットの復元期間はこの時点で無効にした）。
 - 他のプロジェクトの J-Quants データは消さずに一覧に出す。2026-10-31 時点で `~/workspace/stocks/research/data/jquants`（3.1GB）。
   そのプロジェクトの results 等も含めて、そちらで消す。
 - 解約後も `update_japan.sh` は動き続ける。xyz は毎週取得し（15分足は約52日分しか遡れないので、再契約後に H1 を評価するために要る）、
-  J-Quants は毎週アクセスを確かめる。拒否されれば何も変えずに `~/.cache/jquants-build/jquants-access-denied` に日付を残し、
-  ログに削除の案内を出す。GCS には xyz だけを送る。
+  J-Quants は毎週アクセスを確かめる。拒否されれば何も変えずに（空のデータディレクトリも作り直さない）
+  `~/.cache/jquants-build/jquants-access-denied` に日付を残し、ログに削除の案内を出す。GCS には xyz だけを送る。
 - **再契約したら**: 新しい API キーを `.env`（`JQUANTS_API_KEY`）に入れて `data-tools/update_japan.sh --force`。`sync` は一覧の
   全ファイルのうち手元にないものをすべて取り直す（約1,800ファイル・1.1GB、1秒1リクエストで30〜40分）ので、解約中の期間も埋まる。
   続いて build（約7分）、`japan_forward.py status`、GCS への控えが走る。提供範囲は過去10年なので、それより古い月は戻らない。
