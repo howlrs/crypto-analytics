@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
-"""Mirror the J-Quants V2 bulk files this repository uses and build a small local SQLite.
+"""Mirror every J-Quants V2 bulk dataset the plan serves and load all columns into a local SQLite.
 
 J-Quants data is licensed for private use and this repository is public, so raw files,
 the derived database and analysis outputs live under --data-dir (default
 /mnt/e/Datas/market/jquants). Paths inside the repository are refused.
 
-  sync   list bulk files, download new or changed ones, verify size, gzip and SHA-256 (network)
-  build  rebuild jquants.db from the verified raw files (offline, no API key)
+  sync   list bulk files, download new or changed ones, verify size, gzip and SHA-256 (network);
+         exit 3 without changing anything when J-Quants refuses a dataset (HTTP 401/403)
+  build  rebuild jquants.db from the verified raw files, one file at a time (offline, no API key)
 
 The API key is read from $JQUANTS_API_KEY, else from the repository .env
 (JQUANTS_API_KEY, or the legacy name JQUANTS_APIKEY). It is sent only to api.jquants.com,
@@ -26,10 +27,12 @@ import json
 import math
 import os
 import re
+import shutil
 import sqlite3
 import sys
 import time
 from collections import defaultdict
+from operator import itemgetter
 from datetime import date, datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
@@ -49,25 +52,175 @@ DATASETS = {
     "topix": "/indices/bars/daily/topix",
     "options225": "/derivatives/bars/daily/options/225",
     "calendar": "/markets/calendar",
+    # Standard plan, checked 2026-10-20 (futures, dividends, breakdown and AM bars return 403)
+    "equities_daily": "/equities/bars/daily",
+    "equities_master": "/equities/master",
+    "indices_daily": "/indices/bars/daily",
+    "margin_weekly": "/markets/margin-interest",
+    "margin_alert": "/markets/margin-alert",
+    "short_ratio": "/markets/short-ratio",
+    "short_positions": "/markets/short-sale-report",
+    "investor_types": "/equities/investor-types",
+    "fins_summary": "/fins/summary",  # disclosure dates and times: earnings-jump risk for the xyz stock perps
+    "equities_valuation": "/equities/valuation",  # daily EPS/BPS/ROE/PER/PBR per stock (found 2026-10-31)
+    "fins_earnings_date": "/fins/earnings-date",  # scheduled earnings dates with their publication dates
 }
 PERIOD = re.compile(r"_(\d{6}|\d{8})\.csv\.gz$")
 SCHEMA = """
-CREATE TABLE source_files (key TEXT PRIMARY KEY, dataset TEXT NOT NULL, last_modified TEXT NOT NULL,
-  size INTEGER NOT NULL, sha256 TEXT NOT NULL);
-CREATE TABLE topix_daily (date TEXT PRIMARY KEY, open REAL, high REAL, low REAL, close REAL NOT NULL,
-  source_key TEXT NOT NULL);
-CREATE TABLE trading_calendar (date TEXT PRIMARY KEY, hol_div TEXT NOT NULL, source_key TEXT NOT NULL);
+CREATE TABLE source_files (id INTEGER PRIMARY KEY, key TEXT NOT NULL UNIQUE, dataset TEXT NOT NULL,
+  last_modified TEXT NOT NULL, size INTEGER NOT NULL, sha256 TEXT NOT NULL);
 CREATE TABLE n225_option_atm (date TEXT NOT NULL, sqd TEXT NOT NULL, ltd TEXT, contract_month TEXT,
   days_to_sq INTEGER NOT NULL, underlying REAL NOT NULL, strike REAL NOT NULL, put_iv REAL NOT NULL,
   call_iv REAL NOT NULL, atm_iv REAL NOT NULL, put_settle REAL NOT NULL, call_settle REAL NOT NULL,
-  put_oi REAL, call_oi REAL, put_volume REAL, call_volume REAL, base_vol REAL, source_key TEXT NOT NULL,
-  PRIMARY KEY (date, sqd));
+  put_oi REAL, call_oi REAL, put_volume REAL, call_volume REAL, base_vol REAL, source_id INTEGER NOT NULL,
+  PRIMARY KEY (date, sqd)) WITHOUT ROWID;
 CREATE TABLE build_meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+CREATE TABLE build_quality (table_name TEXT NOT NULL, column_name TEXT NOT NULL, token TEXT NOT NULL,
+  rows INTEGER NOT NULL, PRIMARY KEY (table_name, column_name, token)) WITHOUT ROWID;
 """
+ATM_COLUMNS = ("date", "sqd", "ltd", "contract_month", "days_to_sq", "underlying", "strike", "put_iv", "call_iv",
+               "atm_iv", "put_settle", "call_settle", "put_oi", "call_oi", "put_volume", "call_volume", "base_vol")
+# Column kinds. Raw values are text and '' is NULL; SQLite column affinity converts numbers. After the
+# load, values a numeric, boolean or time column could not take are counted in build_quality and set to
+# NULL, so nothing is dropped silently.
+#   T text   R real   I integer   B 'true'/'false' -> 1/0   H time (HH:MM until 2018-03 becomes HH:MM:SS)
+#   F margin-alert reasons: the dict literal becomes one 0/1 column per known reason, other keys as JSON
+SQL_TYPES = {"T": "TEXT", "R": "REAL", "I": "INTEGER", "B": "INTEGER", "H": "TEXT"}
+ALERT_REASONS = (("Restricted", "restricted"), ("DailyPublication", "daily_publication"),
+                 ("Monitoring", "monitoring"), ("RestrictedByJSF", "restricted_by_jsf"),
+                 ("PrecautionByJSF", "precaution_by_jsf"), ("UnclearOrSecOnAlert", "unclear_or_sec_on_alert"))
+_INVESTOR_GROUPS = ("Prop", "Brk", "Tot", "Ind", "Frgn", "SecCo", "InvTr", "BusCo", "OthCo", "InsCo", "Bank",
+                    "TrstBnk", "OthFin")
+
+
+def _snake(name: str) -> str:
+    return re.sub(r"(?<=[a-z0-9])(?=[A-Z])", "_", name).lower()
+
+
+class Table:
+    """One loaded dataset: (source, target, kind) columns, the date column a newer file replaces, and
+    a primary key (None keeps exact duplicate rows). A table without secondary indexes is WITHOUT
+    ROWID; one with them stays a rowid table, because with a WITHOUT ROWID table SQLite plans
+    joins such as japan_positioning's (equities_daily JOIN a temp date table) as a scan of the
+    secondary index with a lookup per row, about 10M random reads. A staged table is loaded into a
+    scratch database and compressed afterwards (the daily master snapshots)."""
+
+    def __init__(self, name: str, date: str, columns, key: tuple | None, indexes: tuple = (), stage: bool = False):
+        self.name, self.date, self.columns, self.key = name, date, tuple(columns), key
+        self.indexes, self.stage = indexes, stage
+        self.targets = []
+        for _, target, kind in self.columns:
+            if kind == "F":
+                self.targets += [(t, "INTEGER") for _, t in ALERT_REASONS] + [(f"{target}_extra", "TEXT")]
+            else:
+                self.targets.append((target, SQL_TYPES[kind]))
+        names = [t for t, _ in self.targets]
+        if len(set(names)) != len(names) or date not in names or any(k not in names for k in key or ()):
+            raise ValueError(f"{name}: inconsistent column definition")
+
+    def kinds(self, wanted: str) -> list[str]:
+        return [t for _, t, k in self.columns if k in wanted]
+
+    def schema(self) -> str:
+        required = {self.date, *(self.key or ())}
+        cols = [f"{t} {typ}{' NOT NULL' if t in required else ''}" for t, typ in self.targets]
+        if not self.stage:
+            cols.append("source_id INTEGER NOT NULL")
+        prefix = "stage." if self.stage else ""
+        if self.key:
+            return (f"CREATE TABLE {prefix}{self.name} ({', '.join(cols)}, PRIMARY KEY ({', '.join(self.key)}))"
+                    f"{'' if self.indexes else ' WITHOUT ROWID'};")
+        return f"CREATE TABLE {prefix}{self.name} ({', '.join(cols)});"
+
+
+def _cols(kind: str, *sources: str, rename: dict | None = None) -> list:
+    return [(s, (rename or {}).get(s, _snake(s)), kind) for s in sources]
+
+
+_FINS = ("DiscDate DiscTime Code DiscNo DocType CurPerType CurPerSt CurPerEn CurFYSt CurFYEn NxtFYSt NxtFYEn Sales OP "
+         "OdP NP EPS DEPS TA Eq EqAR BPS CFO CFI CFF CashEq Div1Q Div2Q Div3Q DivFY DivAnn DivUnit DivTotalAnn "
+         "PayoutRatioAnn FDiv1Q FDiv2Q FDiv3Q FDivFY FDivAnn FDivUnit FDivTotalAnn FPayoutRatioAnn NxFDiv1Q NxFDiv2Q "
+         "NxFDiv3Q NxFDivFY NxFDivAnn NxFDivUnit NxFPayoutRatioAnn FSales2Q FOP2Q FOdP2Q FNP2Q FEPS2Q NxFSales2Q "
+         "NxFOP2Q NxFOdP2Q NxFNp2Q NxFEPS2Q FSales FOP FOdP FNP FEPS NxFSales NxFOP NxFOdP NxFNp NxFEPS MatChgSub "
+         "SigChgInC ChgByASRev ChgNoASRev ChgAcEst RetroRst ShOutFY TrShFY AvgSh NCSales NCOP NCOdP NCNP NCEPS NCTA "
+         "NCEq NCEqAR NCBPS FNCSales2Q FNCOP2Q FNCOdP2Q FNCNP2Q FNCEPS2Q NxFNCSales2Q NxFNCOP2Q NxFNCOdP2Q NxFNCNP2Q "
+         "NxFNCEPS2Q FNCSales FNCOP FNCOdP FNCNP FNCEPS NxFNCSales NxFNCOP NxFNCOdP NxFNCNP NxFNCEPS ShEq NCShEq ROE "
+         "NCROE").split()
+_FINS_TEXT = {"DiscDate", "Code", "DiscNo", "DocType", "CurPerType", "CurPerSt", "CurPerEn", "CurFYSt", "CurFYEn",
+              "NxtFYSt", "NxtFYEn"}
+_FINS_BOOL = {"MatChgSub", "SigChgInC", "ChgByASRev", "ChgNoASRev", "ChgAcEst", "RetroRst"}
+_FINS_RENAME = {"CurPerSt": "cur_per_start", "CurPerEn": "cur_per_end", "CurFYSt": "cur_fy_start",
+                "CurFYEn": "cur_fy_end", "NxtFYSt": "nxt_fy_start", "NxtFYEn": "nxt_fy_end"}
+_OHLC = {"O": "open", "H": "high", "L": "low", "C": "close", "Vo": "volume", "Va": "turnover"}
+
+# Every mirrored dataset is loaded with all of its columns. Existing table and column names are kept
+# for the analyses in backtests/; new columns use the snake_case of the J-Quants V2 name.
+TABLES = {
+    "calendar": Table("trading_calendar", "date", _cols("T", "Date", "HolDiv"), ("date",)),
+    "topix": Table("topix_daily", "date", _cols("T", "Date") + _cols("R", "O", "H", "L", "C", rename=_OHLC),
+                   ("date",)),
+    "options225": Table("n225_options", "date", _cols("T", "Date", "Code") + _cols(
+        "R", "O", "H", "L", "C", "EO", "EH", "EL", "EC", "AO", "AH", "AL", "AC", "Vo", "OI", "Va",
+        rename={**_OHLC, "OI": "open_interest"}) + _cols("T", "CM", rename={"CM": "contract_month"})
+        + _cols("R", "Strike", "VoOA") + _cols("T", "EmMrgnTrgDiv", "PCDiv", "LTD", "SQD", rename={"PCDiv": "pc_div"})
+        + _cols("R", "Settle", "Theo", "BaseVol", "UnderPx", "IV", "IR"),
+        ("date", "code", "em_mrgn_trg_div")),  # an emergency-margin day (001) repeats each contract beside 002
+    "equities_daily": Table("equities_daily", "date", _cols("T", "Date", "Code") + _cols(
+        "R", "O", "H", "L", "C", rename=_OHLC) + _cols("I", "UL", "LL", rename={"UL": "upper_limit", "LL": "lower_limit"})
+        + _cols("R", "Vo", "Va", "AdjFactor", "MktCap", rename={**_OHLC, "MktCap": "market_cap"})
+        + _cols("T", "ExRT"), ("date", "code"), indexes=(("code", "date"),)),
+    "equities_master": Table("equities_master_stage", "date", _cols(
+        "T", "Date", "Code", "CoName", "CoNameEn", "S17", "S17Nm", "S33", "S33Nm", "ScaleCat", "Mkt", "MktNm",
+        "Mrgn", "MrgnNm", "ProdCat"), ("date", "code"), stage=True),
+    "equities_valuation": Table("equities_valuation", "date", _cols("T", "Date", "Code") + _cols(
+        "R", "EPS", "FwdEPS", "BPS", "ROE", "FwdROE", "PER", "FwdPER", "PBR", "MktCap", rename={"MktCap": "market_cap"}),
+        ("date", "code"), indexes=(("code", "date"),)),
+    "indices_daily": Table("indices_daily", "date", _cols("T", "Date", "Code") + _cols("R", "O", "H", "L", "C",
+                                                                                      rename=_OHLC), ("date", "code")),
+    "margin_weekly": Table("margin_weekly", "date", _cols("T", "Date", "Code", "PubDate", "IssType") + _cols(
+        "R", "LongVol", "ShrtVol", "LongNegVol", "ShrtNegVol", "LongStdVol", "ShrtStdVol", "LongVal", "ShrtVal",
+        "LongNegVal", "ShrtNegVal", "LongStdVal", "ShrtStdVal",
+        rename={f"{side}{part}{unit}": f"{'long' if side == 'Long' else 'short'}{'_' + part.lower() if part else ''}_"
+                f"{'shares' if unit == 'Vol' else 'value'}" for side in ("Long", "Shrt") for part in ("", "Neg", "Std")
+                for unit in ("Vol", "Val")}), ("date", "code"), indexes=(("code", "date"),)),
+    "margin_alert": Table("margin_alert", "pub_date", _cols("T", "PubDate", "Code", "AppDate")
+                          + [("PubReason", "pub_reason", "F")] + _cols(
+        "R", "ShrtOut", "ShrtOutChg", "ShrtOutRatio", "LongOut", "LongOutChg", "LongOutRatio", "SLRatio", "ShrtNegOut",
+        "ShrtNegOutChg", "ShrtStdOut", "ShrtStdOutChg", "LongNegOut", "LongNegOutChg", "LongStdOut", "LongStdOutChg",
+        rename={"SLRatio": "sl_ratio"})
+        + _cols("T", "TSEMrgnRegCls", rename={"TSEMrgnRegCls": "tse_margin_reg_cls"}),
+        ("pub_date", "code", "app_date"), indexes=(("code", "pub_date"),)),
+    "short_ratio": Table("short_ratio", "date", _cols("T", "Date", "S33") + _cols(
+        "R", "SellExShortVa", "ShrtWithResVa", "ShrtNoResVa",
+        rename={"ShrtWithResVa": "short_with_res_va", "ShrtNoResVa": "short_no_res_va"}), ("date", "s33")),
+    "short_positions": Table("short_positions", "disc_date", _cols(
+        "T", "DiscDate", "CalcDate", "Code", "SSName", "SSAddr", "DICName", "DICAddr", "FundName",
+        rename={"SSName": "ss_name", "SSAddr": "ss_addr", "DICName": "dic_name", "DICAddr": "dic_addr"})
+        + _cols("R", "ShrtPosToSO", "ShrtPosShares", "ShrtPosUnits", rename={"ShrtPosToSO": "shrt_pos_to_so"})
+        + _cols("T", "PrevRptDate") + _cols("R", "PrevRptRatio") + _cols("T", "Notes"),
+        None, indexes=(("code", "calc_date"),)),  # reports can repeat verbatim within a file; all are kept
+    "investor_types": Table("investor_types", "en_date", _cols("T", "PubDate", "StDate", "EnDate", "Section")
+                            + _cols("R", *(f"{g}{k}" for g in _INVESTOR_GROUPS for k in ("Sell", "Buy", "Tot", "Bal"))),
+                            ("en_date", "section", "pub_date")),  # a week can be republished with a later PubDate
+    "fins_summary": Table("fins_summary", "disc_date", [
+        (s, _FINS_RENAME.get(s, _snake(s)), "H" if s == "DiscTime" else "T" if s in _FINS_TEXT
+         else "B" if s in _FINS_BOOL else "R") for s in _FINS], ("code", "disc_no"), indexes=(("disc_date",),)),
+    "fins_earnings_date": Table("fins_earnings_date", "pub_date", _cols(
+        "T", "PubDate", "SchDate", "FQName", "FYE", "Code", "CoName", "CoNameEn", rename={"FQName": "fq_name"}),
+        None, indexes=(("code", "sch_date"), ("sch_date",))),  # SchDate is empty while a date is undecided
+}
 
 
 class JQuantsError(RuntimeError):
-    """Messages never contain the API key or presigned URLs."""
+    """Messages never contain the API key or presigned URLs. status is the HTTP code, if any."""
+
+    def __init__(self, message: str, status: int | None = None):
+        super().__init__(message)
+        self.status = status
+
+
+class AccessDenied(JQuantsError):
+    """J-Quants refused a dataset (HTTP 401/403): the subscription ended or the plan does not cover it."""
 
 
 def outside_repo(path: Path) -> Path:
@@ -152,7 +305,7 @@ class Client:
                     return response.read()
             except HTTPError as exc:
                 if not (exc.code == 429 or 500 <= exc.code < 600) or attempt == self._retries:
-                    raise JQuantsError(f"{what} failed with HTTP {exc.code}") from None
+                    raise JQuantsError(f"{what} failed with HTTP {exc.code}", exc.code) from None
                 error = exc
             except (URLError, TimeoutError, OSError, http.client.HTTPException):
                 if attempt == self._retries:
@@ -264,8 +417,21 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
         except BlockingIOError:
             raise JQuantsError("another sync holds the lock; retry when it finishes") from None
         manifest = _read_manifest(raw / "manifest.json")
+        # List every dataset before downloading anything: if the plan lost one (subscription ended,
+        # or a lower plan), nothing changes locally, so files from different plans are never mixed.
+        # After a renewal the same call fetches every file missing locally, which fills the gap.
+        listings, denied = {}, []
         for name in datasets:
-            listed = [x for x in client.bulk_list(DATASETS[name]) if in_months(x["key"], start, end)]
+            try:
+                listings[name] = [x for x in client.bulk_list(DATASETS[name]) if in_months(x["key"], start, end)]
+            except JQuantsError as exc:
+                if exc.status not in (401, 403):
+                    raise
+                denied.append(name)
+        if denied:
+            raise AccessDenied(f"J-Quants refused {', '.join(denied)} (HTTP 401/403): the subscription ended or "
+                               "the plan does not cover them; nothing was downloaded")
+        for name, listed in listings.items():
             log(f"{name}: {len(listed)} bulk files in range")
             for item in sorted(listed, key=lambda x: x["key"]):
                 path, entry = raw / item["key"], manifest["files"].get(item["key"])
@@ -352,8 +518,10 @@ def atm_by_expiry(rows, source_key: str) -> tuple[list[dict], int]:
     return out, inconsistent
 
 
-def _csv_rows(data: bytes):
-    return csv.DictReader(io.StringIO(gzip.decompress(data).decode("utf-8"), newline=""))
+def _csv_table(data: bytes) -> tuple[list[str], list[list[str]]]:
+    reader = csv.reader(io.StringIO(gzip.decompress(data).decode("utf-8"), newline=""))
+    header = next(reader, [])
+    return header, list(reader)
 
 
 def _modified(entry: dict) -> datetime:
@@ -361,69 +529,226 @@ def _modified(entry: dict) -> datetime:
     return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
 
-def build(data_dir: Path) -> dict:
-    """Rebuild jquants.db. A file with a newer LastModified replaces every date it contains."""
+_REASON = re.compile(r"'(\w+)': '([^']*)'")
+
+
+def _reasons(value: str) -> tuple:
+    """Margin-alert PubReason dict literal -> one value per ALERT_REASONS key, then the rest (JSON).
+    A value that does not look like the dict literal is kept verbatim in the extra column."""
+    if not value:
+        return (None,) * (len(ALERT_REASONS) + 1)
+    found = dict(_REASON.findall(value))
+    if not found:
+        return (None,) * len(ALERT_REASONS) + (value,)
+    flags = tuple(found.pop(source, None) for source, _ in ALERT_REASONS)
+    return flags + (json.dumps(found, sort_keys=True, ensure_ascii=False) if found else None,)
+
+
+def _chunks(values: list, size: int = 500):
+    for i in range(0, len(values), size):
+        yield values[i:i + size]
+
+
+class _Loader:
+    """Streams one verified file at a time into its table; a newer file replaces every date it holds."""
+
+    def __init__(self, conn: sqlite3.Connection):
+        self.conn, self.loaded = conn, defaultdict(set)
+
+    def _delete_dates(self, table: str, column: str, dates: list[str]) -> None:
+        for part in _chunks(dates):
+            self.conn.execute(f"DELETE FROM {table} WHERE {column} IN ({','.join('?' * len(part))})", part)
+
+    def load(self, spec: Table, header: list[str], rows: list[list[str]], source_id: int, label: str,
+             also: tuple[tuple[str, str], ...] = ()) -> tuple[int, list[str]]:
+        """Returns (dates overridden, unloaded header columns). `also` lists (table, date column)
+        pairs derived from the same file, replaced together with it."""
+        position = {name: i for i, name in enumerate(header)}
+        missing = [s for s, _, _ in spec.columns if s not in position]
+        if missing:
+            raise JQuantsError(f"{label}: missing columns {missing}; check the schema")
+        extra = sorted(set(header) - {s for s, _, _ in spec.columns})
+        idx = [position[s] for s, _, _ in spec.columns]
+        date_i = position[next(s for s, t, _ in spec.columns if t == spec.date)]
+        dates = set(map(itemgetter(date_i), rows))
+        if "" in dates:
+            raise JQuantsError(f"{label}: row without date or key")
+        overlap = sorted(dates & self.loaded[spec.name])
+        prefix = "stage." if spec.stage else ""
+        if overlap:
+            self._delete_dates(prefix + spec.name, spec.date, overlap)
+            for table, column in also:
+                self._delete_dates(table, column, overlap)
+        self.loaded[spec.name] |= dates
+        if any(k == "F" for _, _, k in spec.columns):
+            values = [tuple(x for i, (_, _, k) in zip(idx, spec.columns)
+                            for x in (_reasons(r[i]) if k == "F" else (r[i],))) for r in rows]
+        else:
+            values = list(map(itemgetter(*idx), rows))
+        replace = bool(spec.key) and spec.date not in spec.key
+        if replace:  # the key can move to another date; within one file it must still be unique
+            key_i = [i for i, t in enumerate(t for t, _ in spec.targets) if t in spec.key]
+            keys = list(map(itemgetter(*key_i), values))
+            if len(set(keys)) != len(keys):
+                raise JQuantsError(f"{label}: duplicate {spec.name} row")
+        marks = ", ".join(["NULLIF(?, '')"] * len(spec.targets) + ([] if spec.stage else [str(int(source_id))]))
+        verb = "INSERT OR REPLACE" if replace else "INSERT"
+        try:
+            self.conn.executemany(f"{verb} INTO {prefix}{spec.name} VALUES ({marks})", values)
+        except sqlite3.IntegrityError as exc:
+            what = "row without date or key" if "NOT NULL" in str(exc) else f"duplicate {spec.name} row"
+            raise JQuantsError(f"{label}: {what}") from None
+        return len(overlap), extra
+
+
+def _clean(conn: sqlite3.Connection, spec: Table, quality: list) -> None:
+    """Count and null the values a typed column could not take; normalise booleans and times."""
+    name = ("stage." if spec.stage else "") + spec.name
+    numeric = [t for t, typ in spec.targets if typ in ("REAL", "INTEGER") and t not in spec.kinds("B")]
+    checks = numeric + spec.kinds("B") + spec.kinds("H")
+    if not checks:
+        return
+    for column in spec.kinds("B"):
+        conn.execute(f"UPDATE {name} SET {column} = CASE {column} WHEN 'true' THEN 1 WHEN 'false' THEN 0 "
+                     f"ELSE {column} END WHERE typeof({column}) = 'text'")
+    for column in spec.kinds("H"):
+        conn.execute(f"UPDATE {name} SET {column} = {column} || ':00' WHERE {column} GLOB '[0-2][0-9]:[0-5][0-9]'")
+    bad = {c: (f"typeof({c}) = 'text'" if c not in spec.kinds("H")
+               else f"{c} NOT GLOB '[0-2][0-9]:[0-5][0-9]:[0-5][0-9]'") for c in checks}
+    counts = conn.execute(f"SELECT {', '.join(f'COALESCE(SUM({w}), 0)' for w in bad.values())} FROM {name}").fetchone()
+    for (column, where), total in zip(bad.items(), counts):
+        if not total:
+            continue
+        top = conn.execute(f"SELECT {column}, COUNT(*) FROM {name} WHERE {where} GROUP BY {column} "
+                           "ORDER BY COUNT(*) DESC, 1 LIMIT 20").fetchall()
+        quality += [(spec.name, column, str(token), n) for token, n in top]
+        if total > sum(n for _, n in top):
+            quality.append((spec.name, column, "<other>", total - sum(n for _, n in top)))
+        conn.execute(f"UPDATE {name} SET {column} = NULL WHERE {where}")
+
+
+def _finish_master(conn: sqlite3.Connection, spec: Table) -> dict:
+    """Compress the daily master snapshots into validity intervals: a new interval starts whenever a
+    code's attributes change or it is missing from a snapshot. The equities_master view rebuilds
+    every (date, code) snapshot row exactly."""
+    attrs = [t for t, _ in spec.targets if t not in ("date", "code")]
+    cols = ", ".join(attrs)
+    statements = [
+        "CREATE TABLE equities_master_dates (date TEXT PRIMARY KEY) WITHOUT ROWID",
+        f"INSERT INTO equities_master_dates SELECT DISTINCT date FROM stage.{spec.name} ORDER BY date",
+        f"CREATE TABLE equities_master_history (code TEXT NOT NULL, valid_from TEXT NOT NULL, valid_to TEXT NOT NULL, "
+        f"{', '.join(f'{a} TEXT' for a in attrs)}, snapshots INTEGER NOT NULL, PRIMARY KEY (code, valid_from)) WITHOUT ROWID",
+        f"WITH d AS (SELECT date, ROW_NUMBER() OVER (ORDER BY date) AS i FROM equities_master_dates), "
+        f"s AS (SELECT m.*, d.i - ROW_NUMBER() OVER (PARTITION BY m.code, {', '.join(f'm.{a}' for a in attrs)} "
+        f"ORDER BY d.i) AS g FROM stage.{spec.name} m JOIN d USING (date)) "
+        f"INSERT INTO equities_master_history SELECT code, MIN(date), MAX(date), {cols}, COUNT(*) FROM s "
+        f"GROUP BY code, {cols}, g",
+        f"CREATE VIEW equities_master AS SELECT d.date, h.code, {', '.join(f'h.{a}' for a in attrs)} "
+        "FROM equities_master_dates d JOIN equities_master_history h ON d.date BETWEEN h.valid_from AND h.valid_to",
+    ]
+    for statement in statements:  # not executescript: it would commit the open build transaction
+        conn.execute(statement)
+    staged = conn.execute(f"SELECT COUNT(*) FROM stage.{spec.name}").fetchone()[0]
+    kept, covered = conn.execute("SELECT COUNT(*), COALESCE(SUM(snapshots), 0) FROM equities_master_history").fetchone()
+    if covered != staged:
+        raise JQuantsError(f"master compression lost rows: {covered} != {staged}")
+    return {"equities_master_snapshot_rows": staged, "equities_master_history_rows": kept}
+
+
+def build(data_dir: Path, work_dir: Path | None = None) -> dict:
+    """Rebuild jquants.db with every column of every mirrored dataset, one file at a time.
+    A file with a newer LastModified replaces every date it contains. work_dir holds the database
+    while it is written (random writes are slow on a Windows drive under WSL); the finished file is
+    copied next to the old one and swapped in atomically."""
     root = outside_repo(data_dir)
+    work = outside_repo(work_dir) if work_dir else root
+    work.mkdir(parents=True, exist_ok=True)
     manifest = _read_manifest(root / "raw" / "manifest.json")
     files = sorted(manifest["files"].values(), key=lambda x: (_modified(x), x["key"]))
-    topix, calendar, options = {}, {}, {}
+    unknown = sorted({f["dataset"] for f in files} - set(TABLES))
+    if unknown:
+        raise JQuantsError(f"no table definition for datasets {unknown}")
     stats = {"files": len(files), "overridden_dates": 0, "inconsistent_option_groups": 0,
-             "topix_without_close": 0, "option_dates_without_atm": 0}
-    for entry in files:
-        path = root / "raw" / entry["key"]
-        data = path.read_bytes() if path.exists() else None
-        if data is None or hashlib.sha256(data).hexdigest() != entry["sha256"]:
-            raise JQuantsError(f"{entry['key']}: raw file missing or SHA-256 mismatch; run sync")
-        rows = list(_csv_rows(data))
-        if entry["dataset"] == "topix":
-            for row in rows:
-                stats["overridden_dates"] += row["Date"] in topix
-                close = _number(row.get("C"))
-                if close is None or close <= 0:
-                    topix.pop(row["Date"], None)
-                    stats["topix_without_close"] += 1
-                    continue
-                topix[row["Date"]] = (row["Date"], _number(row.get("O")), _number(row.get("H")),
-                                      _number(row.get("L")), close, entry["key"])
-        elif entry["dataset"] == "calendar":
-            for row in rows:
-                calendar[row["Date"]] = (row["Date"], row["HolDiv"], entry["key"])
-        elif entry["dataset"] == "options225":
-            atm, bad = atm_by_expiry(rows, entry["key"])
-            if rows and not atm:
-                raise JQuantsError(f"{entry['key']}: option rows present but no usable ATM pair; check the schema")
-            stats["inconsistent_option_groups"] += bad
-            dates = {row["Date"] for row in rows}
-            stats["option_dates_without_atm"] += len(dates - {r["date"] for r in atm})
-            stale = {k for k in options if k[0] in dates}
-            stats["overridden_dates"] += len({k[0] for k in stale})
-            for k in stale:
-                del options[k]
-            options.update({(r["date"], r["sqd"]): r for r in atm})
-    tmp = root / f".jquants.db.tmp-{os.getpid()}"
-    tmp.unlink(missing_ok=True)
+             "option_dates_without_atm": 0}
+    unloaded: dict[str, list[str]] = {}
+    quality: list[tuple] = []
+    tmp, stage = work / f".jquants.db.tmp-{os.getpid()}", work / f".jquants-stage.tmp-{os.getpid()}"
+    swap = root / f".jquants.db.swap-{os.getpid()}"
+    for path in (tmp, stage, swap):
+        path.unlink(missing_ok=True)
     try:
-        conn = sqlite3.connect(tmp)
+        conn = sqlite3.connect(tmp, isolation_level=None)
         try:
+            conn.execute("ATTACH DATABASE ? AS stage", (str(stage),))
+            for pragma in ("main.journal_mode=OFF", "stage.journal_mode=OFF", "main.synchronous=OFF",
+                           "stage.synchronous=OFF", "cache_size=-1048576", "temp_store=MEMORY"):
+                conn.execute(f"PRAGMA {pragma}")
             conn.executescript(SCHEMA)
-            conn.executemany("INSERT INTO source_files VALUES (?,?,?,?,?)",
-                             [(f["key"], f["dataset"], f["last_modified"], f["size"], f["sha256"]) for f in files])
-            conn.executemany("INSERT INTO topix_daily VALUES (?,?,?,?,?,?)", sorted(topix.values()))
-            conn.executemany("INSERT INTO trading_calendar VALUES (?,?,?)", sorted(calendar.values()))
-            columns = ("date", "sqd", "ltd", "contract_month", "days_to_sq", "underlying", "strike", "put_iv",
-                       "call_iv", "atm_iv", "put_settle", "call_settle", "put_oi", "call_oi", "put_volume",
-                       "call_volume", "base_vol", "source_key")
-            conn.executemany(f"INSERT INTO n225_option_atm VALUES ({','.join('?' * len(columns))})",
-                             [tuple(options[k][c] for c in columns) for k in sorted(options)])
-            stats.update({"topix_rows": len(topix), "calendar_rows": len(calendar), "option_atm_rows": len(options),
-                          "built_at": now_iso()})
+            for spec in TABLES.values():
+                conn.execute(spec.schema())
+                if spec.key is None or spec.key[0] != spec.date:  # date deletes need an index during the load
+                    conn.execute(f"CREATE INDEX {'stage.' if spec.stage else ''}{spec.name}_{spec.date} "
+                                 f"ON {spec.name} ({spec.date})")
+            loader = _Loader(conn)
+            conn.execute("BEGIN")
+            for source_id, entry in enumerate(files, 1):
+                path = root / "raw" / entry["key"]
+                data = path.read_bytes() if path.exists() else None
+                if data is None or hashlib.sha256(data).hexdigest() != entry["sha256"]:
+                    raise JQuantsError(f"{entry['key']}: raw file missing or SHA-256 mismatch; run sync")
+                conn.execute("INSERT INTO source_files VALUES (?,?,?,?,?,?)", (
+                    source_id, entry["key"], entry["dataset"], entry["last_modified"], entry["size"], entry["sha256"]))
+                header, rows = _csv_table(data)
+                if not rows:
+                    continue
+                spec = TABLES[entry["dataset"]]
+                also = (("n225_option_atm", "date"),) if entry["dataset"] == "options225" else ()
+                overridden, extra = loader.load(spec, header, rows, source_id, entry["key"], also)
+                stats["overridden_dates"] += overridden
+                if extra:
+                    unloaded[entry["dataset"]] = sorted(set(unloaded.get(entry["dataset"], [])) | set(extra))
+                if entry["dataset"] == "options225":
+                    atm, bad = atm_by_expiry([dict(zip(header, r)) for r in rows], entry["key"])
+                    if not atm:
+                        raise JQuantsError(f"{entry['key']}: option rows present but no usable ATM pair; check the schema")
+                    stats["inconsistent_option_groups"] += bad
+                    day = header.index("Date")
+                    stats["option_dates_without_atm"] += len({r[day] for r in rows} - {r["date"] for r in atm})
+                    conn.executemany(f"INSERT INTO n225_option_atm VALUES ({','.join('?' * (len(ATM_COLUMNS) + 1))})",
+                                     [tuple(r[c] for c in ATM_COLUMNS) + (source_id,) for r in atm])
+            for spec in TABLES.values():
+                _clean(conn, spec, quality)
+            stats["topix_without_close"] = conn.execute(
+                "DELETE FROM topix_daily WHERE close IS NULL OR close <= 0").rowcount
+            stats.update(_finish_master(conn, TABLES["equities_master"]))
+            conn.execute("COMMIT")
+            conn.execute("DETACH DATABASE stage")
+            for spec in TABLES.values():
+                for cols in spec.indexes:
+                    if spec.key is None or cols != (spec.date,) or spec.key[0] == spec.date:
+                        conn.execute(f"CREATE INDEX IF NOT EXISTS {spec.name}_{'_'.join(cols)} "
+                                     f"ON {spec.name} ({', '.join(cols)})")
+            for spec in TABLES.values():
+                if not spec.stage:
+                    stats[f"{spec.name}_rows"] = conn.execute(f"SELECT COUNT(*) FROM {spec.name}").fetchone()[0]
+            stats.update({"topix_rows": stats["topix_daily_rows"], "calendar_rows": stats["trading_calendar_rows"],
+                          "option_atm_rows": conn.execute("SELECT COUNT(*) FROM n225_option_atm").fetchone()[0],
+                          "unloaded_columns": unloaded, "quality_issues": len(quality), "built_at": now_iso()})
+            conn.executemany("INSERT INTO build_quality VALUES (?,?,?,?)", quality)
+            # No ANALYZE: without statistics the planner keeps the plans the analyses were written against.
             conn.executemany("INSERT INTO build_meta VALUES (?,?)", [(k, json.dumps(v)) for k, v in stats.items()])
-            conn.commit()
         finally:
             conn.close()
-        os.replace(tmp, root / "jquants.db")
+        if work == root:
+            os.replace(tmp, root / "jquants.db")
+        else:
+            shutil.copyfile(tmp, swap)
+            os.replace(swap, root / "jquants.db")
     finally:
-        tmp.unlink(missing_ok=True)
+        for path in (tmp, stage, swap):
+            path.unlink(missing_ok=True)
+    for name, columns in unloaded.items():
+        log(f"warning: {name} has columns without a table definition: {columns}")
     return stats
 
 
@@ -431,6 +756,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", choices=("sync", "build"))
     parser.add_argument("--data-dir", type=Path, default=DEFAULT_DIR)
+    parser.add_argument("--work-dir", type=Path, default=None,
+                        help="build: write the database here first (a Linux filesystem is much faster than /mnt)")
     parser.add_argument("--datasets", default=",".join(DATASETS))
     parser.add_argument("--start", default="2016-10", help="first month (YYYY-MM) to mirror")
     parser.add_argument("--end", default=None, help="last month (YYYY-MM); default: everything listed")
@@ -438,7 +765,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         outside_repo(args.data_dir)
         if args.command == "build":
-            log(f"build: {json.dumps(build(args.data_dir), sort_keys=True)}")
+            log(f"build: {json.dumps(build(args.data_dir, args.work_dir), sort_keys=True)}")
             return 0
         datasets = [x.strip() for x in args.datasets.split(",") if x.strip()]
         if not datasets or any(x not in DATASETS for x in datasets):
@@ -449,6 +776,9 @@ def main(argv: list[str] | None = None) -> int:
         counts = sync(Client(load_api_key()), args.data_dir, datasets, args.start, args.end)
         log(f"sync: {json.dumps(counts, sort_keys=True)}")
         return 0
+    except AccessDenied as exc:
+        log(f"access denied: {exc}")
+        return 3
     except (ValueError, KeyError, OSError, csv.Error, sqlite3.Error, JQuantsError) as exc:
         log(f"error: {type(exc).__name__}: {exc}")
         return 1

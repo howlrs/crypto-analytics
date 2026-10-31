@@ -145,6 +145,9 @@ hl_watch.db と market.db は完全に独立したファイルであり、相互
 - [docs/prospective-validation.md](docs/prospective-validation.md) — 将来検証の事前登録、封印境界、統計非開示、更新・最終評価手順
 - [docs/reproducibility.md](docs/reproducibility.md) — 分析コード・成果物・外部DB・実行環境の再現性マニフェスト
 - [docs/limitations.md](docs/limitations.md) — 観測サンプルバイアス・清算価格の動的性質など解釈上の注意
+- [docs/japan-crossmarket.md](docs/japan-crossmarket.md) — J-Quants の日本市場データは暗号資産のリスク判断に効くか（結論: 効かない）
+- [docs/jquants-standard.md](docs/jquants-standard.md) — J-Quants Standard の取得データ棚卸し、xyz 日本株 perp のキャリー、需給指標の事前登録検定
+- [docs/japan-perp-forward.md](docs/japan-perp-forward.md) — 日本株 perp キャリーと空売り比率の将来検証（2026-11-02 開始の事前登録）
 
 ## 環境要件
 
