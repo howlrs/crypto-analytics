@@ -12,6 +12,9 @@
 # changes; the date goes to $WORK/jquants-access-denied, the log repeats the licence duty (after a
 # cancellation every J-Quants copy must be deleted: data-tools/purge_jquants.sh) and the next week
 # checks again. After a renewal the sync fetches every file missing locally, so the gap is refilled.
+# If $WORK/jquants-cancel-requested exists (the user submitted the cancellation), the first refusal
+# also runs purge_jquants.sh --yes, so the data goes when the paid period ends; a failed purge is
+# retried next hour. Remove the marker if the cancellation is undone; regained access removes it.
 # Network access waits for the read-only VPN route check in data-tools/vpn_route.sh; resolution is IPv4.
 set -euo pipefail
 export PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/sbin:/sbin:$HOME/google-cloud-sdk/bin"  # cron gives /usr/bin:/bin only
@@ -30,6 +33,8 @@ GCS_HOSTS=(storage.googleapis.com oauth2.googleapis.com)
 HL_STAMP="$WORK/hl-last-success"
 JQ_STAMP="$WORK/jquants-last-success"
 DENIED="$WORK/jquants-access-denied"
+CANCEL="$WORK/jquants-cancel-requested"
+PURGED="$WORK/jquants-purged"
 # shellcheck source=vpn_route.sh
 source "$REPO/data-tools/vpn_route.sh"
 mkdir -p "$WORK" "$LOGS"
@@ -75,7 +80,7 @@ if due "$JQ_STAMP"; then
     0)
       if [[ -f "$DENIED" ]]; then
         echo "J-Quants access is back (refused since $(cat "$DENIED")); every missing file was fetched"
-        rm -f "$DENIED"
+        rm -f "$DENIED" "$PURGED" "$CANCEL"
       fi
       python3 data-tools/fetch_jquants.py build --data-dir "$DATA" --work-dir "$WORK"
       python3 backtests/japan_forward.py status --jquants-db "$DATA/jquants.db" >/dev/null
@@ -87,7 +92,17 @@ if due "$JQ_STAMP"; then
       echo "NOTICE: if the subscription has ended, the J-Quants licence requires deleting every acquired copy:"
       echo "NOTICE:   data-tools/purge_jquants.sh (dry run), then data-tools/purge_jquants.sh --yes"
       echo "NOTICE: access is checked again next week; after a renewal the sync refetches everything missing."
-      touch "$JQ_STAMP" ;;
+      purged=1
+      if [[ -f "$CANCEL" && ! -f "$PURGED" ]]; then
+        echo "NOTICE: cancellation requested on $(head -1 "$CANCEL"): deleting the J-Quants data now"
+        JQ_DATA_DIR="$DATA" JQ_WORK_DIR="$WORK" JQ_GCS_URI="$GCS_URI" JQ_GCLOUD_CONFIG="$GCLOUD_CONFIG" \
+          "$REPO/data-tools/purge_jquants.sh" --yes || purged=0
+      fi
+      if [[ "$purged" == 1 ]]; then
+        touch "$JQ_STAMP"
+      else
+        echo "purge failed; it is retried next hour"  # JQ_STAMP stays old, so the part stays due
+      fi ;;
     *)
       echo "J-Quants sync failed (exit $rc); it is retried next hour" ;;
   esac

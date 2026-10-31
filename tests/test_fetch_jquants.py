@@ -198,6 +198,10 @@ class ExpiredSubscriptionTest(unittest.TestCase):
             with self.assertRaisesRegex(fj.AccessDenied, "calendar"):
                 fj.sync(bulk, Path(tmp), ["topix", "calendar"], "2016-10", None)
             self.assertEqual(bulk.downloads, [])  # topix was listable but is not fetched either
+            fresh = Path(tmp) / "purged" / "jquants"
+            with self.assertRaises(fj.AccessDenied):
+                fj.sync(bulk, fresh, ["topix", "calendar"], "2016-10", None)
+            self.assertFalse(fresh.exists())  # a refused sync recreates nothing after a purge
             bulk.bulk_list = listing  # renewed: everything missing locally is fetched
             self.assertEqual(fj.sync(bulk, Path(tmp), ["topix", "calendar"], "2016-10", None)["downloaded"], 2)
 

@@ -409,6 +409,7 @@ def _atomic_write(path: Path, data: bytes) -> None:
 
 def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: str | None) -> dict:
     raw = outside_repo(data_dir) / "raw"
+    created = [p for p in (raw.parent, raw) if not p.exists()]  # removed again if access is refused
     raw.mkdir(parents=True, exist_ok=True)
     counts = {"downloaded": 0, "skipped": 0, "superseded": 0}
     with open(raw / ".sync.lock", "w") as lock:
@@ -428,10 +429,7 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
                 if exc.status not in (401, 403):
                     raise
                 denied.append(name)
-        if denied:
-            raise AccessDenied(f"J-Quants refused {', '.join(denied)} (HTTP 401/403): the subscription ended or "
-                               "the plan does not cover them; nothing was downloaded")
-        for name, listed in listings.items():
+        for name, listed in ({} if denied else listings).items():
             log(f"{name}: {len(listed)} bulk files in range")
             for item in sorted(listed, key=lambda x: x["key"]):
                 path, entry = raw / item["key"], manifest["files"].get(item["key"])
@@ -462,6 +460,13 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
                 _atomic_write(raw / "manifest.json", (json.dumps(manifest, indent=1, sort_keys=True) + "\n").encode())
                 counts["downloaded"] += 1
                 log(f"  {item['key']} ({len(data):,} B)")
+    if denied:
+        if created:  # leave no empty data directory behind a purge (after the lock is closed)
+            (raw / ".sync.lock").unlink(missing_ok=True)
+            for path in reversed(created):
+                path.rmdir()
+        raise AccessDenied(f"J-Quants refused {', '.join(denied)} (HTTP 401/403): the subscription ended or "
+                           "the plan does not cover them; nothing was downloaded")
     return counts
 
 
