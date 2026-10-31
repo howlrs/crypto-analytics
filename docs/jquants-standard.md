@@ -230,7 +230,8 @@ python3 backtests/japan_positioning.py         # 通信なし。market.db は re
 - `update_japan.sh` は外部通信の前に、ホスト側 VPN の分割経路（0.0.0.0/1 と 128.0.0.0/1）が同じデバイスにあり、
   取得先がそこを通ることを読み取りだけで確かめ、満たさなければ何も取得せずに止まる。名前解決は IPv4 に固定する
   （`data-tools/ipv4_run.py`。この WSL では IPv6 だけが VPN を通らない）。引数なしなら前回成功から6日未満は何もしない。
-  ログは `/mnt/e/Datas/market/jquants/logs/`。
+  ログは `~/.cache/jquants-build/logs/`（J-Quants のデータを含まない）。xyz と J-Quants は独立して動き、J-Quants が拒否されても
+  xyz の取得は続く（§9）。
 - 個別に動かすときは `python3 data-tools/ipv4_run.py data-tools/fetch_jquants.py sync`、
   `python3 data-tools/fetch_jquants.py build --work-dir ~/.cache/jquants-build`。
   `--work-dir` に Linux 側のディレクトリを渡すと、/mnt/e に直接書くより速い（2026-10-31 の実測で 7分 対 24分）。
@@ -262,7 +263,7 @@ python3 backtests/japan_positioning.py         # 通信なし。market.db は re
 - 作り直しの検証（2026-10-31）: 全14データセットで、原本から独立に数えた行数（同じ日付は新しいファイルが置き換える）と一致した。
   分析が読む列は旧 DB と差分ゼロで、`hl_japan_carry.py` と `japan_positioning.py` の出力はバイト単位で同じだった。
 - `sync` は一覧から消えたファイルを手元から消さない。Standard の提供範囲は過去10年なので、古い月が順に一覧から外れると
-  見込まれ、その後は手元の原本（約1.1GB）が唯一の写しになる。
+  見込まれ、契約中は手元の原本（約1.1GB）とその控えだけが写しになる。解約したらこれも消す（§9）。
 
 ### 控え（Google Cloud Storage）
 
@@ -274,4 +275,30 @@ python3 backtests/japan_positioning.py         # 通信なし。market.db は re
   無効にするには `JQ_GCS_URI=` を空にする。
 - 復元: `gcloud --configuration=gonumb storage rsync gs://crypto-bitflyer-418902-jquants/jquants/raw /mnt/e/Datas/market/jquants/raw --recursive`
   の後に `fetch_jquants.py build`。J-Quants のデータは私的利用のライセンスなので、バケットを公開・共有しないこと。
-  解約時はこのバケットも削除対象とする。
+  解約時は `purge_jquants.sh` が `jquants/` の全版を消す（§9）。
+
+## 9. 解約と再契約
+
+**解約したら J-Quants のデータをすべて消す。** J-Quants の公式ヘルプ（https://jpx-jquants.com/help/usage 、2026-10-31 確認）によると、
+J-Quants はデータ販売ではなく利用サービスなので、解約・退会後は取得したデータ、その複製、元データを復元できる派生物をすべて削除する。
+元データを復元できない派生物（集計統計など）は、外部に配信・公開しない限り残してよい。規約本文と食い違えば規約が優先する。
+
+- 解約の効力が生じた後（API が拒否するようになった後）に実行する。
+  ```bash
+  data-tools/purge_jquants.sh         # 一覧だけ（GCS の一覧は VPN 経路の確認後）
+  data-tools/purge_jquants.sh --yes   # 削除
+  ```
+  消すもの: `/mnt/e/Datas/market/jquants/`（原本・`jquants.db`・J-Quants 由来の値を含む results）、作りかけの DB、
+  GCS の `jquants/` の全版（復元期間を先に無効にする）。残すもの: Hyperliquid のデータ（J-Quants ではない）、コード、文書、
+  事前登録の registry（規則のみ）、文書中の集計値。
+- 他のプロジェクトの J-Quants データは消さずに一覧に出す。2026-10-31 時点で `~/workspace/stocks/research/data/jquants`（3.1GB）。
+  そのプロジェクトの results 等も含めて、そちらで消す。
+- 解約後も `update_japan.sh` は動き続ける。xyz は毎週取得し（15分足は約52日分しか遡れないので、再契約後に H1 を評価するために要る）、
+  J-Quants は毎週アクセスを確かめる。拒否されれば何も変えずに `~/.cache/jquants-build/jquants-access-denied` に日付を残し、
+  ログに削除の案内を出す。GCS には xyz だけを送る。
+- **再契約したら**: 新しい API キーを `.env`（`JQUANTS_API_KEY`）に入れて `data-tools/update_japan.sh --force`。`sync` は一覧の
+  全ファイルのうち手元にないものをすべて取り直す（約1,800ファイル・1.1GB、1秒1リクエストで30〜40分）ので、解約中の期間も埋まる。
+  続いて build（約7分）、`japan_forward.py status`、GCS への控えが走る。提供範囲は過去10年なので、それより古い月は戻らない。
+- `sync` は、どれか1つのデータセットでも 401/403 なら何もダウンロードせずに終了コード 3 で止まる。Free や下位プランのファイルが
+  混ざらないようにするためで、プランを変えて一部だけ取るときは `--datasets` で明示する。
+

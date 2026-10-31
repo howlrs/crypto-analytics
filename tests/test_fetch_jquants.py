@@ -177,6 +177,41 @@ class FakeBulk:
         return self.files[key][1]
 
 
+class ExpiredSubscriptionTest(unittest.TestCase):
+    """After cancellation nothing changes locally; after a renewal the missing files are fetched."""
+
+    def test_a_refused_dataset_stops_the_sync_before_any_download(self):
+        topix = "indices/bars/daily/topix/historical/2024/t_202408.csv.gz"
+        cal = "markets/calendar/live/markets_calendar.csv.gz"
+        files = {topix: (T1, gz_csv(["Date", "O", "H", "L", "C"], [{"Date": "2024-08-01", "O": "1", "H": "1",
+                                                                     "L": "1", "C": "2"}])),
+                 cal: (T1, gz_csv(["Date", "HolDiv"], [{"Date": "2024-08-01", "HolDiv": "1"}]))}
+        bulk = FakeBulk(files)
+        listing = bulk.bulk_list
+
+        def refused(endpoint):
+            if "calendar" in endpoint:
+                raise fj.JQuantsError("GET /bulk/list failed with HTTP 403", 403)
+            return listing(endpoint)
+        with tempfile.TemporaryDirectory() as tmp:
+            bulk.bulk_list = refused
+            with self.assertRaisesRegex(fj.AccessDenied, "calendar"):
+                fj.sync(bulk, Path(tmp), ["topix", "calendar"], "2016-10", None)
+            self.assertEqual(bulk.downloads, [])  # topix was listable but is not fetched either
+            bulk.bulk_list = listing  # renewed: everything missing locally is fetched
+            self.assertEqual(fj.sync(bulk, Path(tmp), ["topix", "calendar"], "2016-10", None)["downloaded"], 2)
+
+    def test_http_status_is_kept_and_access_denied_exits_3(self):
+        error = HTTPError("https://api.jquants.com/v2/bulk/list", 401, "Unauthorized", Message(), None)
+        c, _ = client([error])
+        with self.assertRaises(fj.JQuantsError) as caught:
+            c.api("/bulk/list", {"endpoint": "/markets/calendar"})
+        self.assertEqual(caught.exception.status, 401)
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(fj, "load_api_key", return_value=SECRET), \
+                mock.patch.object(fj, "sync", side_effect=fj.AccessDenied("refused")):
+            self.assertEqual(fj.main(["sync", "--data-dir", tmp]), 3)
+
+
 class MirrorAndBuildTest(unittest.TestCase):
     def test_atm_choice(self):
         rows = [option("2024-08-20", "38000", "1", iv="25"), option("2024-08-20", "38000", "2", iv="23"),
