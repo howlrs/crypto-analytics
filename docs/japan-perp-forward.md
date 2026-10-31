@@ -90,7 +90,7 @@ BTC/ETH の funding capture（年率 8〜10%）を上回るか。清算なしで
 
 ```bash
 cd /home/o9oem/workspace/crypto/analytics
-data-tools/update_japan.sh --force          # 外部通信。経路確認 → fetch_hl_xyz → sync → build → status（約10分）
+data-tools/update_japan.sh --force          # 外部通信。経路確認 → fetch_hl_xyz → sync → build → status → GCS 控え（約10分）
 python3 backtests/japan_forward.py status   # 通信なし。出力は /mnt/e/Datas/market/jquants/results/japan_forward
 ```
 

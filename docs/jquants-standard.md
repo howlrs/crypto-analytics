@@ -221,7 +221,7 @@ funding（毎時の実績、年率換算。正は perp の売り側が受け取�
 
 ```bash
 cd /home/o9oem/workspace/crypto/analytics
-data-tools/update_japan.sh --force   # 外部通信。経路確認 → fetch_hl_xyz → sync → build → japan_forward status
+data-tools/update_japan.sh --force   # 外部通信。経路確認 → fetch_hl_xyz → sync → build → japan_forward status → GCS 控え
 data-tools/update_japan.sh --check   # 通信なし。VPN 経路の確認だけ
 python3 backtests/hl_japan_carry.py            # 通信なし。出力は /mnt/e/Datas/market/jquants/results/hl_japan_carry
 python3 backtests/japan_positioning.py         # 通信なし。market.db は read-only。出力は .../results/japan_positioning
@@ -263,3 +263,15 @@ python3 backtests/japan_positioning.py         # 通信なし。market.db は re
   分析が読む列は旧 DB と差分ゼロで、`hl_japan_carry.py` と `japan_positioning.py` の出力はバイト単位で同じだった。
 - `sync` は一覧から消えたファイルを手元から消さない。Standard の提供範囲は過去10年なので、古い月が順に一覧から外れると
   見込まれ、その後は手元の原本（約1.1GB）が唯一の写しになる。
+
+### 控え（Google Cloud Storage）
+
+- 原本と xyz の保存分を、非公開バケット `gs://crypto-bitflyer-418902-jquants`（gonumb66 のプロジェクト、asia-northeast1、
+  公開アクセス防止を強制、オブジェクトの版管理あり、削除後7日の復元期間）に置く。2026-10-31 の初回で 1,823 ファイル・1.08GB が
+  手元と一致した。DB（約5GB）は原本から作り直せるので置かない。
+- `update_japan.sh` が週1回の更新の後に `gcloud storage rsync` で追加・変更分を送る（削除は伝えない）。Google 側のホストも
+  VPN の経路を確かめ、IPv6 アドレスが返る場合は控えだけを飛ばす。控えの失敗は更新の失敗にしない（翌週の実行で追いつく）。
+  無効にするには `JQ_GCS_URI=` を空にする。
+- 復元: `gcloud --configuration=gonumb storage rsync gs://crypto-bitflyer-418902-jquants/jquants/raw /mnt/e/Datas/market/jquants/raw --recursive`
+  の後に `fetch_jquants.py build`。J-Quants のデータは私的利用のライセンスなので、バケットを公開・共有しないこと。
+  解約時はこのバケットも削除対象とする。
