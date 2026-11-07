@@ -18,6 +18,8 @@
 # a dataset) or 7 days for exit 4 (any other 401/403; see purge_gate.sh). Access is rechecked hourly until
 # then and a failed purge is retried next hour. Remove the marker if the cancellation is undone; a renewal
 # after a purge removes it.
+# If $WORK/jquants-manual-only exists, the schedule leaves J-Quants alone (no sync, build or access check)
+# and only --force fetches it; xyz keeps its schedule.
 # Network access waits for the read-only VPN route check in data-tools/vpn_route.sh; resolution is IPv4.
 set -euo pipefail
 export PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/sbin:/sbin:$HOME/google-cloud-sdk/bin"  # cron gives /usr/bin:/bin only
@@ -38,6 +40,7 @@ JQ_STAMP="$WORK/jquants-last-success"
 DENIED="$WORK/jquants-access-denied"
 CANCEL="$WORK/jquants-cancel-requested"
 PURGED="$WORK/jquants-purged"
+MANUAL="$WORK/jquants-manual-only"
 # shellcheck source=vpn_route.sh
 source "$REPO/data-tools/vpn_route.sh"
 # shellcheck source=purge_gate.sh
@@ -58,7 +61,8 @@ case "${1:-}" in
   *) echo "usage: $0 [--force|--check]"; exit 2 ;;
 esac
 due() { [[ "$FORCE" == 1 || ! -f "$1" ]] || (( $(date +%s) - $(stat -c %Y "$1") >= EVERY_DAYS * 86400 )); }
-due "$HL_STAMP" || due "$JQ_STAMP" || exit 0
+jq_due() { [[ "$FORCE" == 1 ]] || { [[ ! -f "$MANUAL" ]] && due "$JQ_STAMP"; }; }
+due "$HL_STAMP" || jq_due || exit 0
 
 exec 9>"$WORK/.lock"
 flock -n 9 || { echo "another update is running"; exit 0; }
@@ -100,7 +104,7 @@ refused() {  # refused plan|other: record the refusal and purge once it has last
   fi
 }
 
-if due "$JQ_STAMP"; then
+if jq_due; then
   rc=0
   python3 data-tools/ipv4_run.py data-tools/fetch_jquants.py sync --data-dir "$DATA" || rc=$?
   case "$rc" in
