@@ -85,12 +85,12 @@ class Stubbed(unittest.TestCase):
 
 class UpdateScriptTest(Stubbed):
     def run_update(self, sync_exit: int, *, marker: str | None = PAST, refused_for=None, purged=False, purge_exit=0,
-                   build_exit=0, monitor_exit=0, gcs=""):
+                   build_exit=0, monitor_exit=0, gcs="", force=True):
         purge = self.repo / "data-tools/purge_jquants.sh"
         purge.write_text(f'#!/usr/bin/env bash\ntouch "{self.work}/stub-purge-ran"\n[[ {purge_exit} != 0 ]] || touch "{self.work}/jquants-purged"\nexit {purge_exit}\n')
         self.script("python3", f"""case "$*" in
   *fetch_hl_xyz*) exit 0 ;;
-  *"fetch_jquants.py sync"*) exit {sync_exit} ;;
+  *"fetch_jquants.py sync"*) touch "{self.work}/stub-sync-ran"; exit {sync_exit} ;;
   *"fetch_jquants.py build"*) touch "{self.work}/stub-build-ran"; exit {build_exit} ;;
   *japan_perp_monitor*) touch "{self.work}/stub-monitor-ran"; exit {monitor_exit} ;;
   *) exit 0 ;;
@@ -104,7 +104,7 @@ esac""")
             age(denied, refused_for)
         if purged:
             (self.work / "jquants-purged").write_text("2026-11-13\n")
-        done = subprocess.run(["bash", "--noprofile", "--norc", str(self.repo / "data-tools/update_japan.sh"), "--force"],
+        done = subprocess.run(["bash", "--noprofile", "--norc", str(self.repo / "data-tools/update_japan.sh"), *(["--force"] if force else [])],
                               env=self.env(gcs), capture_output=True, text=True)
         self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
         return self.work
@@ -143,6 +143,31 @@ esac""")
         work = self.run_update(3, marker=None, refused_for=30 * 86400)
         self.assertFalse((work / "stub-purge-ran").exists())
         self.assertTrue((work / "jquants-last-success").exists())
+
+    def test_manual_only_skips_jquants_on_the_schedule_and_keeps_xyz(self):
+        (self.work / "jquants-manual-only").touch()
+        work = self.run_update(0, marker=None, force=False, gcs="gs://stub")
+        self.assertFalse((work / "stub-sync-ran").exists())
+        self.assertFalse((work / "stub-build-ran").exists())
+        self.assertFalse((work / "jquants-last-success").exists())
+        self.assertTrue((work / "stub-monitor-ran").exists())
+        self.assertTrue((work / "hl-last-success").exists())
+
+    def test_manual_only_with_xyz_up_to_date_does_nothing(self):
+        (self.work / "jquants-manual-only").touch()
+        (self.work / "hl-last-success").touch()
+        work = self.run_update(0, marker=None, force=False)
+        self.assertFalse((work / "stub-sync-ran").exists())
+        self.assertFalse((work / "stub-monitor-ran").exists())
+
+    def test_manual_only_still_fetches_when_asked(self):
+        (self.work / "jquants-manual-only").touch()
+        work = self.run_update(0, marker=None)
+        self.assertTrue((work / "stub-sync-ran").exists())
+        self.assertTrue((work / "stub-build-ran").exists())
+
+    def test_the_schedule_fetches_jquants_without_the_switch(self):
+        self.assertTrue((self.run_update(0, marker=None, force=False) / "stub-sync-ran").exists())
 
     def test_a_refusal_that_went_away_keeps_the_cancellation(self):
         work = self.run_update(0, refused_for=3600)
