@@ -255,7 +255,8 @@ def weekly_cross_sections(wide: dict[str, pd.DataFrame], margin: pd.DataFrame, m
         big = universe & (cap.iloc[d].to_numpy(float) >= np.nanmedian(np.where(universe, cap.iloc[d].to_numpy(float), np.nan)))
         row["slope_level_large"] = cross_section_slope(np.where(big, y, np.nan), np.where(big, share, np.nan),
                                                        [np.where(big, c, np.nan) for c in controls], m.s33.where(big).to_numpy(), config)
-        row["long_book"], row["short_book"] = book_return(np.where(stock, y, np.nan), long_value), book_return(np.where(stock, y, np.nan), short_value)
+        held = np.where(stock & tradable, y, np.nan)  # without a trade at the decision close there is no entry price
+        row["long_book"], row["short_book"] = book_return(held, long_value), book_return(held, short_value)
         cap_now = np.where(stock & tradable, cap.iloc[d].to_numpy(float), np.nan)
         row["market"] = book_return(y, cap_now)
         row["equal"] = float(np.nanmean(np.where(np.isfinite(cap_now), y, np.nan)))

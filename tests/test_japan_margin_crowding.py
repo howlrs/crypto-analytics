@@ -7,7 +7,7 @@ import pandas as pd
 
 from backtests.japan_margin_crowding import (
     Config, adjusted_log_prices, book_alpha, book_return, cross_section_slope, decile_spread, load_wide, membership,
-    ols_hac, primary_family, weekly_schedule,
+    ols_hac, primary_family, weekly_cross_sections, weekly_schedule,
 )
 
 BUSINESS = pd.bdate_range("2024-07-01", "2024-08-30").strftime("%Y-%m-%d").to_numpy()
@@ -113,6 +113,49 @@ class EstimatorTest(unittest.TestCase):
         self.assertAlmostEqual(got["alpha_weekly"], -0.001, delta=0.0004)
         self.assertAlmostEqual(got["beta_market"], 1.3, delta=0.03)
         self.assertAlmostEqual(got["beta_size"], 0.8, delta=0.06)
+
+
+class CrossSectionTest(unittest.TestCase):
+    """One synthetic market through the whole weekly step."""
+    stocks, days = 320, 300
+
+    def market(self):
+        rng = np.random.default_rng(7)
+        index = pd.bdate_range("2021-01-04", periods=self.days).strftime("%Y-%m-%d")
+        codes = [f"{i:05d}" for i in range(self.stocks)]
+        close = pd.DataFrame(1000 * np.exp(np.cumsum(rng.normal(0, 0.01, (self.days, self.stocks)), axis=0)), index=index, columns=codes)
+        wide = {"close": close, "adj_factor": pd.DataFrame(1.0, index=index, columns=codes),
+                "market_cap": close * 1e7, "turnover": pd.DataFrame(1e8, index=index, columns=codes)}
+        reference = index[280]
+        shares = pd.Series(rng.uniform(1e4, 1e6, self.stocks), index=codes)
+        margin = pd.DataFrame({"date": reference, "code": codes, "long_shares": shares.to_numpy(), "short_shares": 1e4})
+        master = pd.DataFrame({"code": codes, "valid_from": "2020-01-01", "valid_to": None, "s33": [str(i % 5) for i in range(self.stocks)],
+                               "mkt_nm": "プライム", "mrgn_nm": "貸借", "prod_cat": "011"})
+        schedule = pd.DataFrame({"reference": [reference], "decision": [index[283]], "next_decision": [index[288]]})
+        topix = pd.Series(2000.0, index=index)
+        return wide, margin, master, schedule, topix
+
+    def test_the_return_runs_from_the_decision_close_to_the_next(self):
+        wide, margin, master, schedule, topix = self.market()
+        one = wide["close"].copy()
+        out = weekly_cross_sections(wide, margin, master, schedule, topix, Config()).iloc[0]
+        close = wide["close"]
+        decision, following = schedule.decision[0], schedule.next_decision[0]
+        expected = (close.loc[following] / close.loc[decision] - 1).mean()
+        self.assertEqual(int(out.stocks), self.stocks)
+        self.assertAlmostEqual(out.equal, expected)
+        wide["close"].loc[schedule.reference[0], one.columns[0]] *= 3  # an earlier price cannot change the return
+        self.assertAlmostEqual(weekly_cross_sections(wide, margin, master, schedule, topix, Config()).iloc[0].equal, expected, places=9)
+
+    def test_a_name_without_a_trade_at_the_decision_stays_out_of_the_books(self):
+        wide, margin, master, schedule, topix = self.market()
+        base = weekly_cross_sections(wide, margin, master, schedule, topix, Config()).iloc[0]
+        halted = wide["close"].columns[3]
+        wide["close"].loc[schedule.decision[0], halted] = np.nan  # its return would start from a stale close
+        wide["close"].loc[schedule.next_decision[0]:, halted] *= 5
+        out = weekly_cross_sections(wide, margin, master, schedule, topix, Config()).iloc[0]
+        self.assertEqual(int(out.stocks), self.stocks - 1)
+        self.assertLess(abs(out.long_book - base.long_book), 0.02)
 
 
 class DecisionTest(unittest.TestCase):
