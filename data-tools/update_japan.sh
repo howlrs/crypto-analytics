@@ -8,13 +8,15 @@
 #
 # The parts are independent. xyz: fetch_hl_xyz (its 15-minute candles reach back only ~52 days, so it
 # keeps running while J-Quants is unavailable). J-Quants: sync -> build -> japan_forward status. When
-# J-Quants refuses a dataset (sync exit 3: the subscription ended or the plan changed) nothing local
-# changes; the date goes to $WORK/jquants-access-denied, the log repeats the licence duty (after a
-# cancellation every J-Quants copy must be deleted: data-tools/purge_jquants.sh) and the next week
-# checks again. After a renewal the sync fetches every file missing locally, so the gap is refilled.
-# If $WORK/jquants-cancel-requested exists (the user submitted the cancellation), the first refusal
-# also runs purge_jquants.sh --yes, so the data goes when the paid period ends; a failed purge is
-# retried next hour. Remove the marker if the cancellation is undone; regained access removes it.
+# J-Quants refuses a dataset nothing local changes; the date goes to $WORK/jquants-access-denied, the
+# log repeats the licence duty (after a cancellation every J-Quants copy must be deleted:
+# data-tools/purge_jquants.sh) and the next week checks again. After a renewal the sync fetches every
+# file missing locally, so the gap is refilled.
+# If $WORK/jquants-cancel-requested exists (the user submitted the cancellation), a refusal that lasts
+# also runs purge_jquants.sh --yes, so the data goes when the paid period ends: 24 hours for sync exit 3
+# (J-Quants says the plan does not cover a dataset), 7 days for exit 4 (any other 401/403; see
+# purge_gate.sh). Access is rechecked hourly until then and a failed purge is retried next hour. Remove
+# the marker if the cancellation is undone; a renewal after a purge removes it.
 # Network access waits for the read-only VPN route check in data-tools/vpn_route.sh; resolution is IPv4.
 set -euo pipefail
 export PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/sbin:/sbin:$HOME/google-cloud-sdk/bin"  # cron gives /usr/bin:/bin only
@@ -37,6 +39,8 @@ CANCEL="$WORK/jquants-cancel-requested"
 PURGED="$WORK/jquants-purged"
 # shellcheck source=vpn_route.sh
 source "$REPO/data-tools/vpn_route.sh"
+# shellcheck source=purge_gate.sh
+source "$REPO/data-tools/purge_gate.sh"
 mkdir -p "$WORK" "$LOGS"
 if [[ -f "$WORK/last-success" ]]; then  # single stamp of the first version
   cp -p "$WORK/last-success" "$HL_STAMP" && mv "$WORK/last-success" "$JQ_STAMP"
@@ -73,6 +77,27 @@ if due "$HL_STAMP"; then
   fi
 fi
 
+refused() {  # refused plan|other: record the refusal and purge once it has lasted and a purge was requested
+  [[ -f "$DENIED" ]] || date -u +%F >"$DENIED"
+  echo "NOTICE: J-Quants refuses access ($1) since $(cat "$DENIED"); nothing local was changed."
+  echo "NOTICE: if the subscription has ended, the J-Quants licence requires deleting every acquired copy:"
+  echo "NOTICE:   data-tools/purge_jquants.sh (dry run), then data-tools/purge_jquants.sh --yes"
+  echo "NOTICE: access is checked again next week; after a renewal the sync refetches everything missing."
+  if [[ ! -f "$CANCEL" || -f "$PURGED" ]]; then
+    touch "$JQ_STAMP"
+  elif ! purge_due "$1" "$DENIED"; then
+    echo "NOTICE: cancellation requested on $(head -1 "$CANCEL"): purging only if this refusal lasts; next check in an hour"
+  else
+    echo "NOTICE: cancellation requested on $(head -1 "$CANCEL"): deleting the J-Quants data now"
+    if JQ_DATA_DIR="$DATA" JQ_WORK_DIR="$WORK" JQ_GCS_URI="$GCS_URI" JQ_GCLOUD_CONFIG="$GCLOUD_CONFIG" \
+        "$REPO/data-tools/purge_jquants.sh" --yes; then
+      touch "$JQ_STAMP"
+    else
+      echo "purge failed; it is retried next hour"  # JQ_STAMP stays old, so the part stays due
+    fi
+  fi
+}
+
 if due "$JQ_STAMP"; then
   rc=0
   python3 data-tools/ipv4_run.py data-tools/fetch_jquants.py sync --data-dir "$DATA" || rc=$?
@@ -80,29 +105,16 @@ if due "$JQ_STAMP"; then
     0)
       if [[ -f "$DENIED" ]]; then
         echo "J-Quants access is back (refused since $(cat "$DENIED")); every missing file was fetched"
-        rm -f "$DENIED" "$PURGED" "$CANCEL"
+        # A refusal that went away changes nothing the user asked for: only a renewal after a purge ends it.
+        [[ ! -f "$PURGED" ]] || rm -f "$PURGED" "$CANCEL"
+        rm -f "$DENIED"
       fi
       python3 data-tools/fetch_jquants.py build --data-dir "$DATA" --work-dir "$WORK"
       python3 backtests/japan_forward.py status --jquants-db "$DATA/jquants.db" >/dev/null
       touch "$JQ_STAMP"
       jq_ok=1 ;;
-    3)
-      [[ -f "$DENIED" ]] || date -u +%F >"$DENIED"
-      echo "NOTICE: J-Quants refuses access since $(cat "$DENIED"); nothing local was changed."
-      echo "NOTICE: if the subscription has ended, the J-Quants licence requires deleting every acquired copy:"
-      echo "NOTICE:   data-tools/purge_jquants.sh (dry run), then data-tools/purge_jquants.sh --yes"
-      echo "NOTICE: access is checked again next week; after a renewal the sync refetches everything missing."
-      purged=1
-      if [[ -f "$CANCEL" && ! -f "$PURGED" ]]; then
-        echo "NOTICE: cancellation requested on $(head -1 "$CANCEL"): deleting the J-Quants data now"
-        JQ_DATA_DIR="$DATA" JQ_WORK_DIR="$WORK" JQ_GCS_URI="$GCS_URI" JQ_GCLOUD_CONFIG="$GCLOUD_CONFIG" \
-          "$REPO/data-tools/purge_jquants.sh" --yes || purged=0
-      fi
-      if [[ "$purged" == 1 ]]; then
-        touch "$JQ_STAMP"
-      else
-        echo "purge failed; it is retried next hour"  # JQ_STAMP stays old, so the part stays due
-      fi ;;
+    3) refused plan ;;
+    4) refused other ;;
     *)
       echo "J-Quants sync failed (exit $rc); it is retried next hour" ;;
   esac

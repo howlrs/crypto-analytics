@@ -191,7 +191,8 @@ class ExpiredSubscriptionTest(unittest.TestCase):
 
         def refused(endpoint):
             if "calendar" in endpoint:
-                raise fj.JQuantsError("GET /bulk/list failed with HTTP 403", 403)
+                raise fj.JQuantsError("GET /bulk/list failed with HTTP 403", 403,
+                                      "This endpoint is not available on your subscription.  If you want more data")
             return listing(endpoint)
         with tempfile.TemporaryDirectory() as tmp:
             bulk.bulk_list = refused
@@ -204,6 +205,38 @@ class ExpiredSubscriptionTest(unittest.TestCase):
             self.assertFalse(fresh.exists())  # a refused sync recreates nothing after a purge
             bulk.bulk_list = listing  # renewed: everything missing locally is fetched
             self.assertEqual(fj.sync(bulk, Path(tmp), ["topix", "calendar"], "2016-10", None)["downloaded"], 2)
+
+    def test_only_a_plan_refusal_counts_as_access_denied(self):
+        """Each of these 401/403s was seen or is possible while the plan is active; none may start a purge."""
+        topix = "indices/bars/daily/topix/historical/2024/indices_bars_daily_topix_202408.csv.gz"
+        bulk = FakeBulk({topix: (T1, gz_csv(["Date", "O", "H", "L", "C"], [{"Date": "2024-08-01", "O": "1", "H": "1",
+                                                                             "L": "1", "C": "2"}]))})
+        listing = bulk.bulk_list
+        for status, message in ((403, "The requested endpoint does not exist. Please check the URL"),  # renamed
+                                (403, ""),  # CloudFront or another firewall answers with an HTML page
+                                (401, "Unauthorized")):  # a rotated or mistyped key
+            def refused(endpoint):
+                raise fj.JQuantsError("GET /bulk/list failed", status, message)
+            bulk.bulk_list = refused
+            with tempfile.TemporaryDirectory() as tmp:
+                with self.assertRaises(fj.Refused):
+                    fj.sync(bulk, Path(tmp), ["topix"], "2016-10", None)
+                self.assertEqual(bulk.downloads, [])
+        bulk.bulk_list = listing
+
+    def test_server_message_is_read_from_json_and_only_json(self):
+        def error(status, body):
+            return HTTPError("https://api.jquants.com/v2/bulk/list", status, "x", Message(), io.BytesIO(body))
+        plan = json.dumps({"message": "This API is not available on your subscription."}).encode()
+        for body, expected in ((plan, "This API is not available on your subscription."),
+                               (b"<html>403 ERROR Request blocked</html>", ""), (b"[]", ""), (b"\xff\xfe", "")):
+            c, _ = client([error(403, body)])
+            with self.assertRaises(fj.JQuantsError) as caught:
+                c.api("/bulk/list", {"endpoint": "/markets/calendar"})
+            self.assertEqual(caught.exception.server_message, expected)
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(fj, "load_api_key", return_value=SECRET), \
+                mock.patch.object(fj, "sync", side_effect=fj.Refused("refused")):
+            self.assertEqual(fj.main(["sync", "--data-dir", tmp]), 4)
 
     def test_http_status_is_kept_and_access_denied_exits_3(self):
         error = HTTPError("https://api.jquants.com/v2/bulk/list", 401, "Unauthorized", Message(), None)
