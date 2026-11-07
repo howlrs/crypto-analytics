@@ -137,10 +137,13 @@ def evaluate(panel: pd.DataFrame, signal: str, target: str, config: Config, sign
     middle = used.date.iloc[len(used) // 2]
     early = ok & (panel.date < middle).to_numpy()
     late = ok & (panel.date >= middle).to_numpy()
-    calm = ok & ~panel.date.str[:7].isin(SHOCK_MONTHS).to_numpy()
+    held_to = panel.date.shift(-1).fillna("")  # a hold that ends inside a shock month is not calm either
+    calm = ok & ~(panel.date.str[:7].isin(SHOCK_MONTHS) | held_to.str[:7].isin(SHOCK_MONTHS)).to_numpy()
     beta, se = newey_west_slope(y[ok], z[ok], config.hac_lags)
     t = beta / se if se > 0 else np.nan
-    pnl = rule_pnl(z[ok], np.expm1(y[ok]), sign, config.cost_bp)
+    days = np.flatnonzero(ok)
+    # A missing day inside the sample is a flat day: leaving and re-entering both pay their cost.
+    pnl = rule_pnl(np.where(ok, z, np.nan), np.expm1(y), sign, config.cost_bp)[days[0]:days[-1] + 1]
     row.update({"first": used.date.iloc[0], "last": used.date.iloc[-1], "split": middle, "slope": beta, "se_hac": se,
                 "t_hac": t, "p_one_sided": float(stats.norm.sf(sign * t)), "corr": float(np.corrcoef(z[ok], y[ok])[0, 1]),
                 "slope_early": newey_west_slope(y[early], z[early], config.hac_lags)[0],

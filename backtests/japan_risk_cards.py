@@ -112,7 +112,7 @@ def run(jquants_db: Path, directory: Path) -> dict:
         if values is not None:
             rows.append({"code": code, **values})
     cards = universe.merge(pd.DataFrame(rows), on="code").sort_values("median_turnover_250d_jpy", ascending=False)
-    target = write_table(cards, "risk_cards", ["code"], "days", directory)
+    target = write_table(cards, "risk_cards", "code", "days", directory)
     fits = cards.rule_leverage_short.notna()
     summary = {"stocks": int(len(cards)), "rule": {"leverages": list(config.leverages), "buffer": config.buffer},
                "short_side_leverage_counts": cards.rule_leverage_short.value_counts(dropna=False).rename(str).to_dict(),

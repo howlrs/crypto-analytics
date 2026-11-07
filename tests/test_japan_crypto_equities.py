@@ -94,6 +94,22 @@ class DecisionTest(unittest.TestCase):
         self.assertLess(row["slope_early"], 0)
         self.assertFalse(primary_family([row], Config()).supports[0])
 
+    def test_a_hold_that_ends_in_a_shock_month_is_left_out_of_the_calm_slope(self):
+        p = self.panel(0.0, n=900)
+        boundary = p.index[p.date.str[:7] == "2022-05"][0] - 1  # the last day before the shock month
+        p.loc[boundary, ["z", "y"]] = [8.0, 0.5]
+        row = evaluate(p, "z", "y", Config())
+        calm = evaluate(p.drop(index=boundary).reset_index(drop=True), "z", "y", Config())["slope_calm"]
+        self.assertAlmostEqual(row["slope_calm"], calm, places=3)
+
+    def test_a_missing_day_is_flat_and_is_not_traded_through(self):
+        p = self.panel(0.0, n=300)
+        p["z"] = 2.0 + 0.01 * p.z  # always a full position
+        p["y"] = 1e-9 * p.z  # no return, so the P&L is the cost
+        p.loc[150, "z"] = np.nan
+        row = evaluate(p, "z", "y", Config())
+        self.assertAlmostEqual(row["rule_mean_daily"] * 300, -3 * Config().cost_bp / 10_000, delta=1e-5)  # in, out at the gap, in again
+
     def test_too_few_days_are_reported_not_tested(self):
         row = evaluate(self.panel(0.0, n=50), "z", "y", Config())
         self.assertEqual(row["days"], 50)

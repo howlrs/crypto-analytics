@@ -164,9 +164,9 @@ def book_alpha(frame: pd.DataFrame, column: str, config: Config) -> dict:
 
 
 def split_masks(frame: pd.DataFrame) -> dict[str, np.ndarray]:
-    months = frame.decision.str[:7]
+    touched = frame.decision.str[:7].isin(SHOCK_MONTHS) | frame.next_decision.fillna("").str[:7].isin(SHOCK_MONTHS)
     return {"early": (frame.decision < SPLIT_DATE).to_numpy(), "late": (frame.decision >= SPLIT_DATE).to_numpy(),
-            "calm": ~months.isin(SHOCK_MONTHS).to_numpy()}
+            "calm": ~touched.to_numpy()}
 
 
 def primary_family(weeks: pd.DataFrame, config: Config) -> pd.DataFrame:
@@ -245,7 +245,9 @@ def weekly_cross_sections(wide: dict[str, pd.DataFrame], margin: pd.DataFrame, m
         keep = lambda x: np.where(universe, x, np.nan)  # noqa: E731
         sectors = m.s33.where(universe).to_numpy()
         kept_controls = [keep(c) for c in controls]
-        row = {"reference": w.reference, "decision": w.decision, "stocks": int(universe.sum()),
+        regressed = np.isfinite(keep(y)) & np.logical_and.reduce([np.isfinite(c) for c in kept_controls])
+        row = {"reference": w.reference, "decision": w.decision, "next_decision": w.next_decision, "stocks": int(universe.sum()),
+               "regressed_stocks": int(regressed.sum()),
                "slope_level": cross_section_slope(keep(y), keep(share), kept_controls, sectors, config),
                "slope_change": cross_section_slope(keep(y), keep(change), kept_controls, sectors, config),
                "decile_level": decile_spread(keep(y), keep(share), config), "decile_change": decile_spread(keep(y), keep(change), config)}
@@ -257,6 +259,7 @@ def weekly_cross_sections(wide: dict[str, pd.DataFrame], margin: pd.DataFrame, m
                                                        [np.where(big, c, np.nan) for c in controls], m.s33.where(big).to_numpy(), config)
         held = np.where(stock & tradable, y, np.nan)  # without a trade at the decision close there is no entry price
         row["long_book"], row["short_book"] = book_return(held, long_value), book_return(held, short_value)
+        row["long_book_universe"] = book_return(keep(y), long_value)
         cap_now = np.where(stock & tradable, cap.iloc[d].to_numpy(float), np.nan)
         row["market"] = book_return(y, cap_now)
         row["equal"] = float(np.nanmean(np.where(np.isfinite(cap_now), y, np.nan)))
@@ -281,6 +284,7 @@ def describe(weeks: pd.DataFrame, config: Config) -> dict:
         out[column] = {"weekly_mean": m, "annual_mean": m * WEEKS_PER_YEAR, "t_hac": t}
     out["short_book"] = book_alpha(weeks, "short_book", config)
     out["long_book"] = book_alpha(weeks, "long_book", config)
+    out["long_book_universe"] = book_alpha(weeks, "long_book_universe", config)
     stress = (weeks.topix_5d <= config.stress_return).to_numpy()
     slopes = weeks.slope_level.to_numpy(float)
     for name, mask in (("after_stress", stress), ("otherwise", ~stress)):
@@ -290,10 +294,10 @@ def describe(weeks: pd.DataFrame, config: Config) -> dict:
 
 
 def by_year(weeks: pd.DataFrame) -> pd.DataFrame:
-    frame = weeks.assign(year=weeks.decision.str[:4])
+    frame = weeks.assign(year=weeks.decision.str[:4], long_excess=weeks.long_book - weeks.market)
     return frame.groupby("year").agg(weeks=("slope_level", "count"), slope_level=("slope_level", "mean"),
                                      slope_change=("slope_change", "mean"), decile_level=("decile_level", "sum"),
-                                     long_minus_market=("long_book", "sum"), market=("market", "sum")).reset_index()
+                                     long_minus_market=("long_excess", "sum"), market=("market", "sum")).reset_index()
 
 
 def run(jquants_db: Path, output: Path, config: Config) -> dict:
@@ -319,7 +323,7 @@ def run(jquants_db: Path, output: Path, config: Config) -> dict:
     summary = {"question": "Do crowded leveraged longs lose? (Japan margin balances, weekly)",
                "verdict": "supported" if tests.supports.all() else ("partly_supported" if tests.supports.any() else "not_supported"),
                "config": asdict(config), "period": [weeks.decision.iloc[0], weeks.decision.iloc[-1]], "weeks": len(weeks),
-               "median_stocks": float(weeks.stocks.median()), "tests": tests.to_dict("records"), "descriptive": describe(weeks, config),
+               "median_stocks": float(weeks.stocks.median()), "median_regressed_stocks": float(weeks.regressed_stocks.median()), "tests": tests.to_dict("records"), "descriptive": describe(weeks, config),
                "by_year": by_year(weeks).to_dict("records")}
     (output / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1, default=float) + "\n")
     (output / "manifest.json").write_text(json.dumps({"inputs": {str(jquants_db): sha256_file(jquants_db)}}, indent=1) + "\n")
@@ -333,7 +337,7 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=JQ_DIR / "results/japan_margin_crowding")
     args = parser.parse_args()
     out = run(args.jquants_db, args.output, Config())
-    print(json.dumps({k: out[k] for k in ("verdict", "period", "weeks", "median_stocks")}, ensure_ascii=False))
+    print(json.dumps({k: out[k] for k in ("verdict", "period", "weeks", "median_stocks", "median_regressed_stocks")}, ensure_ascii=False))
     print(pd.DataFrame(out["tests"]).round(6).T.to_string())
     print(json.dumps(out["descriptive"], indent=1, default=float))
 

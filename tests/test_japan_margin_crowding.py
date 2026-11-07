@@ -6,8 +6,8 @@ import numpy as np
 import pandas as pd
 
 from backtests.japan_margin_crowding import (
-    Config, adjusted_log_prices, book_alpha, book_return, cross_section_slope, decile_spread, load_wide, membership,
-    ols_hac, primary_family, weekly_cross_sections, weekly_schedule,
+    Config, adjusted_log_prices, book_alpha, book_return, by_year, cross_section_slope, decile_spread, load_wide, membership,
+    ols_hac, primary_family, split_masks, weekly_cross_sections, weekly_schedule,
 )
 
 BUSINESS = pd.bdate_range("2024-07-01", "2024-08-30").strftime("%Y-%m-%d").to_numpy()
@@ -157,14 +157,29 @@ class CrossSectionTest(unittest.TestCase):
         self.assertEqual(int(out.stocks), self.stocks - 1)
         self.assertLess(abs(out.long_book - base.long_book), 0.02)
 
+    def test_the_stock_count_says_who_reached_the_regression(self):
+        wide, margin, master, schedule, topix = self.market()
+        day = wide["close"].index[150]  # listed too recently for the momentum control
+        wide["close"].iloc[:150, :20] = np.nan
+        wide["market_cap"].iloc[:150, :20] = np.nan
+        out = weekly_cross_sections(wide, margin, master, schedule, topix, Config()).iloc[0]
+        self.assertEqual(int(out.stocks), self.stocks)
+        self.assertEqual(int(out.regressed_stocks), self.stocks - 20)
+        self.assertEqual(day, wide["close"].index[150])
+
+    def test_by_year_reports_the_excess_of_the_long_book(self):
+        weeks = pd.DataFrame({"decision": ["2024-01-10", "2024-01-17"], "slope_level": [0.0, 0.0], "slope_change": [0.0, 0.0],
+                              "decile_level": [0.0, 0.0], "long_book": [0.03, 0.01], "market": [0.02, 0.0]})
+        self.assertAlmostEqual(by_year(weeks).long_minus_market[0], 0.02)
+
 
 class DecisionTest(unittest.TestCase):
     def weeks(self, level, seed=4, n=500):
         rng = np.random.default_rng(seed)
         market = rng.normal(0.002, 0.02, n)
         size = rng.normal(0, 0.01, n)
-        return pd.DataFrame({"decision": pd.date_range("2017-01-04", periods=n, freq="W-WED").strftime("%Y-%m-%d"),
-                             "market": market, "equal": market + size, "long_book": market + rng.normal(level / 2, 0.003, n),
+        decisions = pd.Series(pd.date_range("2017-01-04", periods=n, freq="W-WED").strftime("%Y-%m-%d"))
+        return pd.DataFrame({"decision": decisions, "next_decision": decisions.shift(-1), "market": market, "equal": market + size, "long_book": market + rng.normal(level / 2, 0.003, n),
                              "slope_level": rng.normal(level, 0.002, n), "slope_change": rng.normal(level, 0.002, n)})
 
     def test_consistent_negative_estimates_are_supported(self):
@@ -172,6 +187,11 @@ class DecisionTest(unittest.TestCase):
 
     def test_noise_is_not_supported(self):
         self.assertFalse(primary_family(self.weeks(0.0), Config()).supports.any())
+
+    def test_a_hold_that_ends_in_a_shock_month_is_not_calm(self):
+        w = pd.DataFrame({"decision": ["2024-07-24", "2024-07-31", "2024-08-07", "2024-08-28", "2024-09-04"],
+                          "next_decision": ["2024-07-31", "2024-08-07", "2024-08-14", "2024-09-04", "2024-09-11"]})
+        self.assertEqual(split_masks(w)["calm"].tolist(), [True, False, False, False, True])
 
     def test_a_sign_flip_between_the_halves_fails_even_when_the_average_passes(self):
         w = self.weeks(-0.001)
