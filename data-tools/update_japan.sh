@@ -13,10 +13,11 @@
 # data-tools/purge_jquants.sh) and the next week checks again. After a renewal the sync fetches every
 # file missing locally, so the gap is refilled.
 # If $WORK/jquants-cancel-requested exists (the user submitted the cancellation), a refusal that lasts
-# also runs purge_jquants.sh --yes, so the data goes when the paid period ends: 24 hours for sync exit 3
-# (J-Quants says the plan does not cover a dataset), 7 days for exit 4 (any other 401/403; see
-# purge_gate.sh). Access is rechecked hourly until then and a failed purge is retried next hour. Remove
-# the marker if the cancellation is undone; a renewal after a purge removes it.
+# also runs purge_jquants.sh --yes, so the data goes when the paid period ends: never before the
+# not-before date in the marker, then after 24 hours for sync exit 3 (J-Quants says the plan does not cover
+# a dataset) or 7 days for exit 4 (any other 401/403; see purge_gate.sh). Access is rechecked hourly until
+# then and a failed purge is retried next hour. Remove the marker if the cancellation is undone; a renewal
+# after a purge removes it.
 # Network access waits for the read-only VPN route check in data-tools/vpn_route.sh; resolution is IPv4.
 set -euo pipefail
 export PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/sbin:/sbin:$HOME/google-cloud-sdk/bin"  # cron gives /usr/bin:/bin only
@@ -86,7 +87,7 @@ refused() {  # refused plan|other: record the refusal and purge once it has last
   echo "NOTICE: access is checked again next week; after a renewal the sync refetches everything missing."
   if [[ ! -f "$CANCEL" || -f "$PURGED" ]]; then
     touch "$JQ_STAMP"
-  elif ! purge_due "$1" "$DENIED"; then
+  elif ! purge_due "$1" "$DENIED" "$CANCEL"; then
     echo "NOTICE: cancellation requested on $(head -1 "$CANCEL"): purging only if this refusal lasts; next check in an hour"
   else
     echo "NOTICE: cancellation requested on $(head -1 "$CANCEL"): deleting the J-Quants data now"
@@ -109,11 +110,16 @@ if due "$JQ_STAMP"; then
         # A refusal that went away changes nothing the user asked for: only a renewal after a purge ends it.
         [[ ! -f "$PURGED" ]] || rm -f "$PURGED" "$CANCEL"
         rm -f "$DENIED"
+      else
+        rm -f "$PURGED"  # a manual purge while access still worked: the plan runs on, so the marker stays
       fi
-      python3 data-tools/fetch_jquants.py build --data-dir "$DATA" --work-dir "$WORK"
-      python3 backtests/japan_forward.py status --jquants-db "$DATA/jquants.db" >/dev/null
-      touch "$JQ_STAMP"
-      jq_ok=1 ;;
+      if python3 data-tools/fetch_jquants.py build --data-dir "$DATA" --work-dir "$WORK" \
+          && python3 backtests/japan_forward.py status --jquants-db "$DATA/jquants.db" >/dev/null; then
+        touch "$JQ_STAMP"
+        jq_ok=1
+      else
+        echo "J-Quants build or status failed; it is retried next hour"
+      fi ;;
     3) refused plan ;;
     4) refused other ;;
     *)

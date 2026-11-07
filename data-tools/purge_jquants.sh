@@ -47,8 +47,13 @@ gcs_objects=0
 if [[ -n "$GCS_URI" ]]; then
   echo "== GCS (deleted, every version): $GCS_URI/jquants/"
   vpn_check storage.googleapis.com oauth2.googleapis.com
-  gcs_objects=$(gcloud --quiet --configuration="$GCLOUD_CONFIG" storage ls --all-versions -r "$GCS_URI/jquants/**" 2>/dev/null \
-                | grep -c '^gs://' || true)
+  listed=0
+  listing=$(gcloud --quiet --configuration="$GCLOUD_CONFIG" storage ls --all-versions -r "$GCS_URI/jquants/**" 2>&1) || listed=$?
+  if [[ "$listed" != 0 && "$listing" != *"matched no objects"* ]]; then  # exit 1 also means an empty prefix
+    echo "GCS listing failed (exit $listed); nothing was deleted, so the backup cannot be left behind unnoticed"
+    exit 1
+  fi
+  gcs_objects=$(grep -c '^gs://' <<<"$listing" || true)
   echo "$gcs_objects object versions"
 fi
 

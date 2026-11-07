@@ -273,7 +273,7 @@ def _server_message(error: HTTPError) -> str:
     """The message of a JSON error body; empty for anything else, such as an HTML page from a firewall."""
     try:
         payload = json.loads(error.read(4096))
-    except (AttributeError, OSError, ValueError):  # no body, unreadable, not JSON or not UTF-8
+    except (AttributeError, OSError, ValueError, http.client.HTTPException):  # no body, cut off, not JSON or not UTF-8
         return ""
     message = payload.get("message") if isinstance(payload, dict) else None
     return message if isinstance(message, str) else ""
@@ -439,15 +439,16 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
         # List every dataset before downloading anything: if the plan lost one (subscription ended,
         # or a lower plan), nothing changes locally, so files from different plans are never mixed.
         # After a renewal the same call fetches every file missing locally, which fills the gap.
-        listings, denied, refused = {}, [], []
+        listings, denied, refused, failure = {}, [], [], None
         for name in datasets:
             try:
                 listings[name] = [x for x in client.bulk_list(DATASETS[name]) if in_months(x["key"], start, end)]
             except JQuantsError as exc:
-                if exc.status not in (401, 403):
-                    raise
-                (denied if PLAN_REFUSAL in exc.server_message else refused).append(name)
-        for name, listed in ({} if denied or refused else listings).items():
+                if exc.status in (401, 403):
+                    (denied if PLAN_REFUSAL in exc.server_message else refused).append(name)
+                else:  # keep listing: a refusal of a later dataset must not stay hidden behind this error
+                    failure = failure or exc
+        for name, listed in ({} if denied or refused or failure else listings).items():
             log(f"{name}: {len(listed)} bulk files in range")
             for item in sorted(listed, key=lambda x: x["key"]):
                 path, entry = raw / item["key"], manifest["files"].get(item["key"])
@@ -478,7 +479,7 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
                 _atomic_write(raw / "manifest.json", (json.dumps(manifest, indent=1, sort_keys=True) + "\n").encode())
                 counts["downloaded"] += 1
                 log(f"  {item['key']} ({len(data):,} B)")
-    if denied or refused:
+    if denied or refused or failure:
         if created:  # leave no empty data directory behind a purge (after the lock is closed)
             (raw / ".sync.lock").unlink(missing_ok=True)
             for path in reversed(created):
@@ -488,6 +489,8 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
                            "not cover them; nothing was downloaded")
     if refused:
         raise Refused(f"HTTP 401/403 without a plan refusal for {', '.join(refused)}; nothing was downloaded")
+    if failure:
+        raise failure
     return counts
 
 
