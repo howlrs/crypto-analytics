@@ -95,7 +95,7 @@ def status(registry: Path, hl_dir: Path, directory: Path) -> dict:
             "leverage": spec["leverage"], "tse_days": int(len(led)), "last_day": days[-1] if days else None,
             "funding_received_sum": float(led.loc[led.valid, "funding_short"].sum()),
             "funding_on_capital_sum": float(led.loc[led.valid, "funding_short"].sum() / capital),
-            "funding_on_capital_annual": float(led.loc[led.valid, "funding_short"].sum() / capital / max(len(led), 1) * carry.TSE_DAYS_PER_YEAR),
+            "funding_on_capital_annual": float(led.loc[led.valid, "funding_short"].sum() / capital / max(int(led.valid.sum()), 1) * carry.TSE_DAYS_PER_YEAR),
             "worst_rise": float(led.rise.max()) if led.rise.notna().any() else None,
             "liquidation_room": float(carry.liquidation_room(spec["leverage"], 10)),
             "room_used": float(led.rise.max() / carry.liquidation_room(spec["leverage"], 10)) if led.rise.notna().any() else None,
@@ -121,8 +121,10 @@ def calibrate(registry: Path, jquants_db: Path, hl_dir: Path, directory: Path, f
             if good.sum() < 2:
                 raise ValueError(f"{coin}: too few days with an exact close to calibrate on")
             error = (official.roc - proxy.roc).to_numpy(float)[good]
-            basis = official.basis.to_numpy(float)[good]
-            rho = float(np.corrcoef(basis[:-1], basis[1:])[0, 1]) if len(basis) > 3 else np.nan
+            all_basis = official.basis.to_numpy(float)
+            basis = all_basis[good]
+            adjacent = good[:-1] & good[1:]  # only neighbouring TSE days: a gap would stretch the lag
+            rho = float(np.corrcoef(all_basis[:-1][adjacent], all_basis[1:][adjacent])[0, 1]) if adjacent.sum() > 3 else np.nan
             out["instruments"][coin] = {
                 "days": int(good.sum()), "daily_error_sd_on_capital": float(error.std(ddof=1)),
                 "cumulative_error_on_capital": float(error.sum()), "basis_mean": float(basis.mean()), "basis_sd": float(basis.std(ddof=1)),

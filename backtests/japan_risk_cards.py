@@ -100,7 +100,7 @@ def run(jquants_db: Path, directory: Path) -> dict:
         marks = ",".join("?" * len(codes))
         bars = pd.read_sql_query(f"SELECT date, code, open, high, low, close, adj_factor, turnover, upper_limit, lower_limit FROM equities_daily WHERE code IN ({marks}) ORDER BY code, date", conn, params=codes)
         filings = pd.read_sql_query(f"SELECT code, disc_date, disc_time, doc_type FROM fins_summary WHERE code IN ({marks})", conn, params=codes)
-        topix = pd.read_sql_query("SELECT date, close FROM topix_daily WHERE close IS NOT NULL", conn).set_index("date").close
+        topix = pd.read_sql_query("SELECT date, close FROM topix_daily WHERE close IS NOT NULL ORDER BY date", conn).set_index("date").close
     business = np.array(sorted(bars.date.unique()), dtype=object)
     rows = []
     by_code = dict(tuple(filings.groupby("code")))
