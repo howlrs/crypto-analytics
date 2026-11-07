@@ -6,10 +6,13 @@ Run them after japan_crypto_equities.py and japan_margin_crowding.py; they read 
 
 Crypto-linked stocks: the same signal against the BTC window it was fitted on and against the window before
 it, a permutation of the signal, and how the rule's P&L falls across three periods.
-Margin crowding, two kinds of dependence:
-  across stocks: the signal is shuffled inside each week and sector, which keeps the cross-section of returns
-  over time: weekly slopes are resampled in moving blocks, and the Newey-West lag is varied. Shuffling inside
-  a week cannot test this: it destroys any persistence between weeks.
+Margin crowding:
+  a randomisation test: the signal is shuffled inside each week and sector, which gives a valid p-value for
+  "the signal is unrelated to returns inside a week". The null spread of t says nothing about dependence: a
+  shuffle makes weekly slopes independent by construction, whatever the data.
+  dependence between weeks: the autocorrelation of the weekly slopes, and their mean resampled in moving
+  blocks. A block of length l is close to a Bartlett estimate at lag l-1, so this and the Newey-West lag sweep
+  are one piece of evidence, not two; only the 26-week block reaches past the lags in the sweep.
 """
 from __future__ import annotations
 
@@ -38,7 +41,7 @@ from backtests.japan_retained import write_summary  # noqa: E402
 JQ_DIR = Path("/mnt/e/Datas/market/jquants")
 RESULTS = JQ_DIR / "results"
 CUTOFF_MS = 1785542400000
-PERIODS = (("2024-08", "2025-03"), ("2025-04", "2025-10"), ("2025-11", "2026-07"))
+PERIODS = (("", "2025-03"), ("2025-04", "2025-10"), ("2025-11", "2026-07"))  # the first runs from the start of the sample
 BLOCKS = (4, 8, 13, 26)
 LAGS = (0, 2, 4, 8, 12)
 SEED = 20261107
@@ -70,19 +73,23 @@ def crypto_checks(panel: pd.DataFrame, draws: int) -> dict:
         z, y, dates = p.loc[ok, "z_treasury"].to_numpy(), p.loc[ok, target].to_numpy(), p.loc[ok, "date"]
         gross = np.clip(z, -1, 1) * np.expm1(y)
         parts = [float(gross[((dates.str[:7] >= a) & (dates.str[:7] <= b)).to_numpy()].sum()) for a, b in PERIODS]
+        if abs(sum(parts) - gross.sum()) > 1e-9:
+            raise ValueError("the periods must cover the whole sample")
         out["treasury"][target] = {"permutation_p_one_sided": permutation_p(y, z, draws, SEED), "gross_rule_by_period": parts,
                                    "first_period_share": parts[0] / sum(parts)}
     return out
 
 
 def block_bootstrap(x: np.ndarray, block: int, draws: int, rng: np.random.Generator) -> np.ndarray:
-    """Means of series rebuilt from overlapping blocks of `block` weeks, which keeps the dependence inside a block."""
+    """Means of series of length n rebuilt from overlapping blocks, which keeps the dependence inside a block."""
     n = len(x)
     wrapped = np.r_[x, x[:block - 1]]
     totals = np.r_[0.0, np.cumsum(wrapped)]
     blocks = int(np.ceil(n / block))
     starts = rng.integers(0, n, size=(draws, blocks))
-    return (totals[starts + block] - totals[starts]).sum(axis=1) / (blocks * block)
+    whole = (totals[starts[:, :-1] + block] - totals[starts[:, :-1]]).sum(axis=1)
+    last = n - (blocks - 1) * block  # the last block is cut so that every series has n observations
+    return (whole + totals[starts[:, -1] + last] - totals[starts[:, -1]]) / n
 
 
 def serial_checks(x: np.ndarray, draws: int) -> dict:
@@ -105,7 +112,7 @@ def stress_episodes(weeks: pd.DataFrame, threshold: float, gap_days: int = 21) -
     means = s.groupby("episode").slope_level.mean()
     calm = s.loc[~s.decision.str.startswith("2020-03"), "slope_level"]
     return {"weeks": int(len(s)), "episodes": int(len(means)), "positive_episodes": int((means > 0).sum()), "episode_mean": float(means.mean()),
-            "episode_t": float(means.mean() / means.std(ddof=1) * np.sqrt(len(means))), "weekly_mean_without_2020_03": float(calm.mean())}
+            "episode_t": float(means.mean() / means.std(ddof=1) * np.sqrt(len(means))), "weekly_mean_without_march_2020": float(calm.mean())}
 
 
 _CASES: list = []
