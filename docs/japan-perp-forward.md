@@ -114,6 +114,9 @@ python3 backtests/japan_forward.py status   # 通信なし。出力は /mnt/e/Da
 - H2 も、空売り比率と日経225（オプションの原資産価格）を再契約後に取り直せば評価できる（2028-10-27 の判断まで）。
 - 再契約したら `data-tools/update_japan.sh --force` の後に `python3 backtests/japan_forward.py status`。登録時の規則・コードと
   一致するかは `status` が確かめる。
+- 解約中も、H1 の受取 funding と清算余裕は `backtests/japan_perp_monitor.py status` で追える（`update_japan.sh` が毎週実行し、結果は
+  `/mnt/e/Datas/market/japan_retained/h1_monitor/status.json`）。乖離の項は日々足すと両端に縮むので、東証終値がなくても損益の大半が分かる。
+  2026-08-31 以降の43営業日で公式の台帳と比べた結果は `docs/jquants-closing-research.md` §7。判定は従来どおり公式の台帳だけで行う。
 
 ## 6. 確認して使わなかったもの
 
@@ -145,3 +148,6 @@ python3 backtests/japan_forward.py status   # 通信なし。出力は /mnt/e/Da
   （再計算の結果は §2 の後ろに追記し、登録時の設計入力 `results/japan_earnings_risk/` は上書きしない）。
   H1・H2 の評価に使う列（株価日足の終値・調整係数、オプションの原資産価格、空売り比率）の値は旧 DB と差分ゼロで、
   `japan_forward.py status` の出力（H2 の最新シグナルと空白期間の値）も登録直後と同じだった。
+
+- 2026-11-07（規則の変更なし）: 解約中の監視 `backtests/japan_perp_monitor.py` を追加した。追跡対象の4ファイルは変更しておらず、
+  `japan_forward.py` と `hl_japan_carry.py` の関数を読み取りで再利用するだけなので、登録時のコードの SHA-256 は変わらない。

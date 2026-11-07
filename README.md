@@ -148,6 +148,7 @@ hl_watch.db と market.db は完全に独立したファイルであり、相互
 - [docs/japan-crossmarket.md](docs/japan-crossmarket.md) — J-Quants の日本市場データは暗号資産のリスク判断に効くか（結論: 効かない）
 - [docs/jquants-standard.md](docs/jquants-standard.md) — J-Quants Standard の取得データ棚卸し、xyz 日本株 perp のキャリー、需給指標の事前登録検定
 - [docs/japan-perp-forward.md](docs/japan-perp-forward.md) — 日本株 perp キャリーと空売り比率の将来検証（2026-11-02 開始の事前登録）
+- [docs/jquants-closing-research.md](docs/jquants-closing-research.md) — J-Quants 解約前の仕上げ: 暗号資産関連株と信用買いの群集の事前登録検定、解約後も残す集計、H1 の監視
 
 ## 環境要件
 

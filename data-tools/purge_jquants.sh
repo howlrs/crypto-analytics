@@ -8,8 +8,9 @@
 #
 # Deleted: JQ_DATA_DIR (raw mirror, jquants.db, results with J-Quants-derived values), unfinished build
 # files in JQ_WORK_DIR, and every version of the jquants/ prefix in the GCS backup (soft delete is cleared
-# first, so nothing is kept for recovery). Kept: the Hyperliquid data (not J-Quants), code, docs and the
-# forward-test registry (rules only). Other projects' J-Quants data is listed, not touched.
+# first, so nothing is kept for recovery). Kept: the Hyperliquid data (not J-Quants), code, docs, the
+# forward-test registry (rules only) and the unpublished aggregates in japan_retained, which live outside
+# JQ_DATA_DIR (backtests/japan_retained.py). Other projects' J-Quants data is listed, not touched.
 # Renewal: put the API key in .env and run data-tools/update_japan.sh --force; the sync refetches all.
 set -euo pipefail
 export PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/sbin:/sbin:$HOME/google-cloud-sdk/bin"
@@ -46,8 +47,13 @@ gcs_objects=0
 if [[ -n "$GCS_URI" ]]; then
   echo "== GCS (deleted, every version): $GCS_URI/jquants/"
   vpn_check storage.googleapis.com oauth2.googleapis.com
-  gcs_objects=$(gcloud --quiet --configuration="$GCLOUD_CONFIG" storage ls --all-versions -r "$GCS_URI/jquants/**" 2>/dev/null \
-                | grep -c '^gs://' || true)
+  listed=0
+  listing=$(gcloud --quiet --configuration="$GCLOUD_CONFIG" storage ls --all-versions -r "$GCS_URI/jquants/**" 2>&1) || listed=$?
+  if [[ "$listed" != 0 && "$listing" != *"matched no objects"* ]]; then  # exit 1 also means an empty prefix
+    echo "GCS listing failed (exit $listed); nothing was deleted, so the backup cannot be left behind unnoticed"
+    exit 1
+  fi
+  gcs_objects=$(grep -c '^gs://' <<<"$listing" || true)
   echo "$gcs_objects object versions"
 fi
 

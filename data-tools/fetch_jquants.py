@@ -6,7 +6,8 @@ the derived database and analysis outputs live under --data-dir (default
 /mnt/e/Datas/market/jquants). Paths inside the repository are refused.
 
   sync   list bulk files, download new or changed ones, verify size, gzip and SHA-256 (network);
-         exit 3 without changing anything when J-Quants refuses a dataset (HTTP 401/403)
+         without changing anything, exit 3 when J-Quants says the plan does not cover a dataset,
+         exit 4 on any other HTTP 401/403 (a firewall page, a renamed endpoint, a bad key)
   build  rebuild jquants.db from the verified raw files, one file at a time (offline, no API key)
 
 The API key is read from $JQUANTS_API_KEY, else from the repository .env
@@ -65,6 +66,7 @@ DATASETS = {
     "equities_valuation": "/equities/valuation",  # daily EPS/BPS/ROE/PER/PBR per stock (found 2026-10-31)
     "fins_earnings_date": "/fins/earnings-date",  # scheduled earnings dates with their publication dates
 }
+PLAN_REFUSAL = "not available on your subscription"  # wording of the JSON 403, checked 2026-11-07
 PERIOD = re.compile(r"_(\d{6}|\d{8})\.csv\.gz$")
 SCHEMA = """
 CREATE TABLE source_files (id INTEGER PRIMARY KEY, key TEXT NOT NULL UNIQUE, dataset TEXT NOT NULL,
@@ -214,13 +216,19 @@ TABLES = {
 class JQuantsError(RuntimeError):
     """Messages never contain the API key or presigned URLs. status is the HTTP code, if any."""
 
-    def __init__(self, message: str, status: int | None = None):
+    def __init__(self, message: str, status: int | None = None, server_message: str = ""):
         super().__init__(message)
         self.status = status
+        self.server_message = server_message
 
 
 class AccessDenied(JQuantsError):
-    """J-Quants refused a dataset (HTTP 401/403): the subscription ended or the plan does not cover it."""
+    """J-Quants itself says the plan does not cover a dataset: the subscription ended or the plan changed."""
+
+
+class Refused(JQuantsError):
+    """HTTP 401/403 for another reason. This is not evidence that the subscription ended: the same status
+    comes from a firewall page, an unknown endpoint and a bad key, so it must not lead to a licence purge."""
 
 
 def outside_repo(path: Path) -> Path:
@@ -259,6 +267,16 @@ def load_api_key(env_file: Path = REPO / ".env", environ=os.environ) -> str:
         if name in found:
             return _checked_key(found[name], name)
     raise ValueError("J-Quants API key is not configured")
+
+
+def _server_message(error: HTTPError) -> str:
+    """The message of a JSON error body; empty for anything else, such as an HTML page from a firewall."""
+    try:
+        payload = json.loads(error.read(4096))
+    except (AttributeError, OSError, ValueError, http.client.HTTPException):  # no body, cut off, not JSON or not UTF-8
+        return ""
+    message = payload.get("message") if isinstance(payload, dict) else None
+    return message if isinstance(message, str) else ""
 
 
 class _NoRedirect(HTTPRedirectHandler):
@@ -305,7 +323,7 @@ class Client:
                     return response.read()
             except HTTPError as exc:
                 if not (exc.code == 429 or 500 <= exc.code < 600) or attempt == self._retries:
-                    raise JQuantsError(f"{what} failed with HTTP {exc.code}", exc.code) from None
+                    raise JQuantsError(f"{what} failed with HTTP {exc.code}", exc.code, _server_message(exc)) from None
                 error = exc
             except (URLError, TimeoutError, OSError, http.client.HTTPException):
                 if attempt == self._retries:
@@ -421,15 +439,16 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
         # List every dataset before downloading anything: if the plan lost one (subscription ended,
         # or a lower plan), nothing changes locally, so files from different plans are never mixed.
         # After a renewal the same call fetches every file missing locally, which fills the gap.
-        listings, denied = {}, []
+        listings, denied, refused, failure = {}, [], [], None
         for name in datasets:
             try:
                 listings[name] = [x for x in client.bulk_list(DATASETS[name]) if in_months(x["key"], start, end)]
             except JQuantsError as exc:
-                if exc.status not in (401, 403):
-                    raise
-                denied.append(name)
-        for name, listed in ({} if denied else listings).items():
+                if exc.status in (401, 403):
+                    (denied if PLAN_REFUSAL in exc.server_message else refused).append(name)
+                else:  # keep listing: a refusal of a later dataset must not stay hidden behind this error
+                    failure = failure or exc
+        for name, listed in ({} if denied or refused or failure else listings).items():
             log(f"{name}: {len(listed)} bulk files in range")
             for item in sorted(listed, key=lambda x: x["key"]):
                 path, entry = raw / item["key"], manifest["files"].get(item["key"])
@@ -460,13 +479,18 @@ def sync(client: Client, data_dir: Path, datasets: list[str], start: str, end: s
                 _atomic_write(raw / "manifest.json", (json.dumps(manifest, indent=1, sort_keys=True) + "\n").encode())
                 counts["downloaded"] += 1
                 log(f"  {item['key']} ({len(data):,} B)")
-    if denied:
+    if denied or refused or failure:
         if created:  # leave no empty data directory behind a purge (after the lock is closed)
             (raw / ".sync.lock").unlink(missing_ok=True)
             for path in reversed(created):
                 path.rmdir()
-        raise AccessDenied(f"J-Quants refused {', '.join(denied)} (HTTP 401/403): the subscription ended or "
-                           "the plan does not cover them; nothing was downloaded")
+    if denied:
+        raise AccessDenied(f"J-Quants refused {', '.join(denied)}: the subscription ended or the plan does "
+                           "not cover them; nothing was downloaded")
+    if refused:
+        raise Refused(f"HTTP 401/403 without a plan refusal for {', '.join(refused)}; nothing was downloaded")
+    if failure:
+        raise failure
     return counts
 
 
@@ -784,6 +808,9 @@ def main(argv: list[str] | None = None) -> int:
     except AccessDenied as exc:
         log(f"access denied: {exc}")
         return 3
+    except Refused as exc:
+        log(f"refused: {exc}")
+        return 4
     except (ValueError, KeyError, OSError, csv.Error, sqlite3.Error, JQuantsError) as exc:
         log(f"error: {type(exc).__name__}: {exc}")
         return 1
