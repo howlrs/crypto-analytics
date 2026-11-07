@@ -50,10 +50,10 @@ class UnitTest(unittest.TestCase):
     def test_market_cap_reaches_yen(self):
         conn = sqlite3.connect(":memory:")
         conn.execute("CREATE TABLE equities_daily (date TEXT, code TEXT, close REAL, adj_factor REAL, market_cap REAL, turnover REAL)")
-        conn.execute("INSERT INTO equities_daily VALUES ('2022-09-14', '72030', 2038, 1, 33249944, 53381308600)")
+        conn.execute("INSERT INTO equities_daily VALUES ('2024-01-04', '00010', 1000, 1, 12000000, 5000000000)")
         wide = load_wide(conn)
-        self.assertEqual(wide["market_cap"].iloc[0, 0], 33_249_944e6)  # the 33 trillion yen of that day
-        self.assertEqual(wide["turnover"].iloc[0, 0], 53381308600)
+        self.assertEqual(wide["market_cap"].iloc[0, 0], 12e12)  # 12 million "millions" is 12 trillion yen
+        self.assertEqual(wide["turnover"].iloc[0, 0], 5e9)
         self.assertGreater(wide["market_cap"].iloc[0, 0], Config().min_market_cap)
 
 

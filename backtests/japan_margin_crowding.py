@@ -48,7 +48,7 @@ STOCK_CATEGORY = "011"  # domestic common stock
 EXCLUDED_MARKETS = ("その他", "TOKYO PRO MARKET")
 LENDABLE = "貸借"
 WEEKS_PER_YEAR = 50  # decisions per year after holidays are close to this; only used to annualise
-MARKET_CAP_UNIT = 1e6  # J-Quants' MktCap is in millions of yen (Toyota 2022-09-14: 33,249,944); turnover is in yen
+MARKET_CAP_UNIT = 1e6  # J-Quants' MktCap is in millions of yen; turnover (Va) is in yen
 
 
 @dataclass(frozen=True)

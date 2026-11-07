@@ -25,11 +25,11 @@ class ClockTest(unittest.TestCase):
 
 class SplitTest(unittest.TestCase):
     def test_a_split_is_not_a_return(self):
-        bars = pd.DataFrame({"date": ["2026-09-25", "2026-09-28", "2026-09-29", "2026-09-30"],
-                             "close": [55780.0, 53340.0, 17880.0, 18095.0], "adj_factor": [1.0, 1.0, 1 / 3, 1.0]})
+        bars = pd.DataFrame({"date": ["2024-01-04", "2024-01-05", "2024-01-09", "2024-01-10"],
+                             "close": [3000.0, 2900.0, 1000.0, 1010.0], "adj_factor": [1.0, 1.0, 1 / 3, 1.0]})
         r = adjusted_log_close(bars).diff().to_numpy()
-        self.assertAlmostEqual(r[2], np.log(17880 / (53340 / 3)))  # +0.6%, not -67%
-        self.assertLess(abs(r[2]), 0.01)
+        self.assertAlmostEqual(r[2], np.log(1000 / (2900 / 3)))  # +3.4%, not -66%
+        self.assertLess(abs(r[2]), 0.05)
 
     def test_a_day_without_trades_carries_the_price(self):
         bars = pd.DataFrame({"date": ["a", "b", "c"], "close": [100.0, np.nan, 110.0], "adj_factor": [1.0, 1.0, 1.0]})
