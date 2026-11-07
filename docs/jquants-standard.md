@@ -256,6 +256,7 @@ python3 backtests/japan_positioning.py         # 通信なし。market.db は re
 | `source_files`・`build_meta`・`build_quality` | 原本ファイル（行の `source_id` が参照）、作成時の集計、数値にできず NULL にした値の件数 | — |
 
 - 既存の表名・列名は変えていない。新しい列は J-Quants V2 の列名の snake_case。
+- 単位: `market_cap`（`MktCap`）は百万円、`turnover`（`Va`）は円（2026-11-07 に確認。2022-09-14 のトヨタは 33,249,944 と 53,381,308,600）。
 - `margin_weekly` は名前のとおりではなくなった。2026-09-28 から日次の行が入り、公表はおおむね翌営業日（2026-11-07 に確認）。
   週次で使うコードは、各週の最終営業日の行に絞ること。`japan_positioning.py` の S2 は研究境界（2026-08-01）の前しか使わないので影響しない。
   `PubDate` と金額列が入るのも 2026 年の途中からで、それ以前は空。
@@ -293,7 +294,7 @@ J-Quants はデータ販売ではなく利用サービスなので、解約・�
   ```
   消すもの: `/mnt/e/Datas/market/jquants/`（原本・`jquants.db`・J-Quants 由来の値を含む results）、作りかけの DB、
   GCS の `jquants/` の全版（復元期間を先に無効にする）。残すもの: Hyperliquid のデータ（J-Quants ではない）、コード、文書、
-  事前登録の registry（規則のみ）、文書中の集計値。
+  事前登録の registry（規則のみ）、文書中の集計値、`/mnt/e/Datas/market/japan_retained/` の非公開の集計（`docs/jquants-closing-research.md` §4）。
 - **自動削除（2026-10-31 に設定、2026-11-07 に発火条件を厳しくした）**: `~/.cache/jquants-build/jquants-cancel-requested` があると、
   契約期間が終わって API の拒否が続いたら `purge_jquants.sh --yes` まで行う（失敗したら毎時やり直す）。
 

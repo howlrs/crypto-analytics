@@ -1,12 +1,13 @@
 """Publication timing, point-in-time membership and the estimators of the margin crowding test."""
+import sqlite3
 import unittest
 
 import numpy as np
 import pandas as pd
 
 from backtests.japan_margin_crowding import (
-    Config, adjusted_log_prices, book_alpha, book_return, cross_section_slope, decile_spread, membership, ols_hac,
-    primary_family, weekly_schedule,
+    Config, adjusted_log_prices, book_alpha, book_return, cross_section_slope, decile_spread, load_wide, membership,
+    ols_hac, primary_family, weekly_schedule,
 )
 
 BUSINESS = pd.bdate_range("2024-07-01", "2024-08-30").strftime("%Y-%m-%d").to_numpy()
@@ -43,6 +44,17 @@ class PriceTest(unittest.TestCase):
         self.assertAlmostEqual(log_price.a[1] - log_price.a[0], 0.0)
         self.assertAlmostEqual(log_price.a[2] - log_price.a[1], 0.0)
         self.assertAlmostEqual(log_price.a[3] - log_price.a[2], np.log(26 / 25))
+
+
+class UnitTest(unittest.TestCase):
+    def test_market_cap_reaches_yen(self):
+        conn = sqlite3.connect(":memory:")
+        conn.execute("CREATE TABLE equities_daily (date TEXT, code TEXT, close REAL, adj_factor REAL, market_cap REAL, turnover REAL)")
+        conn.execute("INSERT INTO equities_daily VALUES ('2022-09-14', '72030', 2038, 1, 33249944, 53381308600)")
+        wide = load_wide(conn)
+        self.assertEqual(wide["market_cap"].iloc[0, 0], 33_249_944e6)  # the 33 trillion yen of that day
+        self.assertEqual(wide["turnover"].iloc[0, 0], 53381308600)
+        self.assertGreater(wide["market_cap"].iloc[0, 0], Config().min_market_cap)
 
 
 class MembershipTest(unittest.TestCase):

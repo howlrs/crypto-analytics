@@ -7,7 +7,7 @@
 #   data-tools/update_japan.sh --check   only print the route evidence and exit
 #
 # The parts are independent. xyz: fetch_hl_xyz (its 15-minute candles reach back only ~52 days, so it
-# keeps running while J-Quants is unavailable). J-Quants: sync -> build -> japan_forward status. When
+# keeps running while J-Quants is unavailable), then the H1 monitor, which needs no J-Quants data. J-Quants: sync -> build -> japan_forward status. When
 # J-Quants refuses a dataset nothing local changes; the date goes to $WORK/jquants-access-denied, the
 # log repeats the licence duty (after a cancellation every J-Quants copy must be deleted:
 # data-tools/purge_jquants.sh) and the next week checks again. After a renewal the sync fetches every
@@ -72,6 +72,7 @@ if due "$HL_STAMP"; then
   if python3 data-tools/ipv4_run.py data-tools/fetch_hl_xyz.py --base "$HL_DIR"; then
     touch "$HL_STAMP"
     hl_ok=1
+    python3 backtests/japan_perp_monitor.py status --hl-dir "$HL_DIR" >/dev/null || echo "H1 monitor failed; the next weekly run retries it"
   else
     echo "xyz fetch failed; it is retried next hour"
   fi

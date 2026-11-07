@@ -33,6 +33,7 @@ from backtests.japan_retained import RETAINED_DIR, retained_path, write_summary 
 HL_DIR = Path("/mnt/e/Datas/market/hyperliquid/xyz")
 JQ_DIR = Path("/mnt/e/Datas/market/jquants")
 REGISTRY = forward.REGISTRY
+EXACT_CLOSE = "15m_0630"  # price_at_close: the 15-minute candle at the close, not the hourly stand-in
 # TSE weekday closures in the H1 window (JPX calendar; compared with J-Quants' trading_calendar on 2026-11-07).
 TSE_CLOSED = frozenset((
     "2026-11-03", "2026-11-23", "2026-12-31", "2027-01-01", "2027-01-11", "2027-02-11", "2027-02-23", "2027-03-22",
@@ -116,7 +117,9 @@ def calibrate(registry: Path, jquants_db: Path, hl_dir: Path, directory: Path, f
             days = ref.date.tolist()
             official = ledger(coin, spec, days, ref.fair_jpy.to_numpy(float), first, hl_dir)
             proxy = ledger(coin, spec, days, None, first, hl_dir)
-            good = (official.valid & proxy.valid & (official.perp_source == "15m")).to_numpy()
+            good = (official.valid & proxy.valid & (official.perp_source == EXACT_CLOSE)).to_numpy()
+            if good.sum() < 2:
+                raise ValueError(f"{coin}: too few days with an exact close to calibrate on")
             error = (official.roc - proxy.roc).to_numpy(float)[good]
             basis = official.basis.to_numpy(float)[good]
             rho = float(np.corrcoef(basis[:-1], basis[1:])[0, 1]) if len(basis) > 3 else np.nan

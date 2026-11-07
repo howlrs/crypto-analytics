@@ -8,8 +8,9 @@
 #
 # Deleted: JQ_DATA_DIR (raw mirror, jquants.db, results with J-Quants-derived values), unfinished build
 # files in JQ_WORK_DIR, and every version of the jquants/ prefix in the GCS backup (soft delete is cleared
-# first, so nothing is kept for recovery). Kept: the Hyperliquid data (not J-Quants), code, docs and the
-# forward-test registry (rules only). Other projects' J-Quants data is listed, not touched.
+# first, so nothing is kept for recovery). Kept: the Hyperliquid data (not J-Quants), code, docs, the
+# forward-test registry (rules only) and the unpublished aggregates in japan_retained, which live outside
+# JQ_DATA_DIR (backtests/japan_retained.py). Other projects' J-Quants data is listed, not touched.
 # Renewal: put the API key in .env and run data-tools/update_japan.sh --force; the sync refetches all.
 set -euo pipefail
 export PATH="${PATH:+$PATH:}/usr/local/sbin:/usr/sbin:/sbin:$HOME/google-cloud-sdk/bin"

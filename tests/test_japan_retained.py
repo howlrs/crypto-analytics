@@ -43,7 +43,7 @@ class PathTest(unittest.TestCase):
         from backtests.japan_retained import RETAINED_DIR
         self.assertNotIn(JQ_DIR.resolve(), [RETAINED_DIR.resolve(), *RETAINED_DIR.resolve().parents])
         purge = (ROOT / "data-tools/purge_jquants.sh").read_text()
-        self.assertNotIn(str(RETAINED_DIR), purge.replace("Kept:", ""))  # the script must never name it for deletion
+        self.assertIn('"$(basename "$resolved")" != "jquants"', purge)  # it can only delete a directory named jquants
 
 
 class WriteTest(unittest.TestCase):

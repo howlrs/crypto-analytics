@@ -34,6 +34,20 @@ class CalendarTest(unittest.TestCase):
         self.assertEqual(monitor.tse_days("2026-12-30", "2027-01-04"), ["2026-12-30", "2027-01-04"])
 
 
+class StatusTest(unittest.TestCase):
+    def test_status_runs_on_hyperliquid_files_alone(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            for coin, price, rate in ((carry.FX, 150.0, 0.0), ("xyz:SOFTBANK", 10.0, 0.0001), ("xyz:KIOXIA", 20.0, 0.0)):
+                write_market(base, coin, price, rate)
+            out = monitor.status(monitor.REGISTRY, base, base / "store")
+            soft = out["instruments"]["xyz:SOFTBANK"]
+            self.assertEqual(soft["liquidations_on_proxy"], 0)
+            self.assertEqual(soft["last_day"], "2026-11-13")
+            self.assertAlmostEqual(soft["funding_received_sum"], 0.0001 * 11 * 24)  # eleven days of hourly funding
+            self.assertTrue((base / "store/h1_monitor/status.json").exists())
+
+
 class ProxyTest(unittest.TestCase):
     spec = {"leverage": 3.0}
 

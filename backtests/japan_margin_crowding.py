@@ -48,6 +48,7 @@ STOCK_CATEGORY = "011"  # domestic common stock
 EXCLUDED_MARKETS = ("その他", "TOKYO PRO MARKET")
 LENDABLE = "貸借"
 WEEKS_PER_YEAR = 50  # decisions per year after holidays are close to this; only used to annualise
+MARKET_CAP_UNIT = 1e6  # J-Quants' MktCap is in millions of yen (Toyota 2022-09-14: 33,249,944); turnover is in yen
 
 
 @dataclass(frozen=True)
@@ -194,6 +195,7 @@ def primary_family(weeks: pd.DataFrame, config: Config) -> pd.DataFrame:
 def load_wide(conn: sqlite3.Connection) -> dict[str, pd.DataFrame]:
     bars = pd.read_sql_query("SELECT date, code, close, adj_factor, market_cap, turnover FROM equities_daily ORDER BY date", conn)
     out = {c: bars.pivot(index="date", columns="code", values=c) for c in ("close", "adj_factor", "market_cap", "turnover")}
+    out["market_cap"] = out["market_cap"] * MARKET_CAP_UNIT
     return out
 
 
