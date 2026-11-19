@@ -75,8 +75,32 @@ Persistent=true
 WantedBy=timers.target
 UNIT
 
+cat > /etc/systemd/system/orderbook-heartbeat.service <<UNIT
+[Unit]
+Description=Report order-book collector health to Cloud Logging (see alerting.sh)
+
+[Service]
+Type=oneshot
+User=orderbook
+WorkingDirectory=/opt/orderbook/current
+ExecStart=/opt/orderbook/current/orderbook/deploy/gce/heartbeat.sh
+UNIT
+
+cat > /etc/systemd/system/orderbook-heartbeat.timer <<UNIT
+[Unit]
+Description=Order-book collector heartbeat every 10 minutes
+
+[Timer]
+OnCalendar=*-*-* *:00/10:30
+AccuracySec=30s
+
+[Install]
+WantedBy=timers.target
+UNIT
+
 systemctl daemon-reload
 systemctl enable --now orderbook-upload.timer
+systemctl enable --now orderbook-heartbeat.timer
 systemctl enable orderbook-collector.service
 if [ "$previous" != "$CODE" ]; then
   systemctl restart orderbook-collector.service

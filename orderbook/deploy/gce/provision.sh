@@ -70,3 +70,4 @@ else
     --metadata-from-file=startup-script="$HERE/startup.sh"
 fi
 echo "done. SSH: gcloud --configuration=$GCLOUD_CONFIG --project=$PROJECT compute ssh $NAME --zone=$ZONE --tunnel-through-iap"
+echo "alerting: PROJECT=$PROJECT ALERT_EMAIL=<address> $HERE/alerting.sh   (email when heartbeats stop)"
