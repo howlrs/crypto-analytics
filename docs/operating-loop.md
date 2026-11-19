@@ -22,7 +22,7 @@
 | ためる | `data-tools/` → `market.db`（足、funding、建玉）。`hl-watch/` → `hl_watch.db`（取得の成功・空・失敗を区別した観測フレーム）。`orderbook/` → 板スナップショット（取引所の時刻と受信時刻つき）。`live_signals/` は受信時刻のない足を「当時使えた」と扱わない | 約定・板の配信を受ける記録器（受信遅延とそのばらつき）。自分の取引イベント |
 | パラメータにする | `research_loop/parameters.json`。板の深さと成行コストは `orderbook.analyze`、出来高に対する参加率は `execution_sensitivity.py` | 実測の往復コスト、注文が板に反映されるまでの時間、約定後の値動き |
 | 仮説を立てて判定する | `research_loop/hypotheses.json`。検証は `strategy_robustness.py`（重複の除外、時系列の分割、多重比較）、`prospective_validation.py`（事前登録と封印）、`event_paths.py`（途中の逆行） | — |
-| 運用して計測する | `research_loop/annotations.jsonl`（いつ何をしたか）。`live_signals/`（現在の状態の診断、オフライン）、`japan_perp_monitor.py`（追跡中の受取 funding と清算余裕） | 実取引、グラフ（施策と結果を同じ時間軸で見る画面）、通知、自動停止 |
+| 運用して計測する | `research_loop/annotations.jsonl`（いつ何をしたか）。`live_signals/`（現在の状態の診断、オフライン）、`japan_perp_monitor.py`（追跡中の受取 funding と清算余裕）。板の収集が止まったときのメール（`orderbook/deploy/gce/heartbeat.sh`、`alerting.sh`） | 実取引、グラフ（施策と結果を同じ時間軸で見る画面）、自動停止 |
 | 振り返る | `python3 -m research_loop.registry review` の出力を入力にして、下の手順で行う | 定期実行の設定 |
 
 ## 3 つの台帳
@@ -106,12 +106,13 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 4. **実際の取引が要るもの**: `cost.realized_round_trip_bp`、`latency.order_to_book_ms`、`liquidity.post_fill_move_bp`。
 
 - **板スナップショットの収集を再開した。** 試行用の終了時刻（2026-11-06）で止まっていたのを、終了時刻なしで動かし直した。2026-11-06〜2026-11-19 は欠測（`data.orderbook.coverage`）。
+- **止まったらメールが届くようにした。** VM が 10 分ごとに状態を記録し、正常な記録が 30 分届かないと通知が出る（[orderbook.md](orderbook.md)）。
 
-決まっていないこと: 振り返りの間隔（`loop.review_interval_days`）、収集が止まったときに知らせる仕組み（今は確認のコマンドがあるだけで、通知はない）。
+決まっていないこと: 振り返りの間隔（`loop.review_interval_days`）。
 
 ## 範囲と限界
 
 - 台帳は状態の記録であり、値や判定の正しさを保証しない。値の根拠は `source` と `evidence` の先にある。
-- 可視化の基盤（時系列 DB とグラフ）、通知、定期実行は、このリポジトリにはまだない。
+- 可視化の基盤（時系列 DB とグラフ）と、振り返りの定期実行は、このリポジトリにはまだない。通知は板の収集の停止だけが対象。
 - `research_loop/`、本書、`playbook.md` は、`results/research_manifest.json` が固定するスナップショットの対象ではない。
 - テストは `tests/test_research_loop.py`。一時ディレクトリと合成の値を使い、リポジトリの台帳は読むだけで書き換えない。
