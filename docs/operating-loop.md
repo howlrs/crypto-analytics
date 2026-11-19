@@ -19,10 +19,10 @@
 
 | 段 | 担っているもの | まだないもの |
 |---|---|---|
-| ためる | `data-tools/` → `market.db`（足、funding、建玉）。`hl-watch/` → `hl_watch.db`（取得の成功・空・失敗を区別した観測フレーム）。`orderbook/` → 板スナップショット（取引所の時刻と受信時刻つき） | 約定・板の配信を受ける記録器（受信遅延とそのばらつき）。自分の取引イベント |
+| ためる | `data-tools/` → `market.db`（足、funding、建玉）。`hl-watch/` → `hl_watch.db`（取得の成功・空・失敗を区別した観測フレーム）。`orderbook/` → 板スナップショット（取引所の時刻と受信時刻つき）。`live_signals/` は受信時刻のない足を「当時使えた」と扱わない | 約定・板の配信を受ける記録器（受信遅延とそのばらつき）。自分の取引イベント |
 | パラメータにする | `research_loop/parameters.json`。板の深さと成行コストは `orderbook.analyze`、出来高に対する参加率は `execution_sensitivity.py` | 実測の往復コスト、注文が板に反映されるまでの時間、約定後の値動き |
 | 仮説を立てて判定する | `research_loop/hypotheses.json`。検証は `strategy_robustness.py`（重複の除外、時系列の分割、多重比較）、`prospective_validation.py`（事前登録と封印）、`event_paths.py`（途中の逆行） | — |
-| 運用して計測する | `research_loop/annotations.jsonl`（いつ何をしたか）。`japan_perp_monitor.py`（追跡中の受取 funding と清算余裕） | 実取引、グラフ（施策と結果を同じ時間軸で見る画面）、通知、自動停止 |
+| 運用して計測する | `research_loop/annotations.jsonl`（いつ何をしたか）。`live_signals/`（現在の状態の診断、オフライン）、`japan_perp_monitor.py`（追跡中の受取 funding と清算余裕） | 実取引、グラフ（施策と結果を同じ時間軸で見る画面）、通知、自動停止 |
 | 振り返る | `python3 -m research_loop.registry review` の出力を入力にして、下の手順で行う | 定期実行の設定 |
 
 ## 3 つの台帳
@@ -90,7 +90,7 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 ## 2026-11-19 時点の状態
 
 パラメータ 42 件のうち、`measured` 16、`documented` 8、`assumed` 8、`unknown` 10。
-仮説 18 件のうち、保留中の採用 2、将来検証に登録済み 3、未検証 2、記述のみ 3、棄却 8。
+仮説 19 件のうち、保留中の採用 2、将来検証に登録済み 3、未検証 2、記述のみ 4、棄却 8。
 
 この日に測ったもの:
 
