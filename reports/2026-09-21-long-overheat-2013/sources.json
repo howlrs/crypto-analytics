@@ -1,0 +1,446 @@
+{
+  "server_time_ms": 1789989184751,
+  "local_clock_ms": 1789989184815,
+  "completed_minute_end_exclusive": 1789989180000,
+  "hour_end_exclusive": 1789988400000,
+  "refresh": false,
+  "transport": "Allowlisted CONNECT proxy; IPv4 socket and DNS bound to verified ExpressVPN interface eth1; no direct fallback.",
+  "collector_sha256": "315fc76adc1e554ead9d8b0567600ae82c876a90ec0bd9016bb905d2c8b395b8",
+  "requests": [
+    {
+      "name": "BTC_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1789989179999",
+      "payload": null,
+      "started_ms": 1789989184815,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "93285ab5d935ecb443eeb9c7bdf88c97f6b1eef320e9131235f9ac3fb645ef91",
+      "bytes": 133187,
+      "finished_ms": 1789989185056
+    },
+    {
+      "name": "BTC_spot_1m",
+      "url": "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1789989179999",
+      "payload": null,
+      "started_ms": 1789989184815,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "028cbbb8e879f74ea852f5262b69fef587f300fa8d09726e6ea542d128ef5ed8",
+      "bytes": 169544,
+      "finished_ms": 1789989184980
+    },
+    {
+      "name": "BTC_spot_book",
+      "url": "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789989184816,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "701dd68f236573ac593b96b79f9f1018e3f24194cf3d51358594181838f67233",
+      "bytes": 6447,
+      "finished_ms": 1789989184914
+    },
+    {
+      "name": "BTC_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789989184914,
+      "attempt": 0,
+      "status": "error",
+      "error": "<urlopen error timed out>",
+      "finished_ms": 1789989204934
+    },
+    {
+      "name": "BTC_oi_5m",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=5m&limit=500&endTime=1789989180000",
+      "payload": null,
+      "started_ms": 1789989184980,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "99dd3ad0a57368376ab88a68ad14d2f2fff33f75326a3cd03e24011c925a0985",
+      "bytes": 85501,
+      "finished_ms": 1789989185082
+    },
+    {
+      "name": "BTC_premium",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT",
+      "payload": null,
+      "started_ms": 1789989185056,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "2842593c86a94f64cacbdb8deed2a120d978109de370e4c0ce602bad78e954e9",
+      "bytes": 231,
+      "finished_ms": 1789989185119
+    },
+    {
+      "name": "BTC_perp_1h",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1h&limit=1000&endTime=1789988399999",
+      "payload": null,
+      "started_ms": 1789989185082,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "3ec6762de0984bd7b058cd09c54dec0a3a88b626c370e86724efa1aa972cc3f5",
+      "bytes": 142159,
+      "finished_ms": 1789989185192
+    },
+    {
+      "name": "BTC_spot_1h",
+      "url": "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=1000&endTime=1789988399999",
+      "payload": null,
+      "started_ms": 1789989185119,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "6f85bcfb90910b1b834c200a8950dd33bc023ef9bddc681725a820fb5b0786ba",
+      "bytes": 178479,
+      "finished_ms": 1789989185278
+    },
+    {
+      "name": "BTC_oi_1h",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=200&endTime=1789988400000",
+      "payload": null,
+      "started_ms": 1789989185192,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "f48ebf2824de94c1bc019d7e4e9467a8c0b5694b76b287c366c1f9e9a1d26069",
+      "bytes": 34201,
+      "finished_ms": 1789989185279
+    },
+    {
+      "name": "BTC_funding",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&startTime=1788779584751&endTime=1789989184751&limit=1000",
+      "payload": null,
+      "started_ms": 1789989185279,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "e28db530cce607b4e826a535bcfd1ec6de36ac20042191a6153adcdabf9612d9",
+      "bytes": 5293,
+      "finished_ms": 1789989185344
+    },
+    {
+      "name": "BTC_bybit_ticker",
+      "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT",
+      "payload": null,
+      "started_ms": 1789989185279,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "9953a34dc23c11c980b1a66045a4366778737f17a6f4abeb586707f296014d9c",
+      "bytes": 875,
+      "finished_ms": 1789989185706
+    },
+    {
+      "name": "BTC_hl_funding",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "fundingHistory",
+        "coin": "BTC",
+        "startTime": 1789902784751,
+        "endTime": 1789989184751
+      },
+      "started_ms": 1789989185344,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "d76b20a67ed3c714eef822bdd5206abb5fadb0c342584898b922c2090f674913",
+      "bytes": 2097,
+      "finished_ms": 1789989185538
+    },
+    {
+      "name": "ETH_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1m&limit=1000&endTime=1789989179999",
+      "payload": null,
+      "started_ms": 1789989185538,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "50d887b87dd5b76e1809b6bbf4f63e9202f96d737dabe814265a2ceb3d93b01b",
+      "bytes": 132440,
+      "finished_ms": 1789989185637
+    },
+    {
+      "name": "ETH_spot_1m",
+      "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1m&limit=1000&endTime=1789989179999",
+      "payload": null,
+      "started_ms": 1789989185637,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "488f03f8c972cb8bef9534ae3a9f801a59a30649a2930b0afc65806377ea9db4",
+      "bytes": 167743,
+      "finished_ms": 1789989185756
+    },
+    {
+      "name": "ETH_spot_book",
+      "url": "https://api.binance.com/api/v3/depth?symbol=ETHUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789989185706,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "68ba32c7d023c771e81f1a6055a919bfa974a1c01de62f95daef448ca154c818",
+      "bytes": 6275,
+      "finished_ms": 1789989185773
+    },
+    {
+      "name": "ETH_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=ETHUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789989185756,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "23bfebdf6180688ec2b1ceb75b25bf889f8a246cb2dc41e7636085cf5dff78d7",
+      "bytes": 4131,
+      "finished_ms": 1789989185815
+    },
+    {
+      "name": "ETH_oi_5m",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=ETHUSDT&period=5m&limit=500&endTime=1789989180000",
+      "payload": null,
+      "started_ms": 1789989185773,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "d82d8f580383f456e1bcf33e864c3cae9b1a3ec0a0395d0aa4ab625434e963b8",
+      "bytes": 86501,
+      "finished_ms": 1789989185872
+    },
+    {
+      "name": "ETH_premium",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=ETHUSDT",
+      "payload": null,
+      "started_ms": 1789989185815,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "6d0703a0bd957389685ac661fc901145d7e0906299a82624b9b5464f364962ad",
+      "bytes": 228,
+      "finished_ms": 1789989185879
+    },
+    {
+      "name": "ETH_perp_1h",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1h&limit=1000&endTime=1789988399999",
+      "payload": null,
+      "started_ms": 1789989185873,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "e13c2a6b4a8ef6133469296d314ba01470adc81f536de4501a1503c4a41c525e",
+      "bytes": 140955,
+      "finished_ms": 1789989185985
+    },
+    {
+      "name": "ETH_spot_1h",
+      "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1h&limit=1000&endTime=1789988399999",
+      "payload": null,
+      "started_ms": 1789989185880,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "62298b42a7ba78796915518ce10a07d2ba2178742922f14fe007082af6e67ae0",
+      "bytes": 176314,
+      "finished_ms": 1789989186024
+    },
+    {
+      "name": "ETH_oi_1h",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=ETHUSDT&period=1h&limit=200&endTime=1789988400000",
+      "payload": null,
+      "started_ms": 1789989185985,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "e9b26988d07146668b9faf06b10fe256cda61c91430544b5ce8e1a1a10f895e0",
+      "bytes": 34601,
+      "finished_ms": 1789989186111
+    },
+    {
+      "name": "ETH_funding",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=ETHUSDT&startTime=1788779584751&endTime=1789989184751&limit=1000",
+      "payload": null,
+      "started_ms": 1789989186024,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "7d28692ce9e934f6c6581c8bf096de8ae0328d9d5705590d326917a25f4606ac",
+      "bytes": 5259,
+      "finished_ms": 1789989186105
+    },
+    {
+      "name": "ETH_bybit_ticker",
+      "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=ETHUSDT",
+      "payload": null,
+      "started_ms": 1789989186105,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "da8463e798b9949ccb216ac7fa454414ca9b4adeb41e4314b00234517360f179",
+      "bytes": 868,
+      "finished_ms": 1789989186256
+    },
+    {
+      "name": "ETH_hl_funding",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "fundingHistory",
+        "coin": "ETH",
+        "startTime": 1789902784751,
+        "endTime": 1789989184751
+      },
+      "started_ms": 1789989186111,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "8d2ae0494f8b14fa06db33ba1d842249dadcf1e938d0f8052faff26bb4b2909f",
+      "bytes": 2115,
+      "finished_ms": 1789989186208
+    },
+    {
+      "name": "HYPE_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1m&limit=1000&endTime=1789989179999",
+      "payload": null,
+      "started_ms": 1789989186208,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "5f9c1ddfd4f78508998cf69fdac526c82cfc356342c851c9f6c72b7a153d9353",
+      "bytes": 136150,
+      "finished_ms": 1789989186313
+    },
+    {
+      "name": "HYPE_spot_1m",
+      "url": "https://api.bybit.com/v5/market/kline?category=spot&symbol=HYPEUSDT&interval=1&limit=1000&end=1789989179999",
+      "payload": null,
+      "started_ms": 1789989186256,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "f66b4d38ba11f362f175c39e40e12e739f281723916938d7c52d3b89e53ef36d",
+      "bytes": 72889,
+      "finished_ms": 1789989186422
+    },
+    {
+      "name": "HYPE_spot_book",
+      "url": "https://api.bybit.com/v5/market/orderbook?category=spot&symbol=HYPEUSDT&limit=50",
+      "payload": null,
+      "started_ms": 1789989186313,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "e9e29aa8a9f27d09bc958348d2d3e7c857365ae336bbb3a859b3563fb1b04c7e",
+      "bytes": 2017,
+      "finished_ms": 1789989187049
+    },
+    {
+      "name": "HYPE_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=HYPEUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789989186423,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "5aabe718264511d600d6194d3efb01ffdeb67e5d43fedd89301a302f12b240d4",
+      "bytes": 4215,
+      "finished_ms": 1789989186485
+    },
+    {
+      "name": "HYPE_oi_5m",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=HYPEUSDT&period=5m&limit=500&endTime=1789989180000",
+      "payload": null,
+      "started_ms": 1789989186485,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "2a26f251ec80cc03aefb55407a6e61b7cfba152b695c19c3784b6763c4cc46f7",
+      "bytes": 86501,
+      "finished_ms": 1789989186597
+    },
+    {
+      "name": "HYPE_premium",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=HYPEUSDT",
+      "payload": null,
+      "started_ms": 1789989186597,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "c206a6e3a9090fa573595ef323fac0e37545047946c0a12148ea5df1850218e8",
+      "bytes": 224,
+      "finished_ms": 1789989186659
+    },
+    {
+      "name": "HYPE_perp_1h",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1h&limit=1000&endTime=1789988399999",
+      "payload": null,
+      "started_ms": 1789989186660,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "7d0b5b0a54872a6458bbec03f4b5f0ec4ea0030179669374278639dfdfbf8f52",
+      "bytes": 145485,
+      "finished_ms": 1789989186769
+    },
+    {
+      "name": "HYPE_spot_1h",
+      "url": "https://api.bybit.com/v5/market/kline?category=spot&symbol=HYPEUSDT&interval=60&limit=1000&end=1789988399999",
+      "payload": null,
+      "started_ms": 1789989186769,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "1cc8dc090023696634309f0b42499fb9dd9b99bc3520668ab54d995005321873",
+      "bytes": 76975,
+      "finished_ms": 1789989187072
+    },
+    {
+      "name": "HYPE_oi_1h",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=HYPEUSDT&period=1h&limit=200&endTime=1789988400000",
+      "payload": null,
+      "started_ms": 1789989187049,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "8574d794b58a93d6aff89adf8ba6fc5367902ce03b436327b84f2663546d4368",
+      "bytes": 34601,
+      "finished_ms": 1789989187135
+    },
+    {
+      "name": "HYPE_funding",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=HYPEUSDT&startTime=1788779584751&endTime=1789989184751&limit=1000",
+      "payload": null,
+      "started_ms": 1789989187072,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "81b1d29c8e6d4de3775fd6cfb2e2b895c9b7fcef370a897a9537e97dcbfd8f93",
+      "bytes": 10426,
+      "finished_ms": 1789989187137
+    },
+    {
+      "name": "HYPE_bybit_ticker",
+      "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=HYPEUSDT",
+      "payload": null,
+      "started_ms": 1789989187135,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "c92311dd8728ee8970dca00238e0c112b63ad6a15db35e44add794d956fe5197",
+      "bytes": 871,
+      "finished_ms": 1789989187284
+    },
+    {
+      "name": "HYPE_hl_funding",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "fundingHistory",
+        "coin": "HYPE",
+        "startTime": 1789902784751,
+        "endTime": 1789989184751
+      },
+      "started_ms": 1789989187137,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "dcedce2afb9261ce7d0baa0b7cba5fbeed77d6684adeb86cee1c7f46dc9713f9",
+      "bytes": 2141,
+      "finished_ms": 1789989187242
+    },
+    {
+      "name": "hl_contexts",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "metaAndAssetCtxs"
+      },
+      "started_ms": 1789989187242,
+      "attempt": 0,
+      "status": "ok",
+      "sha256": "1896eb8face0fc504f4ce90781f9e47d11385c6f365164feb529b3ce988d6879",
+      "bytes": 72596,
+      "finished_ms": 1789989187363
+    },
+    {
+      "name": "BTC_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789989204935,
+      "attempt": 1,
+      "status": "ok",
+      "sha256": "61aab734e842a050889aa65bc17884e4a98dbb8a50d62943356f49629fd72f8b",
+      "bytes": 4285,
+      "finished_ms": 1789989205001
+    }
+  ],
+  "completed_ms": 1789989205001
+}

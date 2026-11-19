@@ -1,0 +1,1187 @@
+{
+  "generated_at_ms": 1789983109143,
+  "as_of_ms": 1789982942723,
+  "sources_sha256": "2d89721c0efcddefac181bc72a5cb9cc265e8a0ecaa4d6bab5565cf7b7e498c1",
+  "archive_sha256": "9367287848f975e93ad0d5a916696e596b10a6b21059ec727e3c05393ecfd87b",
+  "engine_sha256": "3ecc738598f7cced1b2e6e39bcfcbc7f2d492351cb189b5fbd70ff785ed88db9",
+  "fixed_reference_source_sha256": "d9835d4e53bc0fa4114320694a32421fde2b8c6af4e3cd454c4a13935e8af2be",
+  "coins": {
+    "BTC": {
+      "original_high4": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109156,
+        "state": "price_breakout_confirmed",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [
+          {
+            "name": "resistance_close_confirmation",
+            "level": 81878.98,
+            "volume_confirmed": false
+          }
+        ],
+        "counterevidence": [
+          "Price confirmation lacks the configured volume expansion.",
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "binance",
+            "symbol": "BTCUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "BTCUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.005641291530026571,
+              "range": 667.8000000000029,
+              "quote_volume": 81105452.1645022,
+              "taker_imbalance": 0.04995753579564366,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.0283882817329959,
+              "range": 2448.1300000000047,
+              "quote_volume": 458948752.94206756,
+              "taker_imbalance": 0.19213604734527334,
+              "flow_status": "known"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.0057837409703489495,
+              "range": 720.6999999999971,
+              "quote_volume": 727342184.5658,
+              "taker_imbalance": 0.1828155069663373,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.02843867981975401,
+              "range": 2492.399999999994,
+              "quote_volume": 3979948825.2209,
+              "taker_imbalance": 0.17170367070807013,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 1.3856065400296929,
+            "prior_median_true_range": 242.86999999999534,
+            "resistance_distance": -2589.8099999999977,
+            "near_resistance": false
+          }
+        },
+        "price": 84468.79,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.156,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "fixed",
+        "reference": {
+          "venue": "binance",
+          "symbol": "BTCUSDT",
+          "support": 81228.15,
+          "resistance": 81878.98,
+          "known_at": 1789977521605,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 84003.18,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 1.024486648138041
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 84012.88,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 0.9848566593015683
+            }
+          ],
+          "price_confirmed": true,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": 0.04995753579564366
+        }
+      },
+      "original_high7d": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109158,
+        "state": "price_breakout_confirmed",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [
+          {
+            "name": "resistance_close_confirmation",
+            "level": 82100,
+            "volume_confirmed": false
+          }
+        ],
+        "counterevidence": [
+          "Price confirmation lacks the configured volume expansion.",
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "binance",
+            "symbol": "BTCUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "BTCUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.005641291530026571,
+              "range": 667.8000000000029,
+              "quote_volume": 81105452.1645022,
+              "taker_imbalance": 0.04995753579564366,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.0283882817329959,
+              "range": 2448.1300000000047,
+              "quote_volume": 458948752.94206756,
+              "taker_imbalance": 0.19213604734527334,
+              "flow_status": "known"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.0057837409703489495,
+              "range": 720.6999999999971,
+              "quote_volume": 727342184.5658,
+              "taker_imbalance": 0.1828155069663373,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.02843867981975401,
+              "range": 2492.399999999994,
+              "quote_volume": 3979948825.2209,
+              "taker_imbalance": 0.17170367070807013,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 1.3856065400296929,
+            "prior_median_true_range": 242.86999999999534,
+            "resistance_distance": -2368.7899999999936,
+            "near_resistance": false
+          }
+        },
+        "price": 84468.79,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.158,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "fixed",
+        "reference": {
+          "venue": "binance",
+          "symbol": "BTCUSDT",
+          "support": 81228.15,
+          "resistance": 82100,
+          "known_at": 1789977521605,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 84003.18,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 1.024486648138041
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 84012.88,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 0.9848566593015683
+            }
+          ],
+          "price_confirmed": true,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": 0.04995753579564366
+        }
+      },
+      "rolling_context": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109160,
+        "state": "neutral",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [],
+        "counterevidence": [
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation.",
+          "Rolling levels are stateless; supply fixed levels to track the same setup over time."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "binance",
+            "symbol": "BTCUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "BTCUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.005641291530026571,
+              "range": 667.8000000000029,
+              "quote_volume": 81105452.1645022,
+              "taker_imbalance": 0.04995753579564366,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.0283882817329959,
+              "range": 2448.1300000000047,
+              "quote_volume": 458948752.94206756,
+              "taker_imbalance": 0.19213604734527334,
+              "flow_status": "known"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.0057837409703489495,
+              "range": 720.6999999999971,
+              "quote_volume": 727342184.5658,
+              "taker_imbalance": 0.1828155069663373,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.02843867981975401,
+              "range": 2492.399999999994,
+              "quote_volume": 3979948825.2209,
+              "taker_imbalance": 0.17170367070807013,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 1.3856065400296929,
+            "prior_median_true_range": 242.86999999999534,
+            "resistance_distance": -294.6899999999878,
+            "near_resistance": false
+          }
+        },
+        "price": 84468.79,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.16,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "rolling_prior_context",
+        "reference": {
+          "venue": "binance",
+          "symbol": "BTCUSDT",
+          "support": 81871.4,
+          "resistance": 84174.1,
+          "known_at": 1789982922668,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 84003.18,
+              "after_reference_known": false,
+              "above_resistance": false,
+              "volume_ratio": 1.024486648138041
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 84012.88,
+              "after_reference_known": false,
+              "above_resistance": false,
+              "volume_ratio": 0.9848566593015683
+            }
+          ],
+          "price_confirmed": false,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": 0.04995753579564366
+        }
+      }
+    },
+    "ETH": {
+      "original_high4": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109175,
+        "state": "price_breakout_confirmed",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [
+          {
+            "name": "resistance_close_confirmation",
+            "level": 2678.7,
+            "volume_confirmed": false
+          }
+        ],
+        "counterevidence": [
+          "Price confirmation lacks the configured volume expansion.",
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "binance",
+            "symbol": "ETHUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "ETHUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.003184878493182053,
+              "range": 17.5,
+              "quote_volume": 31544979.630276,
+              "taker_imbalance": 0.20548068976969214,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.011372461170848336,
+              "range": 35.409999999999854,
+              "quote_volume": 161532178.102504,
+              "taker_imbalance": 0.020271127578024517,
+              "flow_status": "known"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.003208286715618236,
+              "range": 19.490000000000236,
+              "quote_volume": 235900435.48119,
+              "taker_imbalance": 0.1080934801708886,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.011384008605234808,
+              "range": 39.36000000000013,
+              "quote_volume": 1467029866.22405,
+              "taker_imbalance": 0.09988943994767308,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 1.1449133137062588,
+            "prior_median_true_range": 9.589999999999918,
+            "resistance_distance": -30.16000000000031,
+            "near_resistance": false
+          }
+        },
+        "price": 2708.86,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.175,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "fixed",
+        "reference": {
+          "venue": "binance",
+          "symbol": "ETHUSDT",
+          "support": 2653.43,
+          "resistance": 2678.7,
+          "known_at": 1789977521605,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 2697.66,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 0.5286535501934927
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 2701.13,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 1.292009343952604
+            }
+          ],
+          "price_confirmed": true,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": 0.20548068976969214
+        }
+      },
+      "original_high7d": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109177,
+        "state": "neutral",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [],
+        "counterevidence": [
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "binance",
+            "symbol": "ETHUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "ETHUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.003184878493182053,
+              "range": 17.5,
+              "quote_volume": 31544979.630276,
+              "taker_imbalance": 0.20548068976969214,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.011372461170848336,
+              "range": 35.409999999999854,
+              "quote_volume": 161532178.102504,
+              "taker_imbalance": 0.020271127578024517,
+              "flow_status": "known"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.003208286715618236,
+              "range": 19.490000000000236,
+              "quote_volume": 235900435.48119,
+              "taker_imbalance": 0.1080934801708886,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.011384008605234808,
+              "range": 39.36000000000013,
+              "quote_volume": 1467029866.22405,
+              "taker_imbalance": 0.09988943994767308,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 1.1449133137062588,
+            "prior_median_true_range": 9.589999999999918,
+            "resistance_distance": -1.1600000000003092,
+            "near_resistance": false
+          }
+        },
+        "price": 2708.86,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.177,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "fixed",
+        "reference": {
+          "venue": "binance",
+          "symbol": "ETHUSDT",
+          "support": 2653.43,
+          "resistance": 2707.7,
+          "known_at": 1789977521605,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 2697.66,
+              "after_reference_known": true,
+              "above_resistance": false,
+              "volume_ratio": 0.5286535501934927
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 2701.13,
+              "after_reference_known": true,
+              "above_resistance": false,
+              "volume_ratio": 1.292009343952604
+            }
+          ],
+          "price_confirmed": false,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": 0.20548068976969214
+        }
+      },
+      "rolling_context": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109179,
+        "state": "early_watch",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [
+          {
+            "name": "buy_pressure_near_resistance",
+            "market": "spot",
+            "taker_imbalance": 0.20548068976969214
+          },
+          {
+            "name": "buy_pressure_near_resistance",
+            "market": "perp",
+            "taker_imbalance": 0.1080934801708886
+          }
+        ],
+        "counterevidence": [
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation.",
+          "Rolling levels are stateless; supply fixed levels to track the same setup over time."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "binance",
+            "symbol": "ETHUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "ETHUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.003184878493182053,
+              "range": 17.5,
+              "quote_volume": 31544979.630276,
+              "taker_imbalance": 0.20548068976969214,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.011372461170848336,
+              "range": 35.409999999999854,
+              "quote_volume": 161532178.102504,
+              "taker_imbalance": 0.020271127578024517,
+              "flow_status": "known"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.003208286715618236,
+              "range": 19.490000000000236,
+              "quote_volume": 235900435.48119,
+              "taker_imbalance": 0.1080934801708886,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.011384008605234808,
+              "range": 39.36000000000013,
+              "quote_volume": 1467029866.22405,
+              "taker_imbalance": 0.09988943994767308,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 1.1449133137062588,
+            "prior_median_true_range": 9.589999999999918,
+            "resistance_distance": 4.279999999999745,
+            "near_resistance": true
+          }
+        },
+        "price": 2708.86,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.179,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "rolling_prior_context",
+        "reference": {
+          "venue": "binance",
+          "symbol": "ETHUSDT",
+          "support": 2666.91,
+          "resistance": 2713.14,
+          "known_at": 1789982923444,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 2697.66,
+              "after_reference_known": false,
+              "above_resistance": false,
+              "volume_ratio": 0.5286535501934927
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 2701.13,
+              "after_reference_known": false,
+              "above_resistance": false,
+              "volume_ratio": 1.292009343952604
+            }
+          ],
+          "price_confirmed": false,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": 0.20548068976969214
+        }
+      }
+    },
+    "HYPE": {
+      "original_high4": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109192,
+        "state": "price_breakout_confirmed",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [
+          {
+            "name": "resistance_close_confirmation",
+            "level": 94.42,
+            "volume_confirmed": false
+          }
+        ],
+        "counterevidence": [
+          "spot short taker flow unknown.",
+          "spot context taker flow unknown.",
+          "Price confirmation lacks the configured volume expansion.",
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "bybit",
+            "symbol": "HYPEUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "HYPEUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.001989112227805734,
+              "range": 0.5,
+              "quote_volume": 846932.45734,
+              "taker_imbalance": null,
+              "flow_status": "unknown"
+            },
+            "context": {
+              "return_fraction": 0.011947557623176008,
+              "range": 1.4500000000000028,
+              "quote_volume": 5798268.76812,
+              "taker_imbalance": null,
+              "flow_status": "unknown"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.0026820324777370175,
+              "range": 0.570999999999998,
+              "quote_volume": 17680425.07283,
+              "taker_imbalance": 0.18036065594545025,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.01234411195379681,
+              "range": 1.4919999999999902,
+              "quote_volume": 82364719.76339,
+              "taker_imbalance": 0.1563746969366231,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 0.8264462809917301,
+            "prior_median_true_range": 0.28000000000000114,
+            "resistance_distance": -1.289999999999992,
+            "near_resistance": false
+          }
+        },
+        "price": 95.71,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.192,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "fixed",
+        "reference": {
+          "venue": "bybit",
+          "symbol": "HYPEUSDT",
+          "support": 92.92,
+          "resistance": 94.42,
+          "known_at": 1789977521605,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 95.63,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 1.1989361867616808
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 95.74,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 0.8922356870723132
+            }
+          ],
+          "price_confirmed": true,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": null
+        }
+      },
+      "original_high7d": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109194,
+        "state": "price_breakout_confirmed",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [
+          {
+            "name": "resistance_close_confirmation",
+            "level": 94.57,
+            "volume_confirmed": false
+          }
+        ],
+        "counterevidence": [
+          "spot short taker flow unknown.",
+          "spot context taker flow unknown.",
+          "Price confirmation lacks the configured volume expansion.",
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "bybit",
+            "symbol": "HYPEUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "HYPEUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.001989112227805734,
+              "range": 0.5,
+              "quote_volume": 846932.45734,
+              "taker_imbalance": null,
+              "flow_status": "unknown"
+            },
+            "context": {
+              "return_fraction": 0.011947557623176008,
+              "range": 1.4500000000000028,
+              "quote_volume": 5798268.76812,
+              "taker_imbalance": null,
+              "flow_status": "unknown"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.0026820324777370175,
+              "range": 0.570999999999998,
+              "quote_volume": 17680425.07283,
+              "taker_imbalance": 0.18036065594545025,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.01234411195379681,
+              "range": 1.4919999999999902,
+              "quote_volume": 82364719.76339,
+              "taker_imbalance": 0.1563746969366231,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 0.8264462809917301,
+            "prior_median_true_range": 0.28000000000000114,
+            "resistance_distance": -1.1400000000000006,
+            "near_resistance": false
+          }
+        },
+        "price": 95.71,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.194,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "fixed",
+        "reference": {
+          "venue": "bybit",
+          "symbol": "HYPEUSDT",
+          "support": 92.92,
+          "resistance": 94.57,
+          "known_at": 1789977521605,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 95.63,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 1.1989361867616808
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 95.74,
+              "after_reference_known": true,
+              "above_resistance": true,
+              "volume_ratio": 0.8922356870723132
+            }
+          ],
+          "price_confirmed": true,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": null
+        }
+      },
+      "rolling_context": {
+        "schema_version": 1,
+        "rule_version": "early-warning-v1-unvalidated",
+        "config": {
+          "context_minutes": 60,
+          "short_minutes": 15,
+          "confirmation_minutes": 5,
+          "confirmation_bars": 2,
+          "pressure_imbalance": 0.1,
+          "compression_ratio": 0.75,
+          "near_resistance_atr": 1.0,
+          "breakout_volume_ratio": 1.5,
+          "reclaim_closes": 3,
+          "max_age_seconds": 120
+        },
+        "config_sha256": "532cbcc361ff831ef8ee0bde071d8fdb65fe1655401cc4b83535df7b14dd47a9",
+        "mode": "observed",
+        "as_of_ms": 1789982942723,
+        "generated_at_ms": 1789983109143,
+        "publication_checked_at_ms": 1789983109196,
+        "state": "neutral",
+        "publishable_state": "stale_data",
+        "usable_for_live": false,
+        "flags": [],
+        "counterevidence": [
+          "spot short taker flow unknown.",
+          "spot context taker flow unknown.",
+          "Price is stale at generation time; refresh before publishing a current assessment."
+        ],
+        "limitations": [
+          "Descriptive rules; false-alarm rate and predictive edge are unvalidated.",
+          "No entry, exit, position sizing or 4–48-hour holding recommendation.",
+          "OHLCV/taker flow only; no order book, OI or liquidation confirmation.",
+          "Rolling levels are stateless; supply fixed levels to track the same setup over time."
+        ],
+        "sources": {
+          "spot": {
+            "venue": "bybit",
+            "symbol": "HYPEUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "available_bars": 1000
+          },
+          "perp": {
+            "venue": "binance",
+            "symbol": "HYPEUSDT",
+            "last_complete_end_ms": 1789982880000,
+            "synchronized": true
+          }
+        },
+        "metrics": {
+          "spot": {
+            "short": {
+              "return_fraction": 0.001989112227805734,
+              "range": 0.5,
+              "quote_volume": 846932.45734,
+              "taker_imbalance": null,
+              "flow_status": "unknown"
+            },
+            "context": {
+              "return_fraction": 0.011947557623176008,
+              "range": 1.4500000000000028,
+              "quote_volume": 5798268.76812,
+              "taker_imbalance": null,
+              "flow_status": "unknown"
+            }
+          },
+          "perp": {
+            "short": {
+              "return_fraction": 0.0026820324777370175,
+              "range": 0.570999999999998,
+              "quote_volume": 17680425.07283,
+              "taker_imbalance": 0.18036065594545025,
+              "flow_status": "known"
+            },
+            "context": {
+              "return_fraction": 0.01234411195379681,
+              "range": 1.4919999999999902,
+              "quote_volume": 82364719.76339,
+              "taker_imbalance": 0.1563746969366231,
+              "flow_status": "known"
+            }
+          },
+          "setup": {
+            "compression_ratio": 0.8264462809917301,
+            "prior_median_true_range": 0.28000000000000114,
+            "resistance_distance": -0.03999999999999204,
+            "near_resistance": false
+          }
+        },
+        "price": 95.71,
+        "freshness": {
+          "price_age_seconds": 229.143,
+          "publication_price_age_seconds": 229.196,
+          "decision_age_seconds": 166.42,
+          "within_limit": false
+        },
+        "reference_kind": "rolling_prior_context",
+        "reference": {
+          "venue": "bybit",
+          "symbol": "HYPEUSDT",
+          "support": 94.22,
+          "resistance": 95.67,
+          "known_at": 1789982924143,
+          "expires_at": null
+        },
+        "confirmation": {
+          "bars": [
+            {
+              "end_ms": 1789982400000,
+              "close": 95.63,
+              "after_reference_known": false,
+              "above_resistance": false,
+              "volume_ratio": 1.1989361867616808
+            },
+            {
+              "end_ms": 1789982700000,
+              "close": 95.74,
+              "after_reference_known": false,
+              "above_resistance": true,
+              "volume_ratio": 0.8922356870723132
+            }
+          ],
+          "price_confirmed": false,
+          "volume_confirmed": false,
+          "spot_flow_confirmation": null
+        }
+      }
+    }
+  }
+}

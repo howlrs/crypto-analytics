@@ -1,0 +1,796 @@
+{
+  "generated_from": "/tmp/crypto-relative.zrRjt5/final",
+  "minute_end_exclusive_utc": "2026-09-21T16:00:00Z",
+  "snapshot_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+  "hourly_data_end_exclusive_utc": "2026-09-21T16:00:00Z",
+  "assets": {
+    "BTC": {
+      "spot_close": 85927.71,
+      "perp_close": 85877.5,
+      "minute_audit": {
+        "spot": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-09-20T23:20:00Z",
+          "last_open_utc": "2026-09-21T15:59:00Z",
+          "ends_at_expected_closed_bar": true
+        },
+        "perp": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-09-20T23:20:00Z",
+          "last_open_utc": "2026-09-21T15:59:00Z",
+          "ends_at_expected_closed_bar": true
+        }
+      },
+      "minute_returns_pct": {
+        "spot": {
+          "15": -0.22326988194030228,
+          "60": 0.09735085004056732,
+          "240": 1.2257679869012161,
+          "720": 5.5295883106501575
+        },
+        "perp": {
+          "15": -0.23524628252787894,
+          "60": 0.0800617186116126,
+          "240": 1.2110798009190349,
+          "720": 5.4958189861148865
+        }
+      },
+      "flow": {
+        "spot": {
+          "15": {
+            "quote_volume": 34018390.2329296,
+            "taker_buy_quote": 14778695.613538,
+            "signed_taker_quote": -4460999.005853601,
+            "taker_imbalance_pct": -13.113492364889678
+          },
+          "60": {
+            "quote_volume": 169301997.6815068,
+            "taker_buy_quote": 83592227.5131048,
+            "signed_taker_quote": -2117542.6552972198,
+            "taker_imbalance_pct": -1.250748771010235
+          },
+          "240": {
+            "quote_volume": 743988552.0336055,
+            "taker_buy_quote": 355096915.8348142,
+            "signed_taker_quote": -33794720.363977075,
+            "taker_imbalance_pct": -4.542371017887737
+          },
+          "720": {
+            "quote_volume": 1854292239.354967,
+            "taker_buy_quote": 979378721.4722373,
+            "signed_taker_quote": 104465203.58950758,
+            "taker_imbalance_pct": 5.633696855995396
+          }
+        },
+        "perp": {
+          "15": {
+            "quote_volume": 300689939.75990003,
+            "taker_buy_quote": 144786823.6162,
+            "signed_taker_quote": -11116292.527500033,
+            "taker_imbalance_pct": -3.696928648951925
+          },
+          "60": {
+            "quote_volume": 1504052124.8654,
+            "taker_buy_quote": 762627444.9414,
+            "signed_taker_quote": 21202765.017400026,
+            "taker_imbalance_pct": 1.4097094553353617
+          },
+          "240": {
+            "quote_volume": 6647222258.4306,
+            "taker_buy_quote": 3343967529.942,
+            "signed_taker_quote": 40712801.45339966,
+            "taker_imbalance_pct": 0.6124784138481942
+          },
+          "720": {
+            "quote_volume": 16185191666.0086,
+            "taker_buy_quote": 8554958580.3053,
+            "signed_taker_quote": 924725494.6019993,
+            "taker_imbalance_pct": 5.71340465830914
+          }
+        },
+        "spot_volume_15_vs_prior": {
+          "recent15_quote_volume": 34018390.2329296,
+          "prior_matched15_quote_volume": 32609681.9203592,
+          "ratio": 1.0431990816718424
+        },
+        "perp_volume_15_vs_prior": {
+          "recent15_quote_volume": 300689939.75990003,
+          "prior_matched15_quote_volume": 239181000.1724,
+          "ratio": 1.257164823055196
+        }
+      },
+      "spot_hourly": {
+        "audit": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-08-11T00:00:00Z",
+          "last_open_utc": "2026-09-21T15:00:00Z",
+          "ends_at_expected_closed_bar": true
+        },
+        "source_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+        "close": 85927.71,
+        "24h": {
+          "return_pct": 6.198969250543818,
+          "high": 86344.7,
+          "low": 80579.43
+        },
+        "48h": {
+          "return_pct": 5.257116314234378,
+          "high": 86344.7,
+          "low": 80126.04
+        },
+        "168h": {
+          "return_pct": 9.353366246693406,
+          "high": 86344.7,
+          "low": 74967.97
+        },
+        "hourly_log_return_sd_last30d": 0.003833091075255965,
+        "risk_scale_pct": {
+          "4": 0.766618215051193,
+          "12": 1.32782169847643,
+          "24": 1.8778234543986458,
+          "48": 2.65564339695286
+        }
+      },
+      "atr14_5m": {
+        "spot": {
+          "atr14": 206.41214285714108,
+          "atr14_pct_of_close": 0.2402160407360339,
+          "bar_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "perp": {
+          "atr14": 219.68571428571366,
+          "atr14_pct_of_close": 0.2558128896226761,
+          "bar_end_utc": "2026-09-21T16:00:00Z"
+        }
+      },
+      "observed_range_levels": {
+        "4h": {
+          "low_support_proxy": 84778.0,
+          "high_resistance_proxy": 86344.7,
+          "distance_to_low_pct": 1.356141923612264,
+          "distance_to_high_pct": -0.482936416479518,
+          "source": "minute",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "24h": {
+          "low_support_proxy": 80579.43,
+          "high_resistance_proxy": 86344.7,
+          "distance_to_low_pct": 6.637277032116029,
+          "distance_to_high_pct": -0.482936416479518,
+          "source": "hourly",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "7d": {
+          "low_support_proxy": 74967.97,
+          "high_resistance_proxy": 86344.7,
+          "distance_to_low_pct": 14.619230052514443,
+          "distance_to_high_pct": -0.482936416479518,
+          "source": "hourly",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        }
+      },
+      "binance_oi": {
+        "latest_timestamp_utc": "2026-09-21T16:00:00Z",
+        "lag_minutes": 0.0,
+        "quantity": 110573.409,
+        "value_usd": 9495840526.046032,
+        "audit": {
+          "count": 500,
+          "unique_timestamps": true,
+          "contiguous_5m": true
+        },
+        "changes": {
+          "0.25h": {
+            "prior_timestamp_utc": "2026-09-21T15:45:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": -0.24326558601074355,
+            "value_pct": -0.4591471140097947
+          },
+          "1h": {
+            "prior_timestamp_utc": "2026-09-21T15:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": -0.7094391324838911,
+            "value_pct": -0.6291857241709775
+          },
+          "4h": {
+            "prior_timestamp_utc": "2026-09-21T12:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": 0.3417558249533714,
+            "value_pct": 1.563441431034862
+          },
+          "24h": {
+            "prior_timestamp_utc": "2026-09-20T16:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": 1.6717185878326601,
+            "value_pct": 7.964093179319542
+          }
+        }
+      },
+      "books": {
+        "spot": {
+          "midpoint": 85864.39499999999,
+          "spread_bp": 0.0011646270837593756,
+          "best_bid": 85864.39,
+          "best_ask": 85864.4,
+          "levels": {
+            "bids": 100,
+            "asks": 100
+          }
+        },
+        "perp": {
+          "midpoint": 85823.95,
+          "spread_bp": 0.011651759212413407,
+          "best_bid": 85823.9,
+          "best_ask": 85824.0,
+          "levels": {
+            "bids": 100,
+            "asks": 100
+          }
+        }
+      },
+      "book_receipts_utc": {
+        "spot": "2026-09-21T16:00:51.507000Z",
+        "perp": "2026-09-21T16:00:51.576000Z"
+      },
+      "funding": {
+        "binance_realized_last_rate_pct": 0.005484999999999999,
+        "binance_realized_last_utc": "2026-09-21T16:00:00.002000Z",
+        "binance_inferred_interval_hours_median": 8.0,
+        "binance_current_premium_lastFundingRate_pct": 0.005484999999999999,
+        "binance_premium_timestamp_utc": "2026-09-21T16:00:51.004000Z",
+        "hyperliquid_realized_last_hourly_rate_pct": 0.00287258,
+        "hyperliquid_realized_last_utc": "2026-09-21T16:00:00.108000Z",
+        "hyperliquid_context_current_hourly_rate_pct": 0.00125,
+        "constant_rate_holding_cost_scenario_pct": {
+          "4": 0.005,
+          "12": 0.015,
+          "24": 0.03,
+          "48": 0.06
+        },
+        "caveat": "Current/premium rates and constant-rate scenarios are indicators, not funding forecasts."
+      },
+      "crossvenue": {
+        "bybit_linear_last_price": 85831.4,
+        "bybit_linear_funding_rate_pct": 0.01,
+        "hyperliquid_mark_price": 85955.0,
+        "hyperliquid_funding_hourly_pct": 0.00125
+      }
+    },
+    "ETH": {
+      "spot_close": 2755.27,
+      "perp_close": 2753.99,
+      "minute_audit": {
+        "spot": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-09-20T23:20:00Z",
+          "last_open_utc": "2026-09-21T15:59:00Z",
+          "ends_at_expected_closed_bar": true
+        },
+        "perp": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-09-20T23:20:00Z",
+          "last_open_utc": "2026-09-21T15:59:00Z",
+          "ends_at_expected_closed_bar": true
+        }
+      },
+      "minute_returns_pct": {
+        "spot": {
+          "15": 0.3693814136306761,
+          "60": 0.6796581246551359,
+          "240": 1.0967277957569133,
+          "720": 3.35040042011292
+        },
+        "perp": {
+          "15": 0.3688221380750534,
+          "60": 0.6891786160854618,
+          "240": 1.0924187752135328,
+          "720": 3.3395997733574934
+        }
+      },
+      "flow": {
+        "spot": {
+          "15": {
+            "quote_volume": 36277368.951767,
+            "taker_buy_quote": 20670524.562606,
+            "signed_taker_quote": 5063680.173445001,
+            "taker_imbalance_pct": 13.958234347638276
+          },
+          "60": {
+            "quote_volume": 99443542.147497,
+            "taker_buy_quote": 51118544.589592,
+            "signed_taker_quote": 2793547.0316870064,
+            "taker_imbalance_pct": 2.8091789284250934
+          },
+          "240": {
+            "quote_volume": 336660826.805931,
+            "taker_buy_quote": 167062721.38860402,
+            "signed_taker_quote": -2535384.028722942,
+            "taker_imbalance_pct": -0.7530974282863201
+          },
+          "720": {
+            "quote_volume": 876759340.513988,
+            "taker_buy_quote": 457561210.120625,
+            "signed_taker_quote": 38363079.72726202,
+            "taker_imbalance_pct": 4.375554152040428
+          }
+        },
+        "perp": {
+          "15": {
+            "quote_volume": 508133494.34301,
+            "taker_buy_quote": 252149905.11096,
+            "signed_taker_quote": -3833684.121089995,
+            "taker_imbalance_pct": -0.7544639673963571
+          },
+          "60": {
+            "quote_volume": 1108865088.06216,
+            "taker_buy_quote": 527221199.23981,
+            "signed_taker_quote": -54422689.582540035,
+            "taker_imbalance_pct": -4.907963120892234
+          },
+          "240": {
+            "quote_volume": 4035515751.11568,
+            "taker_buy_quote": 2020268341.43215,
+            "signed_taker_quote": 5020931.748619556,
+            "taker_imbalance_pct": 0.12441858880694046
+          },
+          "720": {
+            "quote_volume": 9367976309.23748,
+            "taker_buy_quote": 4829988698.41673,
+            "signed_taker_quote": 292001087.5959797,
+            "taker_imbalance_pct": 3.1170135145201616
+          }
+        },
+        "spot_volume_15_vs_prior": {
+          "recent15_quote_volume": 36277368.951767,
+          "prior_matched15_quote_volume": 21049262.695995,
+          "ratio": 1.723450815152277
+        },
+        "perp_volume_15_vs_prior": {
+          "recent15_quote_volume": 508133494.34301,
+          "prior_matched15_quote_volume": 176965707.25926,
+          "ratio": 2.8713670134891127
+        }
+      },
+      "spot_hourly": {
+        "audit": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-08-11T00:00:00Z",
+          "last_open_utc": "2026-09-21T15:00:00Z",
+          "ends_at_expected_closed_bar": true
+        },
+        "source_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+        "close": 2755.27,
+        "24h": {
+          "return_pct": 5.440260838617572,
+          "high": 2765.43,
+          "low": 2606.69
+        },
+        "48h": {
+          "return_pct": 4.32045010525679,
+          "high": 2765.43,
+          "low": 2564.33
+        },
+        "168h": {
+          "return_pct": 9.838228728154096,
+          "high": 2765.43,
+          "low": 2358.88
+        },
+        "hourly_log_return_sd_last30d": 0.005149048116085421,
+        "risk_scale_pct": {
+          "4": 1.0298096232170841,
+          "12": 1.7836825895353519,
+          "24": 2.5225081090896566,
+          "48": 3.5673651790707037
+        }
+      },
+      "atr14_5m": {
+        "spot": {
+          "atr14": 10.171428571428546,
+          "atr14_pct_of_close": 0.3691626799344001,
+          "bar_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "perp": {
+          "atr14": 10.783571428571479,
+          "atr14_pct_of_close": 0.3915617496276849,
+          "bar_end_utc": "2026-09-21T16:00:00Z"
+        }
+      },
+      "observed_range_levels": {
+        "4h": {
+          "low_support_proxy": 2712.2,
+          "high_resistance_proxy": 2765.43,
+          "distance_to_low_pct": 1.588009733795448,
+          "distance_to_high_pct": -0.36739313596799716,
+          "source": "minute",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "24h": {
+          "low_support_proxy": 2606.69,
+          "high_resistance_proxy": 2765.43,
+          "distance_to_low_pct": 5.699948977438818,
+          "distance_to_high_pct": -0.36739313596799716,
+          "source": "hourly",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "7d": {
+          "low_support_proxy": 2358.88,
+          "high_resistance_proxy": 2765.43,
+          "distance_to_low_pct": 16.804161296886644,
+          "distance_to_high_pct": -0.36739313596799716,
+          "source": "hourly",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        }
+      },
+      "binance_oi": {
+        "latest_timestamp_utc": "2026-09-21T16:00:00Z",
+        "lag_minutes": 0.0,
+        "quantity": 2386797.245,
+        "value_usd": 6573215744.75755,
+        "audit": {
+          "count": 500,
+          "unique_timestamps": true,
+          "contiguous_5m": true
+        },
+        "changes": {
+          "0.25h": {
+            "prior_timestamp_utc": "2026-09-21T15:45:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": 0.30040834827771423,
+            "value_pct": 0.6703654778654089
+          },
+          "1h": {
+            "prior_timestamp_utc": "2026-09-21T15:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": -0.09120777431679272,
+            "value_pct": 0.5822648833358368
+          },
+          "4h": {
+            "prior_timestamp_utc": "2026-09-21T12:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": -1.4357564508279186,
+            "value_pct": -0.35461496212803034
+          },
+          "24h": {
+            "prior_timestamp_utc": "2026-09-20T16:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": 2.0874668983690503,
+            "value_pct": 7.626134704000598
+          }
+        }
+      },
+      "books": {
+        "spot": {
+          "midpoint": 2752.855,
+          "spread_bp": 0.03632592345117443,
+          "best_bid": 2752.85,
+          "best_ask": 2752.86,
+          "levels": {
+            "bids": 100,
+            "asks": 100
+          }
+        },
+        "perp": {
+          "midpoint": 2751.875,
+          "spread_bp": 0.036338859869064835,
+          "best_bid": 2751.87,
+          "best_ask": 2751.88,
+          "levels": {
+            "bids": 100,
+            "asks": 100
+          }
+        }
+      },
+      "book_receipts_utc": {
+        "spot": "2026-09-21T16:00:51.916000Z",
+        "perp": "2026-09-21T16:00:51.977000Z"
+      },
+      "funding": {
+        "binance_realized_last_rate_pct": 0.008935,
+        "binance_realized_last_utc": "2026-09-21T16:00:00.002000Z",
+        "binance_inferred_interval_hours_median": 8.0,
+        "binance_current_premium_lastFundingRate_pct": 0.008935,
+        "binance_premium_timestamp_utc": "2026-09-21T16:00:51.004000Z",
+        "hyperliquid_realized_last_hourly_rate_pct": 0.00512319,
+        "hyperliquid_realized_last_utc": "2026-09-21T16:00:00.108000Z",
+        "hyperliquid_context_current_hourly_rate_pct": 0.007571099999999999,
+        "constant_rate_holding_cost_scenario_pct": {
+          "4": 0.030284399999999996,
+          "12": 0.0908532,
+          "24": 0.1817064,
+          "48": 0.3634128
+        },
+        "caveat": "Current/premium rates and constant-rate scenarios are indicators, not funding forecasts."
+      },
+      "crossvenue": {
+        "bybit_linear_last_price": 2752.53,
+        "bybit_linear_funding_rate_pct": 0.01,
+        "hyperliquid_mark_price": 2757.1,
+        "hyperliquid_funding_hourly_pct": 0.007571099999999999
+      }
+    },
+    "HYPE": {
+      "spot_close": 93.13,
+      "perp_close": 93.118,
+      "minute_audit": {
+        "spot": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-09-20T23:20:00Z",
+          "last_open_utc": "2026-09-21T15:59:00Z",
+          "ends_at_expected_closed_bar": true
+        },
+        "perp": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-09-20T23:20:00Z",
+          "last_open_utc": "2026-09-21T15:59:00Z",
+          "ends_at_expected_closed_bar": true
+        }
+      },
+      "minute_returns_pct": {
+        "spot": {
+          "15": -0.24635818337618298,
+          "60": -1.0308182784272035,
+          "240": -2.4408129059291794,
+          "720": -0.29975377368590683
+        },
+        "perp": {
+          "15": -0.3051293855657833,
+          "60": -1.0435706695005265,
+          "240": -2.414537528033367,
+          "720": -0.26668951556760856
+        }
+      },
+      "flow": {
+        "spot": {
+          "15": {
+            "quote_volume": 1049303.4415,
+            "taker_buy_quote": null,
+            "signed_taker_quote": null,
+            "taker_imbalance_pct": null
+          },
+          "60": {
+            "quote_volume": 6650540.61817,
+            "taker_buy_quote": null,
+            "signed_taker_quote": null,
+            "taker_imbalance_pct": null
+          },
+          "240": {
+            "quote_volume": 18390656.4388,
+            "taker_buy_quote": null,
+            "signed_taker_quote": null,
+            "taker_imbalance_pct": null
+          },
+          "720": {
+            "quote_volume": 36664225.67537,
+            "taker_buy_quote": null,
+            "signed_taker_quote": null,
+            "taker_imbalance_pct": null
+          }
+        },
+        "perp": {
+          "15": {
+            "quote_volume": 15041774.23155,
+            "taker_buy_quote": 7952523.665870001,
+            "signed_taker_quote": 863273.1001900006,
+            "taker_imbalance_pct": 5.73917070487131
+          },
+          "60": {
+            "quote_volume": 79078609.72053,
+            "taker_buy_quote": 36004352.45978,
+            "signed_taker_quote": -7069904.800970003,
+            "taker_imbalance_pct": -8.940350400640074
+          },
+          "240": {
+            "quote_volume": 237567200.48287,
+            "taker_buy_quote": 107453650.31943,
+            "signed_taker_quote": -22659899.844010025,
+            "taker_imbalance_pct": -9.5383116010764
+          },
+          "720": {
+            "quote_volume": 512597604.66665,
+            "taker_buy_quote": 252549737.15618,
+            "signed_taker_quote": -7498130.354290009,
+            "taker_imbalance_pct": -1.4627712431793616
+          }
+        },
+        "spot_volume_15_vs_prior": {
+          "recent15_quote_volume": 1049303.4415,
+          "prior_matched15_quote_volume": 1570345.46896,
+          "ratio": 0.6681991079293699
+        },
+        "perp_volume_15_vs_prior": {
+          "recent15_quote_volume": 15041774.23155,
+          "prior_matched15_quote_volume": 12552371.042709999,
+          "ratio": 1.198321351429917
+        }
+      },
+      "spot_hourly": {
+        "audit": {
+          "count": 1000,
+          "unique_timestamps": true,
+          "contiguous": true,
+          "ohlc_finite_consistent": true,
+          "first_utc": "2026-08-11T00:00:00Z",
+          "last_open_utc": "2026-09-21T15:00:00Z",
+          "ends_at_expected_closed_bar": true
+        },
+        "source_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+        "close": 93.13,
+        "24h": {
+          "return_pct": 1.2392651375149555,
+          "high": 96.08,
+          "low": 91.93
+        },
+        "48h": {
+          "return_pct": 0.07522028798623293,
+          "high": 96.08,
+          "low": 89.69
+        },
+        "168h": {
+          "return_pct": 16.601978214598702,
+          "high": 96.08,
+          "low": 75.19
+        },
+        "hourly_log_return_sd_last30d": 0.007445525990185446,
+        "risk_scale_pct": {
+          "4": 1.4891051980370893,
+          "12": 2.5792058608151534,
+          "24": 3.6475479085169624,
+          "48": 5.158411721630307
+        }
+      },
+      "atr14_5m": {
+        "spot": {
+          "atr14": 0.35999999999999843,
+          "atr14_pct_of_close": 0.3865564265005889,
+          "bar_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "perp": {
+          "atr14": 0.37614285714285345,
+          "atr14_pct_of_close": 0.4039421563423328,
+          "bar_end_utc": "2026-09-21T16:00:00Z"
+        }
+      },
+      "observed_range_levels": {
+        "4h": {
+          "low_support_proxy": 93.0,
+          "high_resistance_proxy": 96.02,
+          "distance_to_low_pct": 0.13978494623656523,
+          "distance_to_high_pct": -3.009789627161008,
+          "source": "minute",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "24h": {
+          "low_support_proxy": 91.93,
+          "high_resistance_proxy": 96.08,
+          "distance_to_low_pct": 1.3053410203415439,
+          "distance_to_high_pct": -3.070358034970866,
+          "source": "hourly",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        },
+        "7d": {
+          "low_support_proxy": 75.19,
+          "high_resistance_proxy": 96.08,
+          "distance_to_low_pct": 23.859555791993614,
+          "distance_to_high_pct": -3.070358034970866,
+          "source": "hourly",
+          "source_range_end_utc": "2026-09-21T16:00:00Z"
+        }
+      },
+      "binance_oi": {
+        "latest_timestamp_utc": "2026-09-21T16:00:00Z",
+        "lag_minutes": 0.0,
+        "quantity": 4252012.15,
+        "value_usd": 396010129.06636816,
+        "audit": {
+          "count": 500,
+          "unique_timestamps": true,
+          "contiguous_5m": true
+        },
+        "changes": {
+          "0.25h": {
+            "prior_timestamp_utc": "2026-09-21T15:45:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": 0.17487958428430428,
+            "value_pct": -0.09365563213104
+          },
+          "1h": {
+            "prior_timestamp_utc": "2026-09-21T15:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": 0.545725261875063,
+            "value_pct": -0.48256343840330507
+          },
+          "4h": {
+            "prior_timestamp_utc": "2026-09-21T12:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": -0.5263039493943467,
+            "value_pct": -2.9046421010883283
+          },
+          "24h": {
+            "prior_timestamp_utc": "2026-09-20T16:00:00Z",
+            "prior_lag_minutes_from_target": 0.0,
+            "quantity_pct": -1.2016925551610158,
+            "value_pct": 0.052808125285186414
+          }
+        }
+      },
+      "books": {
+        "spot": {
+          "midpoint": 93.065,
+          "spread_bp": 1.0745178101317259,
+          "best_bid": 93.06,
+          "best_ask": 93.07,
+          "levels": {
+            "bids": 50,
+            "asks": 50
+          }
+        },
+        "perp": {
+          "midpoint": 93.0545,
+          "spread_bp": 0.10746390556123292,
+          "best_bid": 93.054,
+          "best_ask": 93.055,
+          "levels": {
+            "bids": 100,
+            "asks": 100
+          }
+        }
+      },
+      "book_receipts_utc": {
+        "spot": "2026-09-21T16:00:52.584000Z",
+        "perp": "2026-09-21T16:00:52.346000Z"
+      },
+      "funding": {
+        "binance_realized_last_rate_pct": 0.005,
+        "binance_realized_last_utc": "2026-09-21T16:00:00.002000Z",
+        "binance_inferred_interval_hours_median": 4.0,
+        "binance_current_premium_lastFundingRate_pct": 0.005,
+        "binance_premium_timestamp_utc": "2026-09-21T16:00:52Z",
+        "hyperliquid_realized_last_hourly_rate_pct": 0.00240414,
+        "hyperliquid_realized_last_utc": "2026-09-21T16:00:00.108000Z",
+        "hyperliquid_context_current_hourly_rate_pct": 0.00125,
+        "constant_rate_holding_cost_scenario_pct": {
+          "4": 0.005,
+          "12": 0.015,
+          "24": 0.03,
+          "48": 0.06
+        },
+        "caveat": "Current/premium rates and constant-rate scenarios are indicators, not funding forecasts."
+      },
+      "crossvenue": {
+        "bybit_linear_last_price": 93.0,
+        "bybit_linear_funding_rate_pct": 0.01,
+        "hyperliquid_mark_price": 93.081,
+        "hyperliquid_funding_hourly_pct": 0.00125
+      }
+    }
+  },
+  "limitations": [
+    "Descriptive current-market metrics, not forecasts or trade instructions.",
+    "HYPE spot (Bybit candles) lacks taker-buy quote data; it is kept null.",
+    "Support/resistance are recent observed high/low ranges, not validated trading levels."
+  ]
+}

@@ -1,0 +1,733 @@
+{
+  "snapshot_cutoff_jst": "2026-09-21T17:47:00+09:00",
+  "protocol": {
+    "original_report_unchanged_sha256": "d9835d4e53bc0fa4114320694a32421fde2b8c6af4e3cd454c4a13935e8af2be",
+    "original_report_mtime_jst": "2026-09-21T16:58:41.605000+09:00",
+    "benchmark_start_jst": "2026-09-21T17:00:00+09:00",
+    "benchmark_start_note": "Conservative next whole hour after artifact last-modification. Not a recorded delivery/actual entry time.",
+    "event_definition": "Threshold > fixed original levels. Show first wick, 1m close, 5m close, 15m close separately. No prospective definition of hold/volume existed.",
+    "supplementary_breakout_benchmark": "First completed UTC-aligned 5m close strictly above prior7d high, then next1m open. Introduced for this audit, NOT an original report strategy.",
+    "volume_diagnostic": "Breakout 5m quote volume versus previous12 complete5m bars median, including only bars completed before breakoutbar start. Diagnostic only, not original cutoff.",
+    "cost": "14bp assumed roundtrip only. Spot benchmarks have no Funding. No actualtrades. Perp funding rates listed separately, no actual account PnL.",
+    "incomplete_horizons": {
+      "4": "2026-09-21T21:00:00+09:00",
+      "12": "2026-09-22T05:00:00+09:00",
+      "24": "2026-09-22T17:00:00+09:00",
+      "48": "2026-09-23T17:00:00+09:00"
+    }
+  },
+  "assets": {
+    "BTC": {
+      "primary_venue": "Binance spot USDT",
+      "levels": {
+        "low4": 81228.15,
+        "high4": 81878.98,
+        "low24": 80165.49,
+        "high24": 82100.0,
+        "high7d": 82100.0
+      },
+      "quality": {
+        "spot": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "perp": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "hl_perp": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        }
+      },
+      "benchmark_spot": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 81720.01,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 83690.33,
+        "gross_pct": 2.4110618684456853,
+        "minus_hypothetical_14bp_pct": 2.271061868445685,
+        "mae_pct": -1.223690501150898e-05,
+        "mfe_pct": 3.0030466222410013,
+        "low": 81720.0,
+        "high": 84174.1,
+        "low_bar_start": "2026-09-21T17:00:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "benchmark_binance_perp": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 81700.0,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 83657.3,
+        "gross_pct": 2.395716034271733,
+        "minus_hypothetical_14bp_pct": 2.255716034271733,
+        "mae_pct": -0.003427172582626259,
+        "mfe_pct": 3.152386780905747,
+        "low": 81697.2,
+        "high": 84275.5,
+        "low_bar_start": "2026-09-21T17:00:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "benchmark_hl_perp": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 81767.0,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 83757.0,
+        "gross_pct": 2.4337446647180405,
+        "minus_hypothetical_14bp_pct": 2.2937446647180404,
+        "mae_pct": 0,
+        "mfe_pct": 3.184658847701405,
+        "low": 81767.0,
+        "high": 84371.0,
+        "low_bar_start": "2026-09-21T17:00:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "change_from_old_live_quote_pct": 2.6231584939089947,
+      "old_live_quote": 81551.115,
+      "flow": {
+        "spot_post_report": {
+          "start": "2026-09-21T17:00:00+09:00",
+          "end": "2026-09-21T17:47:00+09:00",
+          "minutes": 47,
+          "quote_volume": 326135873.1950817,
+          "signed_quote": 79184312.73592788,
+          "imbalance_pct": 24.279547036692573,
+          "price_change_pct": 2.4110618684456853
+        },
+        "perp_post_report": {
+          "start": "2026-09-21T17:00:00+09:00",
+          "end": "2026-09-21T17:47:00+09:00",
+          "minutes": 47,
+          "quote_volume": 3001538296.1682,
+          "signed_quote": 609988613.5749998,
+          "imbalance_pct": 20.32253309423766,
+          "price_change_pct": 2.395716034271733
+        },
+        "spot_last_complete_hour": {
+          "start": "2026-09-21T16:00:00+09:00",
+          "end": "2026-09-21T17:00:00+09:00",
+          "minutes": 60,
+          "quote_volume": 50973941.1327315,
+          "signed_quote": -19630085.146527097,
+          "imbalance_pct": -38.510040052449824,
+          "price_change_pct": 0.09811377793040865
+        },
+        "perp_last_complete_hour": {
+          "start": "2026-09-21T16:00:00+09:00",
+          "end": "2026-09-21T17:00:00+09:00",
+          "minutes": 60,
+          "quote_volume": 272179089.1809,
+          "signed_quote": 11472487.708299994,
+          "imbalance_pct": 4.215051105808865,
+          "price_change_pct": 0.1112621018979354
+        }
+      },
+      "crossings": {
+        "low4": {
+          "level": 81228.15,
+          "first_wick_bar_start_jst": null,
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": null,
+          "latest_above": true,
+          "latest_distance_pct": 3.0311905417025997
+        },
+        "high4": {
+          "level": 81878.98,
+          "first_wick_bar_start_jst": "2026-09-21T17:02:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:04:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:10:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:15:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:02:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 2.212228339923139,
+          "subsequent_minutes": 43,
+          "subsequent_closes_below": 3,
+          "subsequent_low": 81786.92,
+          "max_consecutive_closes_above": 31,
+          "breakout_5m_quote_volume": 8003527.2991034,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 1.359569420557864
+        },
+        "low24": {
+          "level": 80165.49,
+          "first_wick_bar_start_jst": null,
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": null,
+          "latest_above": true,
+          "latest_distance_pct": 4.396954350307092
+        },
+        "high24": {
+          "level": 82100.0,
+          "first_wick_bar_start_jst": "2026-09-21T17:23:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:24:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:25:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:23:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 1.9370645554202204,
+          "subsequent_minutes": 23,
+          "subsequent_closes_below": 0,
+          "subsequent_low": 82102.26,
+          "max_consecutive_closes_above": 24,
+          "breakout_5m_quote_volume": 19455056.3061374,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 3.2553655234294623
+        },
+        "high7d": {
+          "level": 82100.0,
+          "first_wick_bar_start_jst": "2026-09-21T17:23:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:24:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:25:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:23:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 1.9370645554202204,
+          "subsequent_minutes": 23,
+          "subsequent_closes_below": 0,
+          "subsequent_low": 82102.26,
+          "max_consecutive_closes_above": 24,
+          "breakout_5m_quote_volume": 19455056.3061374,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 3.2553655234294623
+        }
+      },
+      "supplementary_5m_breakout_benchmark": {
+        "entry_jst": "2026-09-21T17:25:00+09:00",
+        "entry_open": 82147.77,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 22,
+        "close": 83690.33,
+        "gross_pct": 1.8777868224542082,
+        "minus_hypothetical_14bp_pct": 1.7377868224542081,
+        "mae_pct": -0.05540016484928412,
+        "mfe_pct": 2.4666889922879243,
+        "low": 82102.26,
+        "high": 84174.1,
+        "low_bar_start": "2026-09-21T17:25:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "oi": {
+        "baseline_time_jst": "2026-09-21T17:00:00+09:00",
+        "end_time_jst": "2026-09-21T17:45:00+09:00",
+        "quantity_change_pct": -0.08856252202446013,
+        "value_change_pct": 2.1281315411420865
+      },
+      "settled_funding_rates_since_benchmark": {
+        "binance": {
+          "count": 1,
+          "sum_rate_pct": 0.01,
+          "timestamps_jst": [
+            "2026-09-21T17:00:00.004000+09:00"
+          ],
+          "boundary_caveat": "Entry exactly17:00 and funding timestamps with msjitter do not establish real settlementeligibility; shownasrate-only."
+        },
+        "hl": {
+          "count": 1,
+          "sum_rate_pct": 0.00125,
+          "timestamps_jst": [
+            "2026-09-21T17:00:00.069000+09:00"
+          ],
+          "boundary_caveat": "Entry exactly17:00 and funding timestamps with msjitter do not establish real settlementeligibility; shownasrate-only."
+        }
+      }
+    },
+    "ETH": {
+      "primary_venue": "Binance spot USDT",
+      "levels": {
+        "low4": 2653.43,
+        "high4": 2678.7,
+        "low24": 2567.52,
+        "high24": 2707.7,
+        "high7d": 2707.7
+      },
+      "quality": {
+        "spot": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "perp": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "hl_perp": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        }
+      },
+      "benchmark_spot": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 2661.66,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 2703.73,
+        "gross_pct": 1.580592562536176,
+        "minus_hypothetical_14bp_pct": 1.440592562536176,
+        "mae_pct": -0.028177904014792254,
+        "mfe_pct": 1.9341313315750286,
+        "low": 2660.91,
+        "high": 2713.14,
+        "low_bar_start": "2026-09-21T17:00:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "benchmark_binance_perp": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 2660.8,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 2702.65,
+        "gross_pct": 1.5728352375225407,
+        "minus_hypothetical_14bp_pct": 1.4328352375225406,
+        "mae_pct": -0.028562838244150512,
+        "mfe_pct": 2.0802014431749782,
+        "low": 2660.04,
+        "high": 2716.15,
+        "low_bar_start": "2026-09-21T17:00:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "benchmark_hl_perp": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 2663.5,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 2705.4,
+        "gross_pct": 1.5731180777172948,
+        "minus_hypothetical_14bp_pct": 1.4331180777172947,
+        "mae_pct": -0.01126337525813037,
+        "mfe_pct": 1.8960015017833731,
+        "low": 2663.2,
+        "high": 2714.0,
+        "low_bar_start": "2026-09-21T17:00:00+09:00",
+        "high_bar_start": "2026-09-21T17:38:00+09:00"
+      },
+      "change_from_old_live_quote_pct": 1.937342238660511,
+      "old_live_quote": 2652.345,
+      "flow": {
+        "spot_post_report": {
+          "start": "2026-09-21T17:00:00+09:00",
+          "end": "2026-09-21T17:47:00+09:00",
+          "minutes": 47,
+          "quote_volume": 90398158.890727,
+          "signed_quote": 18210099.907942995,
+          "imbalance_pct": 20.14432609181267,
+          "price_change_pct": 1.580592562536176
+        },
+        "perp_post_report": {
+          "start": "2026-09-21T17:00:00+09:00",
+          "end": "2026-09-21T17:47:00+09:00",
+          "minutes": 47,
+          "quote_volume": 1143982075.74255,
+          "signed_quote": 135372729.11627007,
+          "imbalance_pct": 11.833465924577592,
+          "price_change_pct": 1.5728352375225407
+        },
+        "spot_last_complete_hour": {
+          "start": "2026-09-21T16:00:00+09:00",
+          "end": "2026-09-21T17:00:00+09:00",
+          "minutes": 60,
+          "quote_volume": 26047679.432468,
+          "signed_quote": -2756715.6298560016,
+          "imbalance_pct": -10.583344428063723,
+          "price_change_pct": -0.046190417178326726
+        },
+        "perp_last_complete_hour": {
+          "start": "2026-09-21T16:00:00+09:00",
+          "end": "2026-09-21T17:00:00+09:00",
+          "minutes": 60,
+          "quote_volume": 306216330.0854,
+          "signed_quote": -17879635.005980015,
+          "imbalance_pct": -5.838890107850747,
+          "price_change_pct": -0.04057267580553914
+        }
+      },
+      "crossings": {
+        "low4": {
+          "level": 2653.43,
+          "first_wick_bar_start_jst": null,
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": "2026-09-21T16:31:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 1.8956595802414267
+        },
+        "high4": {
+          "level": 2678.7,
+          "first_wick_bar_start_jst": "2026-09-21T17:26:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:27:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:26:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 0.9344084817262122,
+          "subsequent_minutes": 20,
+          "subsequent_closes_below": 1,
+          "subsequent_low": 2677.05,
+          "max_consecutive_closes_above": 19,
+          "breakout_5m_quote_volume": 4761240.693227001,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 1.664505790930327
+        },
+        "low24": {
+          "level": 2567.52,
+          "first_wick_bar_start_jst": null,
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": null,
+          "latest_above": true,
+          "latest_distance_pct": 5.305119336947728
+        },
+        "high24": {
+          "level": 2707.7,
+          "first_wick_bar_start_jst": "2026-09-21T17:38:00+09:00",
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": "2026-09-21T17:38:00+09:00",
+          "latest_above": false,
+          "latest_distance_pct": -0.14661890165084124
+        },
+        "high7d": {
+          "level": 2707.7,
+          "first_wick_bar_start_jst": "2026-09-21T17:38:00+09:00",
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": "2026-09-21T17:38:00+09:00",
+          "latest_above": false,
+          "latest_distance_pct": -0.14661890165084124
+        }
+      },
+      "supplementary_5m_breakout_benchmark": null,
+      "oi": {
+        "baseline_time_jst": "2026-09-21T17:00:00+09:00",
+        "end_time_jst": "2026-09-21T17:45:00+09:00",
+        "quantity_change_pct": 0.6312391679793139,
+        "value_change_pct": 2.112988361180279
+      },
+      "settled_funding_rates_since_benchmark": {
+        "binance": {
+          "count": 1,
+          "sum_rate_pct": 0.008660000000000001,
+          "timestamps_jst": [
+            "2026-09-21T17:00:00.004000+09:00"
+          ],
+          "boundary_caveat": "Entry exactly17:00 and funding timestamps with msjitter do not establish real settlementeligibility; shownasrate-only."
+        },
+        "hl": {
+          "count": 1,
+          "sum_rate_pct": 0.00170234,
+          "timestamps_jst": [
+            "2026-09-21T17:00:00.069000+09:00"
+          ],
+          "boundary_caveat": "Entry exactly17:00 and funding timestamps with msjitter do not establish real settlementeligibility; shownasrate-only."
+        }
+      },
+      "lower_band_reclaim_after_old_quote": {
+        "level": 2653.43,
+        "first_completed_close_jst": "2026-09-21T16:52:00+09:00",
+        "first_close": 2654.37,
+        "last_completed_close_at_report_mtime_jst": "2026-09-21T16:58:00+09:00",
+        "last_completed_close_at_report_mtime": 2658.24,
+        "caveat": "This verifies only price reclaim; original holding and buy-flow confirmation terms were not operationally defined."
+      }
+    },
+    "HYPE": {
+      "primary_venue": "Bybit spot USDT",
+      "levels": {
+        "low4": 92.92,
+        "high4": 94.42,
+        "low24": 90.19,
+        "high24": 94.48,
+        "high7d": 94.57
+      },
+      "quality": {
+        "spot": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "perp": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "hl_perp": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        },
+        "hl_spot": {
+          "n": 227,
+          "start": "2026-09-21T14:00:00+09:00",
+          "end_exclusive": "2026-09-21T17:47:00+09:00",
+          "unique": true,
+          "contiguous": true,
+          "ohlc_valid": true,
+          "flow_valid": true
+        }
+      },
+      "benchmark_spot": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 94.18,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 94.84,
+        "gross_pct": 0.700785729454223,
+        "minus_hypothetical_14bp_pct": 0.560785729454223,
+        "mae_pct": -0.1274155871735072,
+        "mfe_pct": 1.146740284561476,
+        "low": 94.06,
+        "high": 95.26,
+        "low_bar_start": "2026-09-21T17:02:00+09:00",
+        "high_bar_start": "2026-09-21T17:41:00+09:00"
+      },
+      "benchmark_binance_perp": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 94.176,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 94.804,
+        "gross_pct": 0.6668365613319738,
+        "minus_hypothetical_14bp_pct": 0.5268365613319738,
+        "mae_pct": -0.030793408086982055,
+        "mfe_pct": 1.2296126401631025,
+        "low": 94.147,
+        "high": 95.334,
+        "low_bar_start": "2026-09-21T17:05:00+09:00",
+        "high_bar_start": "2026-09-21T17:41:00+09:00"
+      },
+      "benchmark_hl_perp": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 94.294,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 94.947,
+        "gross_pct": 0.6925149002057429,
+        "minus_hypothetical_14bp_pct": 0.5525149002057429,
+        "mae_pct": -0.03923897596876946,
+        "mfe_pct": 1.0732390183892937,
+        "low": 94.257,
+        "high": 95.306,
+        "low_bar_start": "2026-09-21T17:05:00+09:00",
+        "high_bar_start": "2026-09-21T17:43:00+09:00"
+      },
+      "change_from_old_live_quote_pct": 0.9580583351075145,
+      "old_live_quote": 93.94,
+      "flow": {
+        "spot_post_report": {
+          "start": "2026-09-21T17:00:00+09:00",
+          "end": "2026-09-21T17:47:00+09:00",
+          "minutes": 47,
+          "quote_volume": 3712320.05932,
+          "signed_quote": null,
+          "imbalance_pct": null,
+          "price_change_pct": 0.700785729454223
+        },
+        "perp_post_report": {
+          "start": "2026-09-21T17:00:00+09:00",
+          "end": "2026-09-21T17:47:00+09:00",
+          "minutes": 47,
+          "quote_volume": 52022354.74674,
+          "signed_quote": 7870061.157240003,
+          "imbalance_pct": 15.12822938437477,
+          "price_change_pct": 0.6668365613319738
+        },
+        "spot_last_complete_hour": {
+          "start": "2026-09-21T16:00:00+09:00",
+          "end": "2026-09-21T17:00:00+09:00",
+          "minutes": 60,
+          "quote_volume": 2182772.77072,
+          "signed_quote": null,
+          "imbalance_pct": null,
+          "price_change_pct": 0.1808318264014508
+        },
+        "perp_last_complete_hour": {
+          "start": "2026-09-21T16:00:00+09:00",
+          "end": "2026-09-21T17:00:00+09:00",
+          "minutes": 60,
+          "quote_volume": 17448482.87156,
+          "signed_quote": -179828.20371999964,
+          "imbalance_pct": -1.0306237226682224,
+          "price_change_pct": 0.22668497174420654
+        }
+      },
+      "crossings": {
+        "low4": {
+          "level": 92.92,
+          "first_wick_bar_start_jst": null,
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": null,
+          "latest_above": true,
+          "latest_distance_pct": 2.06629358588033
+        },
+        "high4": {
+          "level": 94.42,
+          "first_wick_bar_start_jst": "2026-09-21T17:03:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:21:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:25:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:03:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 0.44482101249736505,
+          "subsequent_minutes": 26,
+          "subsequent_closes_below": 0,
+          "subsequent_low": 94.4,
+          "max_consecutive_closes_above": 25,
+          "breakout_5m_quote_volume": 91653.83145,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 0.5830108749667773
+        },
+        "low24": {
+          "level": 90.19,
+          "first_wick_bar_start_jst": null,
+          "first_close_1m_time_jst": null,
+          "first_close_5m_time_jst": null,
+          "first_close_15m_time_jst": null,
+          "first_wick_since16_jst": null,
+          "latest_above": true,
+          "latest_distance_pct": 5.155782237498618
+        },
+        "high24": {
+          "level": 94.48,
+          "first_wick_bar_start_jst": "2026-09-21T17:23:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:25:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:25:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:23:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 0.38103302286198737,
+          "subsequent_minutes": 22,
+          "subsequent_closes_below": 0,
+          "subsequent_low": 94.41,
+          "max_consecutive_closes_above": 23,
+          "breakout_5m_quote_volume": 91653.83145,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 0.5830108749667773
+        },
+        "high7d": {
+          "level": 94.57,
+          "first_wick_bar_start_jst": "2026-09-21T17:26:00+09:00",
+          "first_close_1m_time_jst": "2026-09-21T17:28:00+09:00",
+          "first_close_5m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_close_15m_time_jst": "2026-09-21T17:30:00+09:00",
+          "first_wick_since16_jst": "2026-09-21T17:26:00+09:00",
+          "latest_above": true,
+          "latest_distance_pct": 0.28550280215713375,
+          "subsequent_minutes": 19,
+          "subsequent_closes_below": 0,
+          "subsequent_low": 94.55,
+          "max_consecutive_closes_above": 20,
+          "breakout_5m_quote_volume": 311260.6063,
+          "prior_5m_volume_count": 12,
+          "volume_ratio_to_prior12median": 2.0646795875180395
+        }
+      },
+      "supplementary_5m_breakout_benchmark": {
+        "entry_jst": "2026-09-21T17:30:00+09:00",
+        "entry_open": 94.76,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 17,
+        "close": 94.84,
+        "gross_pct": 0.08442380751372269,
+        "minus_hypothetical_14bp_pct": -0.05557619248627732,
+        "mae_pct": -0.17940059096664962,
+        "mfe_pct": 0.5276487969607446,
+        "low": 94.59,
+        "high": 95.26,
+        "low_bar_start": "2026-09-21T17:40:00+09:00",
+        "high_bar_start": "2026-09-21T17:41:00+09:00"
+      },
+      "oi": {
+        "baseline_time_jst": "2026-09-21T17:00:00+09:00",
+        "end_time_jst": "2026-09-21T17:45:00+09:00",
+        "quantity_change_pct": 0.12016199941844441,
+        "value_change_pct": 1.0194544394739546
+      },
+      "settled_funding_rates_since_benchmark": {
+        "binance": {
+          "count": 1,
+          "sum_rate_pct": 0.005,
+          "timestamps_jst": [
+            "2026-09-21T17:00:00.004000+09:00"
+          ],
+          "boundary_caveat": "Entry exactly17:00 and funding timestamps with msjitter do not establish real settlementeligibility; shownasrate-only."
+        },
+        "hl": {
+          "count": 1,
+          "sum_rate_pct": 0.00125,
+          "timestamps_jst": [
+            "2026-09-21T17:00:00.069000+09:00"
+          ],
+          "boundary_caveat": "Entry exactly17:00 and funding timestamps with msjitter do not establish real settlementeligibility; shownasrate-only."
+        }
+      },
+      "hl_spot_benchmark": {
+        "entry_jst": "2026-09-21T17:00:00+09:00",
+        "entry_open": 94.226,
+        "end_jst": "2026-09-21T17:47:00+09:00",
+        "minutes": 47,
+        "close": 94.793,
+        "gross_pct": 0.6017447413665167,
+        "minus_hypothetical_14bp_pct": 0.46174474136651666,
+        "mae_pct": -0.031838346104051674,
+        "mfe_pct": 0.9731921125804011,
+        "low": 94.196,
+        "high": 95.143,
+        "low_bar_start": "2026-09-21T17:05:00+09:00",
+        "high_bar_start": "2026-09-21T17:43:00+09:00"
+      }
+    }
+  }
+}
