@@ -7,8 +7,10 @@ md() { curl -fsS -H "Metadata-Flavor: Google" \
   "http://metadata.google.internal/computeMetadata/v1/instance/attributes/$1"; }
 COMMIT=$(md orderbook-commit)
 BUCKET=$(md orderbook-bucket)
-UNTIL=$(md orderbook-until)
+UNTIL=$(md orderbook-until 2>/dev/null || true)   # optional; empty or absent means collect without an end time
 [[ "$COMMIT" =~ ^[0-9a-f]{7,40}$ ]] || { echo "invalid orderbook-commit: $COMMIT" >&2; exit 1; }
+[[ -z "$UNTIL" || "$UNTIL" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$ ]] ||
+  { echo "invalid orderbook-until: $UNTIL" >&2; exit 1; }
 STREAMS=hyperliquid:perp:BTC,hyperliquid:perp:BTC:4,binance:perp:BTCUSDT,binance:spot:BTCUSDT,hyperliquid:perp:ETH,binance:perp:ETHUSDT,binance:spot:ETHUSDT,hyperliquid:perp:HYPE,hyperliquid:perp:HYPE:4,bybit:perp:HYPEUSDT,bybit:spot:HYPEUSDT
 
 id orderbook >/dev/null 2>&1 ||
@@ -38,7 +40,7 @@ Wants=network-online.target
 User=orderbook
 WorkingDirectory=/opt/orderbook/current
 ExecStart=/usr/bin/python3 -m orderbook.supervise --data-dir /var/lib/orderbook/data --db-period day \\
-  --allow-default-route --streams $STREAMS --interval-sec 60 --chunk-min 360 --until $UNTIL \\
+  --allow-default-route --streams $STREAMS --interval-sec 60 --chunk-min 360 ${UNTIL:+--until $UNTIL} \\
   --min-free-gb 3
 Environment=PYTHONUNBUFFERED=1
 Restart=on-failure

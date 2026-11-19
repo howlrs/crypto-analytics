@@ -199,11 +199,28 @@ gcloud --configuration=gonumb --project=<project> compute ssh orderbook-collecto
 ```
 
 2026-10-06 01:47 UTC から、プロジェクト `crypto-bitflyer-418902` の VM `orderbook-collector` で稼働している。
-対象は 11 ストリーム・60 秒間隔で、`--until 2026-11-06T00:00:00Z` までの 1 か月を試行とする（見込み約 1.8GB）。
-延長するときは `startup.sh` の `--until`（メタデータ `orderbook-until`）を変更する。
+対象は 11 ストリーム・60 秒間隔。止めずに続ける前提で動かす。
 
-コードを更新するときは、メタデータの `orderbook-commit` を書き換えて、VM を再起動するか、
-VM 上で `sudo google_metadata_script_runner startup` を実行する。
+- **欠測**: 当初は `--until 2026-11-06T00:00:00Z` までの 1 か月を試行としていたため、その時刻で収集が止まった。
+  2026-11-19 03:25 UTC に終了時刻を外して再開した。**2026-11-06 00:00〜2026-11-19 03:25 UTC の板は欠測**で、後から取得できない
+  （公開 API は過去の板を返さない）。
+- **終了時刻**: メタデータ `orderbook-until` は任意。空か未設定なら終了しない。期間を区切るときだけ `2026-12-31T00:00:00Z` の形で入れる。
+- **VM 上のファイルの整理**: 締まった日の DB は、アップロード後も `KEEP_DAYS`（既定 14）日は VM に残す。それより古い日は、
+  バケットにサイズが 0 でない実体があると確かめてから消す（`upload-closed.sh`）。消さないとディスクが埋まり、空きの下限（3GB）で
+  collector が停止して、再起動もされない。バケット側は消さない（サービスアカウントに削除・上書きの権限がない）。
+- **止まっていないかの確認**: 最新の日次 DB が直近の締まった日（UTC）でなければ、終了コード 1 で不足日数を出す。
+
+  ```bash
+  CLOUDSDK_ACTIVE_CONFIG_NAME=gonumb orderbook/deploy/gce/check-freshness.sh gs://<project>-orderbook/orderbook
+  ```
+
+- **コードの更新**: メタデータの `orderbook-commit` を書き換えて、VM を再起動するか、VM 上で
+  `sudo google_metadata_script_runner startup` を実行する。`startup.sh` 自体は VM 作成時にメタデータ `startup-script` へ入れたものが
+  使われるので、変更したら `compute instances add-metadata --metadata-from-file startup-script=orderbook/deploy/gce/startup.sh` で入れ直す。
+
+2026-11-19 の再開は、稼働中のコード（`7c4cb98`）のまま、`orderbook-until` を遠い将来の時刻にして行った。この時点の VM の空きは 12GB で、
+1 日あたり約 68MB 増える。ファイルの整理を含むコードへ更新するまでの猶予は、下限まで約 130 日。
+
 同じ時刻を WSL と GCE の両方で集めると、分析で二重に数えられる。両方の DB を分析に渡すときは、
 `--start` / `--end` で期間を分けるか、どちらか一方だけを使う。
 

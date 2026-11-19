@@ -413,6 +413,18 @@
       "note": "スナップショットの間の約定と取消は区別できない。秒未満の遅延や約定後の値動きは、この間隔では測れない"
     },
     {
+      "id": "data.orderbook.coverage",
+      "group": "data",
+      "name": "板スナップショットがある期間と、欠測の期間",
+      "value": {"collected": [["2026-10-06T01:48:00Z", "2026-11-06T00:00:00Z"], ["2026-11-19T03:26:00Z", "継続中"]], "gap": [["2026-11-06T00:00:00Z", "2026-11-19T03:26:00Z"]]},
+      "unit": null,
+      "status": "measured",
+      "as_of": "2026-11-19",
+      "source": "バケットの日次 DB の一覧と、VM の collector のログ。docs/orderbook.md",
+      "used_by": ["orderbook/analyze.py", "orderbook/deploy/gce/check-freshness.sh"],
+      "note": "欠測は、試行用の終了時刻で収集が止まっていたため。公開 API は過去の板を返さないので埋められない。月をまたぐ集計では、この区間を観測の切れ目として扱う"
+    },
+    {
       "id": "data.bybit_price_coverage",
       "group": "data",
       "name": "market.db にある Bybit BTC・ETH の 1 分足の期間",

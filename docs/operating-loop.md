@@ -82,13 +82,14 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 4. 古い `documented` / `measured`（既定で 90 日超）を確かめ直す。担保掛目、料率、funding の上限は取引所が予告なく変える。
 5. 開いている仮説の `next_check` を見る。新しい仮説は [playbook.md](playbook.md) の受付の問いに答えてから追加する。
 6. 封印が保たれていることを確かめる（`python3 backtests/prospective_validation.py verify`）。収益は見ない。
-7. `annotate --kind review` で記録する。`note` に仮説の status の内訳を残すと、歩留まりの推移になる。
+7. 続けている収集が止まっていないことを確かめる（板は `orderbook/deploy/gce/check-freshness.sh`、[orderbook.md](orderbook.md)）。止まっていた期間は後から埋められない。
+8. `annotate --kind review` で記録する。`note` に仮説の status の内訳を残すと、歩留まりの推移になる。
 
 間隔はまだ決めていない（`loop.review_interval_days` は `unknown`）。
 
 ## 2026-11-19 時点の状態
 
-パラメータ 41 件のうち、`measured` 15、`documented` 8、`assumed` 8、`unknown` 10。
+パラメータ 42 件のうち、`measured` 16、`documented` 8、`assumed` 8、`unknown` 10。
 仮説 18 件のうち、保留中の採用 2、将来検証に登録済み 3、未検証 2、記述のみ 3、棄却 8。
 
 この日に測ったもの:
@@ -104,7 +105,9 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 3. **記録器が要るもの**: `latency.stream_receive_ms`、`liquidity.cross_venue_lead_lag`（秒単位）。配信を受けて、取引所の時刻と受信時刻を並べて保存する。
 4. **実際の取引が要るもの**: `cost.realized_round_trip_bp`、`latency.order_to_book_ms`、`liquidity.post_fill_move_bp`。
 
-決まっていないこと: 振り返りの間隔（`loop.review_interval_days`）、板スナップショットの収集を続けるかどうか（試行は 2026-11-06 に終了）。
+- **板スナップショットの収集を再開した。** 試行用の終了時刻（2026-11-06）で止まっていたのを、終了時刻なしで動かし直した。2026-11-06〜2026-11-19 は欠測（`data.orderbook.coverage`）。
+
+決まっていないこと: 振り返りの間隔（`loop.review_interval_days`）、収集が止まったときに知らせる仕組み（今は確認のコマンドがあるだけで、通知はない）。
 
 ## 範囲と限界
 
