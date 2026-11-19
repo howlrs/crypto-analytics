@@ -5,3 +5,6 @@ __pycache__/
 *.db-wal
 *.db-shm
 .env
+
+# Raw third-party API responses kept locally; see reports/SNAPSHOTS.md
+reports/**/*.zip

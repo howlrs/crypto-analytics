@@ -1,0 +1,97 @@
+{
+  "generated_at_ms": 1789986956514,
+  "assumptions": {
+    "holding_hours": [
+      4,
+      48
+    ],
+    "market": "spot reference; venue-specific perp prices not verified for order placement",
+    "position_sizes": null,
+    "orders_submitted": false
+  },
+  "plan": {
+    "BTC": {
+      "venue": "Binance spot USDT",
+      "shallow": null,
+      "main": [
+        83700,
+        84200
+      ],
+      "example_bids": [
+        84150,
+        83950,
+        83750
+      ],
+      "withdrawn_bids": [
+        84450,
+        84350
+      ],
+      "cancel_review_close": 83700,
+      "basis": "最終ask84,305.72が上位候補84,450/84,350を下回ったため、その2本は案から除外。旧高値84,174.10・18:00足安値83,700・17:00以降VWAP約83,860の帯を待つ。"
+    },
+    "ETH": {
+      "venue": "Binance spot USDT",
+      "shallow": [
+        2712,
+        2713
+      ],
+      "main": [
+        2704,
+        2709
+      ],
+      "example_bids": [
+        2712,
+        2708,
+        2704
+      ],
+      "withdrawn_bids": [
+        2715
+      ],
+      "cancel_review_close": 2700,
+      "basis": "直近の安値2,715.18と旧高値2,713.14。下段は前回7日高値2,707.70の再テストを想定。"
+    },
+    "HYPE": {
+      "venue": "Bybit spot USDT",
+      "shallow": [
+        94.85,
+        95.0
+      ],
+      "main": [
+        94.5,
+        94.65
+      ],
+      "example_bids": [
+        94.95,
+        94.85,
+        94.62,
+        94.55
+      ],
+      "cancel_review_close": 94.4,
+      "basis": "直近の安値94.85/94.88。下段は前回高値94.57と突破後の押し安値94.59/94.65。ただし現物売買方向は不明。"
+    }
+  },
+  "quote_check": {
+    "BTC": {
+      "bid": 84305.71,
+      "ask": 84305.72,
+      "mid": 84305.715,
+      "receipt_ms": 1789986860470,
+      "all_example_bids_below_ask_at_check": true
+    },
+    "ETH": {
+      "bid": 2714.11,
+      "ask": 2714.12,
+      "mid": 2714.115,
+      "receipt_ms": 1789986861696,
+      "all_example_bids_below_ask_at_check": true
+    },
+    "HYPE": {
+      "bid": 95.23,
+      "ask": 95.24,
+      "mid": 95.235,
+      "receipt_ms": 1789986862467,
+      "all_example_bids_below_ask_at_check": true
+    }
+  },
+  "analysis_minute_end_ms": 1789986360000
+}

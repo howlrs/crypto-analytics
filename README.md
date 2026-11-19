@@ -153,6 +153,7 @@ hl_watch.db と market.db は完全に独立したファイルであり、相互
 
 - [docs/operating-loop.md](docs/operating-loop.md) — 観測→パラメータ→仮説→検証→計測のループ、3つの台帳の規則、定期の振り返りの手順、未計測の一覧
 - [docs/playbook.md](docs/playbook.md) — 判断の原則（利益の源泉、裁定、指値、取引所のパラメータ、検証の落とし穴、資金管理）と、仮説を受け付けるときの問い
+- [docs/early-warning.md](docs/early-warning.md) — BTC/ETH/HYPE の短時間の変化のオフライン診断（`live_signals/`）。検証済みの戦略ではない
 - [docs/propagation-lag.md](docs/propagation-lag.md) — BTC の急変は ETH・HYPE へ遅れて伝わるか（設計を先に固定した探索。結論: 1分足で見える遅れはなく、この形では棄却）
 - [docs/hl-watch.md](docs/hl-watch.md) — hl-watch コマンドリファレンスと5段パイプラインの仕組み
 - [docs/hl-api-notes.md](docs/hl-api-notes.md) — Hyperliquid info API / Hypurrscan / L1 explorer の実測済み仕様

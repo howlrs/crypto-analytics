@@ -1,0 +1,10 @@
+{
+  "data_sha256": "7af1eac017b4d913080f694a03aec3dc428a780074c931bc1b1080798f1de7ca",
+  "evidence_sha256": "04f3ad1aaee5a1cca1bbffb412cef92720f573988b59783ba3755e4549fcfd5c",
+  "verification": {
+    "successful_raw_sha256_checked": 53,
+    "market_successful_sha256_checked": 37,
+    "fail_closed_transport": "All external HTTP and DNS use verified local ExpressVPN-bound IPv4 proxy; no direct fallback."
+  },
+  "archive_bytes": 7743924
+}

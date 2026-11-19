@@ -1,0 +1,3912 @@
+{
+  "generated_utc": "2026-09-21T17:01:06.191032+00:00",
+  "scope": "Public, read-only research. Hyperliquid Core/EVM activity, representative LP economics, stablecoin/TVL/lending stocks; Ethereum capital and BTC/ETH/HYPE market context. Not an exhaustive chain, wallet or cross-exchange flow audit.",
+  "activity": {
+    "current_days": [
+      "2026-09-14",
+      "2026-09-15",
+      "2026-09-16",
+      "2026-09-17",
+      "2026-09-18",
+      "2026-09-19",
+      "2026-09-20"
+    ],
+    "prior_days": [
+      "2026-09-07",
+      "2026-09-08",
+      "2026-09-09",
+      "2026-09-10",
+      "2026-09-11",
+      "2026-09-12",
+      "2026-09-13"
+    ],
+    "series": {
+      "transactions": {
+        "current": 3226627,
+        "prior": 2655634,
+        "change_pct": 21.501193312030196,
+        "daily": {
+          "2026-09-07": 373364,
+          "2026-09-08": 397429,
+          "2026-09-09": 448348,
+          "2026-09-10": 432488,
+          "2026-09-11": 440488,
+          "2026-09-12": 251371,
+          "2026-09-13": 312146,
+          "2026-09-14": 423631,
+          "2026-09-15": 434928,
+          "2026-09-16": 455027,
+          "2026-09-17": 529281,
+          "2026-09-18": 525038,
+          "2026-09-19": 427873,
+          "2026-09-20": 430849
+        }
+      },
+      "new_addresses": {
+        "current": 23930,
+        "prior": 34354,
+        "change_pct": -30.34290039005647,
+        "daily": {
+          "2026-09-07": 4209,
+          "2026-09-08": 5161,
+          "2026-09-09": 7318,
+          "2026-09-10": 6810,
+          "2026-09-11": 4570,
+          "2026-09-12": 3254,
+          "2026-09-13": 3032,
+          "2026-09-14": 3416,
+          "2026-09-15": 3601,
+          "2026-09-16": 3023,
+          "2026-09-17": 4215,
+          "2026-09-18": 4157,
+          "2026-09-19": 2901,
+          "2026-09-20": 2617
+        }
+      },
+      "gas_used": {
+        "current": 496512502258,
+        "prior": 458788487112,
+        "change_pct": 8.222528726356382,
+        "daily": {
+          "2026-09-07": 64221891059,
+          "2026-09-08": 68504972679,
+          "2026-09-09": 84075011406,
+          "2026-09-10": 75248014897,
+          "2026-09-11": 71920296687,
+          "2026-09-12": 44695635863,
+          "2026-09-13": 50122664521,
+          "2026-09-14": 69338306816,
+          "2026-09-15": 66643735785,
+          "2026-09-16": 69099248263,
+          "2026-09-17": 76768700712,
+          "2026-09-18": 83040370162,
+          "2026-09-19": 64620444554,
+          "2026-09-20": 67001695966
+        }
+      }
+    },
+    "limits": [
+      "Explorer-produced daily aggregates, not independent full-node replay.",
+      "Addresses are not people; new addresses are not active users.",
+      "Gas consumed is not capacity utilization; HyperEVM transactions exclude HyperCore order actions."
+    ]
+  },
+  "capital": {
+    "date_label_utc": "2026-09-21T00:00:00+00:00",
+    "method": "Latest common provider-dated stock record. Dates are provider labels, not independently audited update times. Differencing known stocks is valid; no claim that current UTC-day flows are complete. Stock change is not proven net deposits.",
+    "series": {
+      "hl_stablecoin_usd": {
+        "value": 7271772241.54,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 7260051584.0,
+            "change": 11720657.539999962,
+            "change_pct": 0.1614404168398753
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 6876571087.0,
+            "change": 395201154.53999996,
+            "change_pct": 5.747067099867831
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 6914830741.0,
+            "change": 356941500.53999996,
+            "change_pct": 5.161970175547359
+          }
+        }
+      },
+      "hl_stablecoin_bridged_usd": {
+        "value": 696093389.7,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 691797396.0,
+            "change": 4295993.700000048,
+            "change_pct": 0.6209901518623218
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 522494110.0,
+            "change": 173599279.70000005,
+            "change_pct": 33.225117063999065
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 661547844.0,
+            "change": 34545545.70000005,
+            "change_pct": 5.221927032687912
+          }
+        }
+      },
+      "eth_stablecoin_usd": {
+        "value": 147466785680.96,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 147381014054.0,
+            "change": 85771626.95999146,
+            "change_pct": 0.05819720234017112
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 148018209979.0,
+            "change": -551424298.0400085,
+            "change_pct": -0.3725381479199319
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 147158405472.0,
+            "change": 308380208.95999146,
+            "change_pct": 0.2095566393036652
+          }
+        }
+      },
+      "hl_defi_tvl_usd": {
+        "value": 1291083893.0,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 1424513050.0,
+            "change": -133429157.0,
+            "change_pct": -9.36665037922959
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 1362006128.0,
+            "change": -70922235.0,
+            "change_pct": -5.2071891265382035
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 1457944331.0,
+            "change": -166860438.0,
+            "change_pct": -11.444911472412045
+          }
+        }
+      },
+      "eth_defi_tvl_usd": {
+        "value": 54119792910.0,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 52583315573.0,
+            "change": 1536477337.0,
+            "change_pct": 2.921986413859634
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 49515934180.0,
+            "change": 4603858730.0,
+            "change_pct": 9.297731742804416
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 49723420183.0,
+            "change": 4396372727.0,
+            "change_pct": 8.841653914432612
+          }
+        }
+      },
+      "hl_bridge_usd": {
+        "value": 6323491715.0,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 6327064116.0,
+            "change": -3572401.0,
+            "change_pct": -0.056462222201381085
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 6119781302.0,
+            "change": 203710413.0,
+            "change_pct": 3.3287204713251084
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 5967046263.0,
+            "change": 356445452.0,
+            "change_pct": 5.973566087633997
+          }
+        }
+      },
+      "hl_bridge_usdc_quantity": {
+        "value": 6325075987.00848,
+        "changes": {
+          "1": {
+            "start_utc": "2026-09-20T00:00:00+00:00",
+            "prior_value": 6329057600.52713,
+            "change": -3981613.518650055,
+            "change_pct": -0.0629100534385807
+          },
+          "7": {
+            "start_utc": "2026-09-14T00:00:00+00:00",
+            "prior_value": 6120769018.03516,
+            "change": 204306968.97332,
+            "change_pct": 3.337929733523981
+          },
+          "30": {
+            "start_utc": "2026-08-22T00:00:00+00:00",
+            "prior_value": 5967462637.53344,
+            "change": 357613349.47504044,
+            "change_pct": 5.992720377095728
+          }
+        }
+      }
+    }
+  },
+  "core_and_market_comparisons": {
+    "complete_utc_days": {
+      "current": [
+        "2026-09-14",
+        "2026-09-15",
+        "2026-09-16",
+        "2026-09-17",
+        "2026-09-18",
+        "2026-09-19",
+        "2026-09-20"
+      ],
+      "prior": [
+        "2026-09-07",
+        "2026-09-08",
+        "2026-09-09",
+        "2026-09-10",
+        "2026-09-11",
+        "2026-09-12",
+        "2026-09-13"
+      ]
+    },
+    "hyperliquid_perps": {
+      "fees": {
+        "prior_7d": 12272526,
+        "current_7d": 18413360,
+        "change_pct": 50.03724579601625,
+        "daily_last_complete": 2127623,
+        "daily_prior": 1754293,
+        "daily_change_pct": 21.2809376768875
+      },
+      "revenue": {
+        "prior_7d": 9503329,
+        "current_7d": 14479047,
+        "change_pct": 52.357631730943964,
+        "daily_last_complete": 1694475,
+        "daily_prior": 1396457,
+        "daily_change_pct": 21.341007993801455
+      }
+    },
+    "dex_3venue_fee_aggregate": {
+      "fees_7d": 678327,
+      "fees_prior_7d": 638118,
+      "fees_change_pct": 6.301185674122967,
+      "lp_fee_residual_7d": 450848,
+      "lp_fee_residual_prior_7d": 474805,
+      "lp_fee_residual_change_pct": -5.0456503196048885,
+      "scope": "Project X, nest CL, HyperSwap V3. Fees minus provider-defined revenue; no emissions, inventory PnL, impermanent loss, gas or hedging costs included."
+    },
+    "relative_market_returns": {
+      "ETH/BTC_60m_pct": 0.12381664696421435,
+      "HYPE/BTC_60m_pct": -0.011339204094151789,
+      "HYPE/ETH_60m_pct": -0.13498871256069078,
+      "ETH/BTC_240m_pct": 0.5096480003194293,
+      "HYPE/BTC_240m_pct": -3.038028665486603,
+      "HYPE/ETH_240m_pct": -3.5296876831115376
+    },
+    "validation": "All 11 fee/volume/revenue series have unique timestamps, finite non-null observations for every one of the same 14 UTC dates. No partial Sep21 flows used."
+  },
+  "dex": {
+    "method": {
+      "comparison": "Sep 14-20 2026 UTC (7 complete days) versus Sep 7-13 UTC (prior 7 complete days)",
+      "partial_day_excluded": "Sep 21 2026 UTC; Project X chart contains it and API was fetched during that day. Nest CL and HyperSwap V3 latest daily row is Sep 20.",
+      "scope": "Project X, nest CL, and HyperSwap V3 only. No HyperEVM whole-chain/pool-volume endpoint is used, avoiding route/bridge double counting.",
+      "tvl": "Mean of the seven UTC-midnight protocol TVL observations matched to each volume window; not a contemporaneous pool-TV L estimate.",
+      "lp_fees": "Implied supply-side fees = DefiLlama fees minus DefiLlama revenue. This is a period cash-flow proxy, not annualized APY and excludes token-reward price/inflation assumptions."
+    },
+    "rows": [
+      {
+        "protocol": "Project X",
+        "current_days": [
+          "2026-09-14",
+          "2026-09-15",
+          "2026-09-16",
+          "2026-09-17",
+          "2026-09-18",
+          "2026-09-19",
+          "2026-09-20"
+        ],
+        "prior_days": [
+          "2026-09-07",
+          "2026-09-08",
+          "2026-09-09",
+          "2026-09-10",
+          "2026-09-11",
+          "2026-09-12",
+          "2026-09-13"
+        ],
+        "volume_7d": 493015683,
+        "volume_prior_7d": 451826031,
+        "volume_change_pct": 9.12,
+        "fees_7d": 479596,
+        "fees_prior_7d": 503875,
+        "revenue_7d": 68584,
+        "revenue_prior_7d": 72057,
+        "lp_supply_side_fees_7d": 411012,
+        "avg_tvl_7d": 41193049.57,
+        "avg_tvl_prior_7d": 42602133.29,
+        "avg_tvl_change_pct": -3.31,
+        "volume_to_avg_tvl_7d": 11.97,
+        "lp_fees_to_avg_tvl_7d_pct": 1.0,
+        "fee_rate_bps": 9.73,
+        "revenue_share_of_fees_pct": 14.3,
+        "volume_share_pct": 80.4,
+        "volume_share_prior_pct": 84.54,
+        "volume_share_change_pp": -4.14
+      },
+      {
+        "protocol": "nest CL",
+        "current_days": [
+          "2026-09-14",
+          "2026-09-15",
+          "2026-09-16",
+          "2026-09-17",
+          "2026-09-18",
+          "2026-09-19",
+          "2026-09-20"
+        ],
+        "prior_days": [
+          "2026-09-07",
+          "2026-09-08",
+          "2026-09-09",
+          "2026-09-10",
+          "2026-09-11",
+          "2026-09-12",
+          "2026-09-13"
+        ],
+        "volume_7d": 96554933,
+        "volume_prior_7d": 61858539,
+        "volume_change_pct": 56.09,
+        "fees_7d": 151208,
+        "fees_prior_7d": 85298,
+        "revenue_7d": 151208,
+        "revenue_prior_7d": 85298,
+        "lp_supply_side_fees_7d": 0,
+        "avg_tvl_7d": 19478630.14,
+        "avg_tvl_prior_7d": 18170054.0,
+        "avg_tvl_change_pct": 7.2,
+        "volume_to_avg_tvl_7d": 4.96,
+        "lp_fees_to_avg_tvl_7d_pct": 0.0,
+        "fee_rate_bps": 15.66,
+        "revenue_share_of_fees_pct": 100.0,
+        "volume_share_pct": 15.75,
+        "volume_share_prior_pct": 11.57,
+        "volume_share_change_pp": 4.17
+      },
+      {
+        "protocol": "HyperSwap V3",
+        "current_days": [
+          "2026-09-14",
+          "2026-09-15",
+          "2026-09-16",
+          "2026-09-17",
+          "2026-09-18",
+          "2026-09-19",
+          "2026-09-20"
+        ],
+        "prior_days": [
+          "2026-09-07",
+          "2026-09-08",
+          "2026-09-09",
+          "2026-09-10",
+          "2026-09-11",
+          "2026-09-12",
+          "2026-09-13"
+        ],
+        "volume_7d": 23657389,
+        "volume_prior_7d": 20779781,
+        "volume_change_pct": 13.85,
+        "fees_7d": 47523,
+        "fees_prior_7d": 48945,
+        "revenue_7d": 7687,
+        "revenue_prior_7d": 5958,
+        "lp_supply_side_fees_7d": 39836,
+        "avg_tvl_7d": 11733103.43,
+        "avg_tvl_prior_7d": 12187619.14,
+        "avg_tvl_change_pct": -3.73,
+        "volume_to_avg_tvl_7d": 2.02,
+        "lp_fees_to_avg_tvl_7d_pct": 0.34,
+        "fee_rate_bps": 20.09,
+        "revenue_share_of_fees_pct": 16.18,
+        "volume_share_pct": 3.86,
+        "volume_share_prior_pct": 3.89,
+        "volume_share_change_pp": -0.03
+      }
+    ],
+    "aggregate": {
+      "covered_volume_7d": 613228005,
+      "covered_volume_prior_7d": 534464351,
+      "covered_volume_change_pct": 14.736933128024464,
+      "hhi": 0.6726444405422474,
+      "prior_hhi": 0.7295763253105646,
+      "hhi_change": -0.05693188476831723,
+      "hhi_x10000": 6726.444405422474,
+      "prior_hhi_x10000": 7295.763253105646,
+      "hhi_x10000_change": -569.3188476831723,
+      "effective_number_of_venues": 1.4866695385066402,
+      "prior_effective_number_of_venues": 1.370658511396079
+    },
+    "coverage_limits": [
+      "The three named DEX deployments are not a chain-total DEX measure: excluded examples include HyperSwap V2 and nest AMM.",
+      "DeFiLlama's reported revenue is protocol/token-holder revenue, not necessarily distributable LP yield; use the per-protocol methodology in raw responses.",
+      "Project X's protocol TVL endpoint is substantially broader than the two quoted LP pools; it is used only as the explicit protocol-level denominator."
+    ]
+  },
+  "market": {
+    "generated_from": "/tmp/crypto-chain-deep.3KAErW/market",
+    "minute_end_exclusive_utc": "2026-09-21T16:52:00Z",
+    "snapshot_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+    "hourly_data_end_exclusive_utc": "2026-09-21T16:00:00Z",
+    "assets": {
+      "BTC": {
+        "spot_close": 85921.66,
+        "perp_close": 85882.1,
+        "minute_audit": {
+          "spot": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-09-21T00:12:00Z",
+            "last_open_utc": "2026-09-21T16:51:00Z",
+            "ends_at_expected_closed_bar": true
+          },
+          "perp": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-09-21T00:12:00Z",
+            "last_open_utc": "2026-09-21T16:51:00Z",
+            "ends_at_expected_closed_bar": true
+          }
+        },
+        "minute_returns_pct": {
+          "spot": {
+            "15": 0.19816509824350792,
+            "60": -0.15982021678100367,
+            "240": 0.8108830473208428,
+            "720": 5.4589930529985065
+          },
+          "perp": {
+            "15": 0.1936625674756609,
+            "60": -0.14928409903440798,
+            "240": 0.8179815061988505,
+            "720": 5.45742328184613
+          }
+        },
+        "flow": {
+          "spot": {
+            "15": {
+              "quote_volume": 18267651.8573222,
+              "taker_buy_quote": 8182816.587078501,
+              "signed_taker_quote": -1902018.6831652,
+              "taker_imbalance_pct": -10.41194948327645
+            },
+            "60": {
+              "quote_volume": 111716590.4205573,
+              "taker_buy_quote": 53897216.4558976,
+              "signed_taker_quote": -3922157.5087621063,
+              "taker_imbalance_pct": -3.510810251187524
+            },
+            "240": {
+              "quote_volume": 687116782.0211064,
+              "taker_buy_quote": 326412978.53804773,
+              "signed_taker_quote": -34290824.9450109,
+              "taker_imbalance_pct": -4.99053812135789
+            },
+            "720": {
+              "quote_volume": 1915076025.126031,
+              "taker_buy_quote": 1011010728.2252599,
+              "signed_taker_quote": 106945431.32448888,
+              "taker_imbalance_pct": 5.584396124297508
+            }
+          },
+          "perp": {
+            "15": {
+              "quote_volume": 187295843.6527,
+              "taker_buy_quote": 97013894.3317,
+              "signed_taker_quote": 6731945.010699987,
+              "taker_imbalance_pct": 3.5942842507401984
+            },
+            "60": {
+              "quote_volume": 783105728.3457,
+              "taker_buy_quote": 344966201.7073,
+              "signed_taker_quote": -93173324.93110001,
+              "taker_imbalance_pct": -11.897924068047283
+            },
+            "240": {
+              "quote_volume": 6163072478.3082,
+              "taker_buy_quote": 3059564535.9019,
+              "signed_taker_quote": -43943406.50440025,
+              "taker_imbalance_pct": -0.7130113536562344
+            },
+            "720": {
+              "quote_volume": 16676130660.6002,
+              "taker_buy_quote": 8790366254.1082,
+              "signed_taker_quote": 904601847.6161995,
+              "taker_imbalance_pct": 5.424530822089646
+            }
+          },
+          "spot_volume_15_vs_prior": {
+            "recent15_quote_volume": 18267651.8573222,
+            "prior_matched15_quote_volume": 20862422.1481411,
+            "ratio": 0.8756246867025409
+          },
+          "perp_volume_15_vs_prior": {
+            "recent15_quote_volume": 187295843.6527,
+            "prior_matched15_quote_volume": 118716238.247,
+            "ratio": 1.5776767055490242
+          }
+        },
+        "spot_hourly": {
+          "audit": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-08-11T00:00:00Z",
+            "last_open_utc": "2026-09-21T15:00:00Z",
+            "ends_at_expected_closed_bar": true
+          },
+          "source_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+          "close": 85927.71,
+          "24h": {
+            "return_pct": 6.198969250543818,
+            "high": 86344.7,
+            "low": 80579.43
+          },
+          "48h": {
+            "return_pct": 5.257116314234378,
+            "high": 86344.7,
+            "low": 80126.04
+          },
+          "168h": {
+            "return_pct": 9.353366246693406,
+            "high": 86344.7,
+            "low": 74967.97
+          },
+          "hourly_log_return_sd_last30d": 0.003833091075255965,
+          "risk_scale_pct": {
+            "4": 0.766618215051193,
+            "12": 1.32782169847643,
+            "24": 1.8778234543986458,
+            "48": 2.65564339695286
+          }
+        },
+        "atr14_5m": {
+          "spot": {
+            "atr14": 189.67857142857142,
+            "atr14_pct_of_close": 0.2205564784053156,
+            "bar_end_utc": "2026-09-21T16:50:00Z"
+          },
+          "perp": {
+            "atr14": 198.57142857142753,
+            "atr14_pct_of_close": 0.23100015422168446,
+            "bar_end_utc": "2026-09-21T16:50:00Z"
+          }
+        },
+        "observed_range_levels": {
+          "4h": {
+            "low_support_proxy": 84778.0,
+            "high_resistance_proxy": 86344.7,
+            "distance_to_low_pct": 1.3490056382552185,
+            "distance_to_high_pct": -0.4899432159704009,
+            "source": "minute",
+            "source_range_end_utc": "2026-09-21T16:52:00Z"
+          },
+          "24h": {
+            "low_support_proxy": 80579.43,
+            "high_resistance_proxy": 86344.7,
+            "distance_to_low_pct": 6.629768912487988,
+            "distance_to_high_pct": -0.4899432159704009,
+            "source": "hourly",
+            "source_range_end_utc": "2026-09-21T16:00:00Z"
+          },
+          "7d": {
+            "low_support_proxy": 74967.97,
+            "high_resistance_proxy": 86344.7,
+            "distance_to_low_pct": 14.611159939371454,
+            "distance_to_high_pct": -0.4899432159704009,
+            "source": "hourly",
+            "source_range_end_utc": "2026-09-21T16:00:00Z"
+          }
+        },
+        "binance_oi": {
+          "latest_timestamp_utc": "2026-09-21T16:50:00Z",
+          "lag_minutes": 2.0,
+          "quantity": 110363.982,
+          "value_usd": 9486910085.477634,
+          "audit": {
+            "count": 500,
+            "unique_timestamps": true,
+            "contiguous_5m": true
+          },
+          "changes": {
+            "0.25h": {
+              "prior_timestamp_utc": "2026-09-21T16:35:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -0.06184242729905254,
+              "value_pct": 0.25586047499954745
+            },
+            "1h": {
+              "prior_timestamp_utc": "2026-09-21T15:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -0.2785053266759596,
+              "value_pct": -0.3547795455891678
+            },
+            "4h": {
+              "prior_timestamp_utc": "2026-09-21T12:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -1.0818047799928454,
+              "value_pct": -0.2560959233519844
+            },
+            "24h": {
+              "prior_timestamp_utc": "2026-09-20T16:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": 3.055632112511475,
+              "value_pct": 9.064037982769513
+            }
+          }
+        },
+        "books": {
+          "spot": {
+            "midpoint": 85920.005,
+            "spread_bp": 0.0011638733022375069,
+            "best_bid": 85920.0,
+            "best_ask": 85920.01,
+            "levels": {
+              "bids": 100,
+              "asks": 100
+            }
+          },
+          "perp": {
+            "midpoint": 85873.05,
+            "spread_bp": 0.011645097036360158,
+            "best_bid": 85873.0,
+            "best_ask": 85873.1,
+            "levels": {
+              "bids": 100,
+              "asks": 100
+            }
+          }
+        },
+        "book_receipts_utc": {
+          "spot": "2026-09-21T16:52:12.189000Z",
+          "perp": "2026-09-21T16:52:12.269000Z"
+        },
+        "funding": {
+          "binance_realized_last_rate_pct": 0.005484999999999999,
+          "binance_realized_last_utc": "2026-09-21T16:00:00.002000Z",
+          "binance_inferred_interval_hours_median": 8.0,
+          "binance_current_premium_lastFundingRate_pct": 0.003858,
+          "binance_premium_timestamp_utc": "2026-09-21T16:52:12Z",
+          "hyperliquid_realized_last_hourly_rate_pct": 0.00287258,
+          "hyperliquid_realized_last_utc": "2026-09-21T16:00:00.108000Z",
+          "hyperliquid_context_current_hourly_rate_pct": 0.0016335199999999999,
+          "constant_rate_holding_cost_scenario_pct": {
+            "4": 0.006534079999999999,
+            "12": 0.01960224,
+            "24": 0.03920448,
+            "48": 0.07840896
+          },
+          "caveat": "Current/premium rates and constant-rate scenarios are indicators, not funding forecasts."
+        },
+        "crossvenue": {
+          "bybit_linear_last_price": 85878.0,
+          "bybit_linear_funding_rate_pct": 0.0019660000000000003,
+          "hyperliquid_mark_price": 85987.0,
+          "hyperliquid_funding_hourly_pct": 0.0016335199999999999
+        }
+      },
+      "ETH": {
+        "spot_close": 2761.32,
+        "perp_close": 2759.92,
+        "minute_audit": {
+          "spot": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-09-21T00:12:00Z",
+            "last_open_utc": "2026-09-21T16:51:00Z",
+            "ends_at_expected_closed_bar": true
+          },
+          "perp": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-09-21T00:12:00Z",
+            "last_open_utc": "2026-09-21T16:51:00Z",
+            "ends_at_expected_closed_bar": true
+          }
+        },
+        "minute_returns_pct": {
+          "spot": {
+            "15": 0.09678647164375054,
+            "60": -0.03620145385038187,
+            "240": 1.3246636968758718,
+            "720": 3.51870318580223
+          },
+          "perp": {
+            "15": 0.08848658920463937,
+            "60": -0.053234059658358035,
+            "240": 1.3268325635697353,
+            "720": 3.5038571305349153
+          }
+        },
+        "flow": {
+          "spot": {
+            "15": {
+              "quote_volume": 14267012.133826999,
+              "taker_buy_quote": 7397313.147367,
+              "signed_taker_quote": 527614.1609070003,
+              "taker_imbalance_pct": 3.6981405493868635
+            },
+            "60": {
+              "quote_volume": 73106827.716573,
+              "taker_buy_quote": 39010303.602825,
+              "signed_taker_quote": 4913779.489077002,
+              "taker_imbalance_pct": 6.7213687730059535
+            },
+            "240": {
+              "quote_volume": 350593045.631651,
+              "taker_buy_quote": 176907615.9761,
+              "signed_taker_quote": 3222186.320549011,
+              "taker_imbalance_pct": 0.9190673804563732
+            },
+            "720": {
+              "quote_volume": 919324703.871953,
+              "taker_buy_quote": 479689623.125747,
+              "signed_taker_quote": 40054542.37954104,
+              "taker_imbalance_pct": 4.356952686122972
+            }
+          },
+          "perp": {
+            "15": {
+              "quote_volume": 155825718.62285,
+              "taker_buy_quote": 68789719.48651,
+              "signed_taker_quote": -18246279.649830014,
+              "taker_imbalance_pct": -11.709414730178192
+            },
+            "60": {
+              "quote_volume": 1081751952.97568,
+              "taker_buy_quote": 504455397.71521,
+              "signed_taker_quote": -72841157.54526007,
+              "taker_imbalance_pct": -6.73362847600033
+            },
+            "240": {
+              "quote_volume": 4392494615.91343,
+              "taker_buy_quote": 2202712082.95757,
+              "signed_taker_quote": 12929550.001709938,
+              "taker_imbalance_pct": 0.2943555116690977
+            },
+            "720": {
+              "quote_volume": 10026596142.52281,
+              "taker_buy_quote": 5150208087.32895,
+              "signed_taker_quote": 273820032.1350899,
+              "taker_imbalance_pct": 2.730937082165097
+            }
+          },
+          "spot_volume_15_vs_prior": {
+            "recent15_quote_volume": 14267012.133826999,
+            "prior_matched15_quote_volume": 12934615.356477,
+            "ratio": 1.1030101584491883
+          },
+          "perp_volume_15_vs_prior": {
+            "recent15_quote_volume": 155825718.62285,
+            "prior_matched15_quote_volume": 204559452.33828,
+            "ratio": 0.7617624941875626
+          }
+        },
+        "spot_hourly": {
+          "audit": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-08-11T00:00:00Z",
+            "last_open_utc": "2026-09-21T15:00:00Z",
+            "ends_at_expected_closed_bar": true
+          },
+          "source_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+          "close": 2755.27,
+          "24h": {
+            "return_pct": 5.440260838617572,
+            "high": 2765.43,
+            "low": 2606.69
+          },
+          "48h": {
+            "return_pct": 4.32045010525679,
+            "high": 2765.43,
+            "low": 2564.33
+          },
+          "168h": {
+            "return_pct": 9.838228728154096,
+            "high": 2765.43,
+            "low": 2358.88
+          },
+          "hourly_log_return_sd_last30d": 0.005149048116085421,
+          "risk_scale_pct": {
+            "4": 1.0298096232170841,
+            "12": 1.7836825895353519,
+            "24": 2.5225081090896566,
+            "48": 3.5673651790707037
+          }
+        },
+        "atr14_5m": {
+          "spot": {
+            "atr14": 10.387857142857163,
+            "atr14_pct_of_close": 0.37584055656344884,
+            "bar_end_utc": "2026-09-21T16:50:00Z"
+          },
+          "perp": {
+            "atr14": 10.6521428571428,
+            "atr14_pct_of_close": 0.38555745667035135,
+            "bar_end_utc": "2026-09-21T16:50:00Z"
+          }
+        },
+        "observed_range_levels": {
+          "4h": {
+            "low_support_proxy": 2712.2,
+            "high_resistance_proxy": 2769.11,
+            "distance_to_low_pct": 1.8110758793599357,
+            "distance_to_high_pct": -0.2813178241384384,
+            "source": "minute",
+            "source_range_end_utc": "2026-09-21T16:52:00Z"
+          },
+          "24h": {
+            "low_support_proxy": 2606.69,
+            "high_resistance_proxy": 2765.43,
+            "distance_to_low_pct": 5.932044086561894,
+            "distance_to_high_pct": -0.1486206485067254,
+            "source": "hourly",
+            "source_range_end_utc": "2026-09-21T16:00:00Z"
+          },
+          "7d": {
+            "low_support_proxy": 2358.88,
+            "high_resistance_proxy": 2765.43,
+            "distance_to_low_pct": 17.060638947297015,
+            "distance_to_high_pct": -0.1486206485067254,
+            "source": "hourly",
+            "source_range_end_utc": "2026-09-21T16:00:00Z"
+          }
+        },
+        "binance_oi": {
+          "latest_timestamp_utc": "2026-09-21T16:50:00Z",
+          "lag_minutes": 2.0,
+          "quantity": 2376508.051,
+          "value_usd": 6565834460.560938,
+          "audit": {
+            "count": 500,
+            "unique_timestamps": true,
+            "contiguous_5m": true
+          },
+          "changes": {
+            "0.25h": {
+              "prior_timestamp_utc": "2026-09-21T16:35:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -0.07972790822855513,
+              "value_pct": 0.16647241308991312
+            },
+            "1h": {
+              "prior_timestamp_utc": "2026-09-21T15:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -0.12851594692760981,
+              "value_pct": 0.24402671986514246
+            },
+            "4h": {
+              "prior_timestamp_utc": "2026-09-21T12:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -1.3658666569623112,
+              "value_pct": -0.07548910944359388
+            },
+            "24h": {
+              "prior_timestamp_utc": "2026-09-20T16:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": 1.355532531131054,
+              "value_pct": 6.3148351299552985
+            }
+          }
+        },
+        "books": {
+          "spot": {
+            "midpoint": 2761.115,
+            "spread_bp": 0.036217252811865976,
+            "best_bid": 2761.11,
+            "best_ask": 2761.12,
+            "levels": {
+              "bids": 100,
+              "asks": 100
+            }
+          },
+          "perp": {
+            "midpoint": 2759.565,
+            "spread_bp": 0.036237595418909425,
+            "best_bid": 2759.56,
+            "best_ask": 2759.57,
+            "levels": {
+              "bids": 100,
+              "asks": 100
+            }
+          }
+        },
+        "book_receipts_utc": {
+          "spot": "2026-09-21T16:52:12.786000Z",
+          "perp": "2026-09-21T16:52:12.854000Z"
+        },
+        "funding": {
+          "binance_realized_last_rate_pct": 0.008935,
+          "binance_realized_last_utc": "2026-09-21T16:00:00.002000Z",
+          "binance_inferred_interval_hours_median": 8.0,
+          "binance_current_premium_lastFundingRate_pct": 0.007068,
+          "binance_premium_timestamp_utc": "2026-09-21T16:52:12Z",
+          "hyperliquid_realized_last_hourly_rate_pct": 0.00512319,
+          "hyperliquid_realized_last_utc": "2026-09-21T16:00:00.108000Z",
+          "hyperliquid_context_current_hourly_rate_pct": 0.00510902,
+          "constant_rate_holding_cost_scenario_pct": {
+            "4": 0.02043608,
+            "12": 0.06130824,
+            "24": 0.12261648,
+            "48": 0.24523296
+          },
+          "caveat": "Current/premium rates and constant-rate scenarios are indicators, not funding forecasts."
+        },
+        "crossvenue": {
+          "bybit_linear_last_price": 2760.03,
+          "bybit_linear_funding_rate_pct": 0.01,
+          "hyperliquid_mark_price": 2763.2,
+          "hyperliquid_funding_hourly_pct": 0.00510902
+        }
+      },
+      "HYPE": {
+        "spot_close": 93.33,
+        "perp_close": 93.329,
+        "minute_audit": {
+          "spot": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-09-21T00:12:00Z",
+            "last_open_utc": "2026-09-21T16:51:00Z",
+            "ends_at_expected_closed_bar": true
+          },
+          "perp": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-09-21T00:12:00Z",
+            "last_open_utc": "2026-09-21T16:51:00Z",
+            "ends_at_expected_closed_bar": true
+          }
+        },
+        "minute_returns_pct": {
+          "spot": {
+            "15": 0.0428770500589426,
+            "60": -0.17114129853459392,
+            "240": -2.25178047758694,
+            "720": -0.8709506107275722
+          },
+          "perp": {
+            "15": 0.027866199371939793,
+            "60": -0.1775496015829825,
+            "240": -2.231324442954574,
+            "720": -0.833041131405865
+          }
+        },
+        "flow": {
+          "spot": {
+            "15": {
+              "quote_volume": 360860.96891,
+              "taker_buy_quote": null,
+              "signed_taker_quote": null,
+              "taker_imbalance_pct": null
+            },
+            "60": {
+              "quote_volume": 3097844.36511,
+              "taker_buy_quote": null,
+              "signed_taker_quote": null,
+              "taker_imbalance_pct": null
+            },
+            "240": {
+              "quote_volume": 19080774.36028,
+              "taker_buy_quote": null,
+              "signed_taker_quote": null,
+              "taker_imbalance_pct": null
+            },
+            "720": {
+              "quote_volume": 38417200.11155,
+              "taker_buy_quote": null,
+              "signed_taker_quote": null,
+              "taker_imbalance_pct": null
+            }
+          },
+          "perp": {
+            "15": {
+              "quote_volume": 6656859.74143,
+              "taker_buy_quote": 3951579.34729,
+              "signed_taker_quote": 1246298.9531499995,
+              "taker_imbalance_pct": 18.722025122348064
+            },
+            "60": {
+              "quote_volume": 57963215.69039,
+              "taker_buy_quote": 26482987.28464,
+              "signed_taker_quote": -4997241.12111,
+              "taker_imbalance_pct": -8.621400765276233
+            },
+            "240": {
+              "quote_volume": 255962933.18548,
+              "taker_buy_quote": 114906241.92013,
+              "signed_taker_quote": -26150449.34522,
+              "taker_imbalance_pct": -10.21649854522898
+            },
+            "720": {
+              "quote_volume": 552941252.81627,
+              "taker_buy_quote": 270323180.96759,
+              "signed_taker_quote": -12294890.881090045,
+              "taker_imbalance_pct": -2.2235437885071985
+            }
+          },
+          "spot_volume_15_vs_prior": {
+            "recent15_quote_volume": 360860.96891,
+            "prior_matched15_quote_volume": 765905.22825,
+            "ratio": 0.47115616345187156
+          },
+          "perp_volume_15_vs_prior": {
+            "recent15_quote_volume": 6656859.74143,
+            "prior_matched15_quote_volume": 23839997.70748,
+            "ratio": 0.279230720703524
+          }
+        },
+        "spot_hourly": {
+          "audit": {
+            "count": 1000,
+            "unique_timestamps": true,
+            "contiguous": true,
+            "ohlc_finite_consistent": true,
+            "first_utc": "2026-08-11T00:00:00Z",
+            "last_open_utc": "2026-09-21T15:00:00Z",
+            "ends_at_expected_closed_bar": true
+          },
+          "source_hour_end_exclusive_utc": "2026-09-21T16:00:00Z",
+          "close": 93.13,
+          "24h": {
+            "return_pct": 1.2392651375149555,
+            "high": 96.08,
+            "low": 91.93
+          },
+          "48h": {
+            "return_pct": 0.07522028798623293,
+            "high": 96.08,
+            "low": 89.69
+          },
+          "168h": {
+            "return_pct": 16.601978214598702,
+            "high": 96.08,
+            "low": 75.19
+          },
+          "hourly_log_return_sd_last30d": 0.007445525990185446,
+          "risk_scale_pct": {
+            "4": 1.4891051980370893,
+            "12": 2.5792058608151534,
+            "24": 3.6475479085169624,
+            "48": 5.158411721630307
+          }
+        },
+        "atr14_5m": {
+          "spot": {
+            "atr14": 0.34714285714285814,
+            "atr14_pct_of_close": 0.37151418786692864,
+            "bar_end_utc": "2026-09-21T16:50:00Z"
+          },
+          "perp": {
+            "atr14": 0.3659285714285677,
+            "atr14_pct_of_close": 0.3915391470362059,
+            "bar_end_utc": "2026-09-21T16:50:00Z"
+          }
+        },
+        "observed_range_levels": {
+          "4h": {
+            "low_support_proxy": 92.38,
+            "high_resistance_proxy": 95.68,
+            "distance_to_low_pct": 1.0283611171249207,
+            "distance_to_high_pct": -2.4561036789297774,
+            "source": "minute",
+            "source_range_end_utc": "2026-09-21T16:52:00Z"
+          },
+          "24h": {
+            "low_support_proxy": 91.93,
+            "high_resistance_proxy": 96.08,
+            "distance_to_low_pct": 1.522897857065142,
+            "distance_to_high_pct": -2.862198168193175,
+            "source": "hourly",
+            "source_range_end_utc": "2026-09-21T16:00:00Z"
+          },
+          "7d": {
+            "low_support_proxy": 75.19,
+            "high_resistance_proxy": 96.08,
+            "distance_to_low_pct": 24.12554861018752,
+            "distance_to_high_pct": -2.862198168193175,
+            "source": "hourly",
+            "source_range_end_utc": "2026-09-21T16:00:00Z"
+          }
+        },
+        "binance_oi": {
+          "latest_timestamp_utc": "2026-09-21T16:50:00Z",
+          "lag_minutes": 2.0,
+          "quantity": 4198991.78,
+          "value_usd": 392229551.9864537,
+          "audit": {
+            "count": 500,
+            "unique_timestamps": true,
+            "contiguous_5m": true
+          },
+          "changes": {
+            "0.25h": {
+              "prior_timestamp_utc": "2026-09-21T16:35:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": 0.013737803400259985,
+              "value_pct": 0.2373817072063078
+            },
+            "1h": {
+              "prior_timestamp_utc": "2026-09-21T15:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -1.2044158188024956,
+              "value_pct": -1.3866170330667171
+            },
+            "4h": {
+              "prior_timestamp_utc": "2026-09-21T12:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -0.9090270615900176,
+              "value_pct": -3.0274318373397002
+            },
+            "24h": {
+              "prior_timestamp_utc": "2026-09-20T16:50:00Z",
+              "prior_lag_minutes_from_target": 2.0,
+              "quantity_pct": -1.8997362364003179,
+              "value_pct": -1.5229379864968862
+            }
+          }
+        },
+        "books": {
+          "spot": {
+            "midpoint": 93.305,
+            "spread_bp": 1.0717539252992996,
+            "best_bid": 93.3,
+            "best_ask": 93.31,
+            "levels": {
+              "bids": 50,
+              "asks": 50
+            }
+          },
+          "perp": {
+            "midpoint": 93.2945,
+            "spread_bp": 0.10718745478080431,
+            "best_bid": 93.294,
+            "best_ask": 93.295,
+            "levels": {
+              "bids": 100,
+              "asks": 100
+            }
+          }
+        },
+        "book_receipts_utc": {
+          "spot": "2026-09-21T16:52:13.345000Z",
+          "perp": "2026-09-21T16:52:13.233000Z"
+        },
+        "funding": {
+          "binance_realized_last_rate_pct": 0.005,
+          "binance_realized_last_utc": "2026-09-21T16:00:00.002000Z",
+          "binance_inferred_interval_hours_median": 4.0,
+          "binance_current_premium_lastFundingRate_pct": 0.005,
+          "binance_premium_timestamp_utc": "2026-09-21T16:52:13.005000Z",
+          "hyperliquid_realized_last_hourly_rate_pct": 0.00240414,
+          "hyperliquid_realized_last_utc": "2026-09-21T16:00:00.108000Z",
+          "hyperliquid_context_current_hourly_rate_pct": 0.0051004100000000005,
+          "constant_rate_holding_cost_scenario_pct": {
+            "4": 0.020401640000000002,
+            "12": 0.06120492000000001,
+            "24": 0.12240984000000002,
+            "48": 0.24481968000000004
+          },
+          "caveat": "Current/premium rates and constant-rate scenarios are indicators, not funding forecasts."
+        },
+        "crossvenue": {
+          "bybit_linear_last_price": 93.26,
+          "bybit_linear_funding_rate_pct": 0.01,
+          "hyperliquid_mark_price": 93.416,
+          "hyperliquid_funding_hourly_pct": 0.0051004100000000005
+        }
+      }
+    },
+    "limitations": [
+      "Descriptive current-market metrics, not forecasts or trade instructions.",
+      "HYPE spot (Bybit candles) lacks taker-buy quote data; it is kept null.",
+      "Support/resistance are recent observed high/low ranges, not validated trading levels."
+    ]
+  },
+  "public_fetch_receipts": [
+    {
+      "name": "blockscout_main",
+      "url": "https://www.hyperscan.com/",
+      "payload": null,
+      "started_ms": 1790009236774,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 115076,
+      "sha256": "ecb316f585143991a93506d27713a149b5595f5c5158eff2627f2e438d3693cf",
+      "finished_ms": 1790009237037,
+      "receipt_archive_path": "activity/blockscout_main.receipt.json",
+      "raw_archive_path": "activity/blockscout_main.raw"
+    },
+    {
+      "name": "blockscout_stats",
+      "url": "https://www.hyperscan.com/api/v2/stats",
+      "payload": null,
+      "started_ms": 1790009236350,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 404: Not Found",
+      "finished_ms": 1790009236728,
+      "receipt_archive_path": "activity/blockscout_stats.receipt.json"
+    },
+    {
+      "name": "builder_tools",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/builder-tools/hyperevm-tools.md",
+      "payload": null,
+      "started_ms": 1790009226677,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 5249,
+      "sha256": "391e80e57b7546998b27a5df3ea9525daacf44c0008a160da5f40c3caf538a1a",
+      "finished_ms": 1790009226797,
+      "receipt_archive_path": "activity/builder_tools.receipt.json",
+      "raw_archive_path": "activity/builder_tools.raw"
+    },
+    {
+      "name": "dual_blocks",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/dual-block-architecture.md",
+      "payload": null,
+      "started_ms": 1790009214980,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 2364,
+      "sha256": "862da061aeac86c24c4ba24a7e6d626a63388dedba03eab7c78075516067cd5c",
+      "finished_ms": 1790009215166,
+      "receipt_archive_path": "activity/dual_blocks.receipt.json",
+      "raw_archive_path": "activity/dual_blocks.raw"
+    },
+    {
+      "name": "etherscan_stats",
+      "url": "https://api.hyperevmscan.io/api",
+      "payload": {
+        "module": "stats",
+        "action": "ethsupply"
+      },
+      "started_ms": 1790009237084,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 155,
+      "sha256": "f4492ab132672f9b28c802ee2bb7bbf4d5d6c3ef9199a3019a719925a88d68f4",
+      "finished_ms": 1790009237567,
+      "receipt_archive_path": "activity/etherscan_stats.receipt.json",
+      "raw_archive_path": "activity/etherscan_stats.raw"
+    },
+    {
+      "name": "evmscan_chart_address",
+      "url": "https://hyperevmscan.io/chart/address",
+      "payload": null,
+      "started_ms": 1790009566917,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 239755,
+      "sha256": "c4bb53bc0cba9ac7459f4e94f9d866545a7f85e8836330e396b5cb9a54b7d15d",
+      "finished_ms": 1790009567230,
+      "receipt_archive_path": "activity/evmscan_chart_address.receipt.json",
+      "raw_archive_path": "activity/evmscan_chart_address.raw"
+    },
+    {
+      "name": "evmscan_chart_gasused",
+      "url": "https://hyperevmscan.io/chart/gasused",
+      "payload": null,
+      "started_ms": 1790009567279,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 263181,
+      "sha256": "6848d18d12fbcbf6e98ef806d88c5239d61c7d7efc1b533663b69966d58a65a9",
+      "finished_ms": 1790009567589,
+      "receipt_archive_path": "activity/evmscan_chart_gasused.receipt.json",
+      "raw_archive_path": "activity/evmscan_chart_gasused.raw"
+    },
+    {
+      "name": "evmscan_chart_tx",
+      "url": "https://hyperevmscan.io/chart/tx",
+      "payload": null,
+      "started_ms": 1790009566469,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 416183,
+      "sha256": "51712b0ea3f5f4bcc763c8bae2bb9a0744dde8d4ccf90f1694308853d1f2a961",
+      "finished_ms": 1790009566865,
+      "receipt_archive_path": "activity/evmscan_chart_tx.receipt.json",
+      "raw_archive_path": "activity/evmscan_chart_tx.raw"
+    },
+    {
+      "name": "evmscan_charts",
+      "url": "https://hyperevmscan.io/charts",
+      "payload": null,
+      "started_ms": 1790009552987,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 235820,
+      "sha256": "b9cd771bea47766a114d3750238eb1c8c7f566406240fdb738dcad8e49e87e01",
+      "finished_ms": 1790009554019,
+      "receipt_archive_path": "activity/evmscan_charts.receipt.json",
+      "raw_archive_path": "activity/evmscan_charts.raw"
+    },
+    {
+      "name": "evmscan_home",
+      "url": "https://hyperevmscan.io/",
+      "payload": null,
+      "started_ms": 1790009532739,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 129080,
+      "sha256": "a0c32b64ced7f8ada4913d483be2faf93a012b1d9b1071bd567ce16f7a6a2415",
+      "finished_ms": 1790009533633,
+      "receipt_archive_path": "activity/evmscan_home.receipt.json",
+      "raw_archive_path": "activity/evmscan_home.raw"
+    },
+    {
+      "name": "hyperevmscan_v2_stats",
+      "url": "https://api.hyperevmscan.io/v2/api?chainid=999&module=stats&action=ethsupply",
+      "payload": null,
+      "started_ms": 1790009277954,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 404: Not Found",
+      "finished_ms": 1790009278339,
+      "receipt_archive_path": "activity/hyperevmscan_v2_stats.receipt.json"
+    },
+    {
+      "name": "hypurrscan_api",
+      "url": "https://api.hypurrscan.io/",
+      "payload": null,
+      "started_ms": 1790009278387,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 404: Not Found",
+      "finished_ms": 1790009282540,
+      "receipt_archive_path": "activity/hypurrscan_api.receipt.json"
+    },
+    {
+      "name": "official_rpc",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/json-rpc.md",
+      "payload": null,
+      "started_ms": 1790009214800,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 2277,
+      "sha256": "fc8f9eb4cf48ca21aa05b819b342fb4efb0c1170c0045f3852095305ed46e236",
+      "finished_ms": 1790009214934,
+      "receipt_archive_path": "activity/official_rpc.receipt.json",
+      "raw_archive_path": "activity/official_rpc.raw"
+    },
+    {
+      "name": "official_tools",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/hyperevm/tools-for-hyperevm-builders.md",
+      "payload": null,
+      "started_ms": 1790009214631,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 444,
+      "sha256": "9c983d2d79b510b07d4ab6817313a763d136f5a95a059757be881865e6fb4aed",
+      "finished_ms": 1790009214749,
+      "receipt_archive_path": "activity/official_tools.receipt.json",
+      "raw_archive_path": "activity/official_tools.raw"
+    },
+    {
+      "name": "rpc_big_gas_price",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_bigBlockGasPrice",
+        "params": [],
+        "id": 6
+      },
+      "started_ms": 1790009290861,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 45,
+      "sha256": "69d3926a59312b1263e28a132abcde75ed1b94a94e132bbaeaf2ba88d36bfe55",
+      "finished_ms": 1790009290936,
+      "receipt_archive_path": "activity/rpc_big_gas_price.receipt.json",
+      "raw_archive_path": "activity/rpc_big_gas_price.raw"
+    },
+    {
+      "name": "rpc_block_46515395_receipts",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockReceipts",
+        "params": [
+          "0x2c5c4c3"
+        ],
+        "id": 7
+      },
+      "started_ms": 1790009311099,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 28858,
+      "sha256": "280b43000a9a7f97de02dd2c5e56d3c6c4616f67fca514d8e4fae4a5654467c9",
+      "finished_ms": 1790009311196,
+      "receipt_archive_path": "activity/rpc_block_46515395_receipts.receipt.json",
+      "raw_archive_path": "activity/rpc_block_46515395_receipts.raw"
+    },
+    {
+      "name": "rpc_block_7d_ago",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockByNumber",
+        "params": [
+          "0x2bc62c3",
+          true
+        ],
+        "id": 8
+      },
+      "started_ms": 1790009329756,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 3198,
+      "sha256": "90e0410439cafc47857bc0f2f1fa1e1cc6259345874a7ee4884f5c341fdb000b",
+      "finished_ms": 1790009329822,
+      "receipt_archive_path": "activity/rpc_block_7d_ago.receipt.json",
+      "raw_archive_path": "activity/rpc_block_7d_ago.raw"
+    },
+    {
+      "name": "rpc_block_7d_ago_receipts",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockReceipts",
+        "params": [
+          "0x2bc62c3"
+        ],
+        "id": 9
+      },
+      "started_ms": 1790009329868,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 2024,
+      "sha256": "f6385ef0a54285ef69a5a469f1a296eb314e1b3e610d29117dea9132a4c9ad53",
+      "finished_ms": 1790009329944,
+      "receipt_archive_path": "activity/rpc_block_7d_ago_receipts.receipt.json",
+      "raw_archive_path": "activity/rpc_block_7d_ago_receipts.raw"
+    },
+    {
+      "name": "rpc_block_number",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_blockNumber",
+        "params": [],
+        "id": 1
+      },
+      "started_ms": 1790009226845,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 45,
+      "sha256": "e0a53181c421ba4264ff8adad123f9300afe7742916c29c304f9b498d6345494",
+      "finished_ms": 1790009227010,
+      "receipt_archive_path": "activity/rpc_block_number.receipt.json",
+      "raw_archive_path": "activity/rpc_block_number.raw"
+    },
+    {
+      "name": "rpc_gas_price",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_gasPrice",
+        "params": [],
+        "id": 5
+      },
+      "started_ms": 1790009290734,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 45,
+      "sha256": "20933b58da9b8e388c45dcdb373a909706d4803d236dcab8db64e6d4f9d04730",
+      "finished_ms": 1790009290815,
+      "receipt_archive_path": "activity/rpc_gas_price.receipt.json",
+      "raw_archive_path": "activity/rpc_gas_price.raw"
+    },
+    {
+      "name": "rpc_latest_block",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockByNumber",
+        "params": [
+          "latest",
+          false
+        ],
+        "id": 2
+      },
+      "started_ms": 1790009264053,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 2621,
+      "sha256": "f86ede621facb7dad4a666b2ed1068c694e9e96f3953450e9558b7c5f2131d12",
+      "finished_ms": 1790009264129,
+      "receipt_archive_path": "activity/rpc_latest_block.receipt.json",
+      "raw_archive_path": "activity/rpc_latest_block.raw"
+    },
+    {
+      "name": "rpc_latest_full",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockByNumber",
+        "params": [
+          "latest",
+          true
+        ],
+        "id": 4
+      },
+      "started_ms": 1790009290575,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 13239,
+      "sha256": "03996e9cff1acd45feec097851faa1dcd81233622eb368904bfa0b9b73585ead",
+      "finished_ms": 1790009290679,
+      "receipt_archive_path": "activity/rpc_latest_full.receipt.json",
+      "raw_archive_path": "activity/rpc_latest_full.raw"
+    },
+    {
+      "name": "rpc_latest_receipts",
+      "url": "https://rpc.hyperliquid.xyz/evm",
+      "payload": {
+        "jsonrpc": "2.0",
+        "method": "eth_getBlockReceipts",
+        "params": [
+          "latest"
+        ],
+        "id": 3
+      },
+      "started_ms": 1790009282589,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 16414,
+      "sha256": "b07a663f9b54334c6bb4079e1fda94464ca147a86cf164fa81fb47ead6398c1c",
+      "finished_ms": 1790009282757,
+      "receipt_archive_path": "activity/rpc_latest_receipts.receipt.json",
+      "raw_archive_path": "activity/rpc_latest_receipts.raw"
+    },
+    {
+      "name": "stats_data_root",
+      "url": "https://stats-data.hyperliquid.xyz/",
+      "payload": null,
+      "started_ms": 1790009263001,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 403: Forbidden",
+      "finished_ms": 1790009263838,
+      "receipt_archive_path": "activity/stats_data_root.receipt.json"
+    },
+    {
+      "name": "stats_root",
+      "url": "https://stats.hyperliquid.xyz/",
+      "payload": null,
+      "started_ms": 1790009263886,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "<urlopen error Remote end closed connection without response>",
+      "finished_ms": 1790009264000,
+      "receipt_archive_path": "activity/stats_root.receipt.json"
+    },
+    {
+      "name": "chains",
+      "url": "https://api.llama.fi/v2/chains",
+      "payload": null,
+      "started_ms": 1790009226067,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 64206,
+      "sha256": "1afaeafdcd646145a980679bdfa49fffc2449353c3eadd2238f465a6e1fdc763",
+      "finished_ms": 1790009226238,
+      "receipt_archive_path": "capital/chains.receipt.json",
+      "raw_archive_path": "capital/chains.raw"
+    },
+    {
+      "name": "ethereum_chart",
+      "url": "https://stablecoins.llama.fi/stablecoincharts/Ethereum",
+      "payload": null,
+      "started_ms": 1790009191246,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 1620120,
+      "sha256": "a6066bb89ac40bfa3b19808f4d8d00f01647d7095e44084fd22aa5f76df71cac",
+      "finished_ms": 1790009191499,
+      "receipt_archive_path": "capital/ethereum_chart.receipt.json",
+      "raw_archive_path": "capital/ethereum_chart.raw"
+    },
+    {
+      "name": "ethereum_tvl",
+      "url": "https://api.llama.fi/v2/historicalChainTvl/Ethereum",
+      "payload": null,
+      "started_ms": 1790009241389,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 121142,
+      "sha256": "f39786d72e953fe6c93e1de2577984f525564733bb29eb77013a60e5c474532e",
+      "finished_ms": 1790009241631,
+      "receipt_archive_path": "capital/ethereum_tvl.receipt.json",
+      "raw_archive_path": "capital/ethereum_tvl.raw"
+    },
+    {
+      "name": "hyperevm_tvl",
+      "url": "https://api.llama.fi/v2/historicalChainTvl/HyperEVM",
+      "payload": null,
+      "started_ms": 1790009226428,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 404: Not Found",
+      "finished_ms": 1790009227628,
+      "receipt_archive_path": "capital/hyperevm_tvl.receipt.json"
+    },
+    {
+      "name": "hyperliquid_bridge_protocol",
+      "url": "https://api.llama.fi/protocol/hyperliquid-bridge",
+      "payload": null,
+      "started_ms": 1790009191551,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 485820,
+      "sha256": "f924f6ec04778aca9af2fd48e14869b348c117d40e4e0cf84fcb08115bb60ae4",
+      "finished_ms": 1790009191793,
+      "receipt_archive_path": "capital/hyperliquid_bridge_protocol.receipt.json",
+      "raw_archive_path": "capital/hyperliquid_bridge_protocol.raw"
+    },
+    {
+      "name": "hyperliquid_chart",
+      "url": "https://stablecoins.llama.fi/stablecoincharts/Hyperliquid%20L1",
+      "payload": null,
+      "started_ms": 1790009190965,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 129519,
+      "sha256": "7d45926b88a098697c844f1f0c579e4225ab18372fa595a6b5e9b13133e2b0b6",
+      "finished_ms": 1790009191197,
+      "receipt_archive_path": "capital/hyperliquid_chart.receipt.json",
+      "raw_archive_path": "capital/hyperliquid_chart.raw"
+    },
+    {
+      "name": "hyperliquid_tvl",
+      "url": "https://api.llama.fi/v2/historicalChainTvl/Hyperliquid",
+      "payload": null,
+      "started_ms": 1790009226286,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 25713,
+      "sha256": "d00a8ab5b218a7363b72a87dc3d7bc8d9e925b16b6954a900865fea5577ff76c",
+      "finished_ms": 1790009226380,
+      "receipt_archive_path": "capital/hyperliquid_tvl.receipt.json",
+      "raw_archive_path": "capital/hyperliquid_tvl.raw"
+    },
+    {
+      "name": "stablecoinchains",
+      "url": "https://stablecoins.llama.fi/stablecoinchains",
+      "payload": null,
+      "started_ms": 1790009190729,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 19539,
+      "sha256": "120caae59abd2a2a215b494e0cb0eedce3e4712394d5f61f15ce65cb37b26bfb",
+      "finished_ms": 1790009190913,
+      "receipt_archive_path": "capital/stablecoinchains.receipt.json",
+      "raw_archive_path": "capital/stablecoinchains.raw"
+    },
+    {
+      "name": "core_evm_transfers",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/hyperevm/hypercore-less-than-greater-than-hyperevm-transfers.md",
+      "payload": null,
+      "started_ms": 1790009230730,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 6784,
+      "sha256": "0bb15976a4859332aa4c2da68bd3b5525ef75acc9224a6a5331dc997f45b0b9c",
+      "finished_ms": 1790009230858,
+      "receipt_archive_path": "core/core_evm_transfers.receipt.json",
+      "raw_archive_path": "core/core_evm_transfers.raw"
+    },
+    {
+      "name": "fee_design",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/trading/fees.md",
+      "payload": null,
+      "started_ms": 1790009230501,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 12174,
+      "sha256": "75e55504b1b887a89e1668a9544d09b013242747bcc29f8648a5410142a71258",
+      "finished_ms": 1790009230626,
+      "receipt_archive_path": "core/fee_design.receipt.json",
+      "raw_archive_path": "core/fee_design.raw"
+    },
+    {
+      "name": "fees_overview",
+      "url": "https://api.llama.fi/overview/fees/Hyperliquid%20L1?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true&dataType=dailyFees",
+      "payload": null,
+      "started_ms": 1790009230965,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 432365,
+      "sha256": "d3246bfb460eab97e4b738a75b1537aaf9feef76f12f72d29a59a321b572f46e",
+      "finished_ms": 1790009232871,
+      "receipt_archive_path": "core/fees_overview.receipt.json",
+      "raw_archive_path": "core/fees_overview.raw"
+    },
+    {
+      "name": "hyperevm_design",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/hyperevm.md",
+      "payload": null,
+      "started_ms": 1790009230280,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 3989,
+      "sha256": "0c38c14d89f7f559e5a3a3d2d91f0953ac2c636f0fbc995b465abd4ead6c0d4c",
+      "finished_ms": 1790009230398,
+      "receipt_archive_path": "core/hyperevm_design.receipt.json",
+      "raw_archive_path": "core/hyperevm_design.raw"
+    },
+    {
+      "name": "perps_fees",
+      "url": "https://api.llama.fi/summary/fees/hyperliquid-perps?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true&dataType=dailyFees",
+      "payload": null,
+      "started_ms": 1790009481231,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 17097,
+      "sha256": "ace62ac5fa2f500ff32b5fe59af825025b29b52aa822c19ce9866b9181a84b0d",
+      "finished_ms": 1790009482483,
+      "receipt_archive_path": "core/perps_fees.receipt.json",
+      "raw_archive_path": "core/perps_fees.raw"
+    },
+    {
+      "name": "perps_revenue",
+      "url": "https://api.llama.fi/summary/fees/hyperliquid-perps?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true&dataType=dailyRevenue",
+      "payload": null,
+      "started_ms": 1790009482576,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 17058,
+      "sha256": "536b1fb2459bf090de21dbab562711dc505b57473d7dd232b292f7fcab8af98a",
+      "finished_ms": 1790009483827,
+      "receipt_archive_path": "core/perps_revenue.receipt.json",
+      "raw_archive_path": "core/perps_revenue.raw"
+    },
+    {
+      "name": "perps_volume",
+      "url": "https://api.llama.fi/summary/derivatives/hyperliquid?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009483927,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 402: Payment Required",
+      "finished_ms": 1790009484002,
+      "receipt_archive_path": "core/perps_volume.receipt.json"
+    },
+    {
+      "name": "hyperswapv3_fees",
+      "url": "https://api.llama.fi/summary/fees/hyperswap-v3?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240826,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 14081,
+      "sha256": "92dcc48b001520edcf268475ed6a3adeefb8fa6d7a322b3e217b2f23c44b4173",
+      "finished_ms": 1790009242092,
+      "receipt_archive_path": "dex_economics/hyperswapv3_fees.receipt.json",
+      "raw_archive_path": "dex_economics/hyperswapv3_fees.raw"
+    },
+    {
+      "name": "hyperswapv3_protocol",
+      "url": "https://api.llama.fi/protocol/hyperswap-v3",
+      "payload": null,
+      "started_ms": 1790009241091,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 2599869,
+      "sha256": "e0f1a79734d074062f6bf5d1a80c182b5ff55315f4c6650778b127d8420da66a",
+      "finished_ms": 1790009243959,
+      "receipt_archive_path": "dex_economics/hyperswapv3_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/hyperswapv3_protocol.raw"
+    },
+    {
+      "name": "hyperswapv3_revenue",
+      "url": "https://api.llama.fi/summary/fees/hyperswap-v3?dataType=dailyRevenue&excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240956,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 13602,
+      "sha256": "3807a4385220b13851eefa1e84e47981d4d021de0f962751f4d76c4fb33b0183",
+      "finished_ms": 1790009242223,
+      "receipt_archive_path": "dex_economics/hyperswapv3_revenue.receipt.json",
+      "raw_archive_path": "dex_economics/hyperswapv3_revenue.raw"
+    },
+    {
+      "name": "hyperswapv3_volume",
+      "url": "https://api.llama.fi/summary/dexs/hyperswap-v3?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240707,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 15709,
+      "sha256": "e1b82b84716539ea68c749a61534c216c93d5f0a35690b23ddce52aba4ccbe9f",
+      "finished_ms": 1790009241982,
+      "receipt_archive_path": "dex_economics/hyperswapv3_volume.receipt.json",
+      "raw_archive_path": "dex_economics/hyperswapv3_volume.raw"
+    },
+    {
+      "name": "hyperdrive_hl_lending_protocol",
+      "url": "https://api.llama.fi/protocol/hyperdrive-hl-lending",
+      "payload": null,
+      "started_ms": 1790009639886,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 1000621,
+      "sha256": "29c1f51737de9de0ca10b16d7dfb4c9e7564993625d3e25afb30a3755d90dd45",
+      "finished_ms": 1790009640169,
+      "receipt_archive_path": "dex_economics/loan/hyperdrive_hl_lending_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/hyperdrive_hl_lending_protocol.raw"
+    },
+    {
+      "name": "hyperlend_isolated_protocol",
+      "url": "https://api.llama.fi/protocol/hyperlend-isolated",
+      "payload": null,
+      "started_ms": 1790009529206,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 437687,
+      "sha256": "2a0ddefada3d8de58052c0c5913af63f49d99119b585ce829b4557cd701f1e9c",
+      "finished_ms": 1790009530413,
+      "receipt_archive_path": "dex_economics/loan/hyperlend_isolated_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/hyperlend_isolated_protocol.raw"
+    },
+    {
+      "name": "hyperlend_pooled_protocol",
+      "url": "https://api.llama.fi/protocol/hyperlend-pooled",
+      "payload": null,
+      "started_ms": 1790009529084,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 1428568,
+      "sha256": "cfbb520194b80eaac3a6ae907175017df3447760b630aa7e51b072d379f9a226",
+      "finished_ms": 1790009531625,
+      "receipt_archive_path": "dex_economics/loan/hyperlend_pooled_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/hyperlend_pooled_protocol.raw"
+    },
+    {
+      "name": "hypurrfi_pooled_protocol",
+      "url": "https://api.llama.fi/protocol/hypurrfi-pooled",
+      "payload": null,
+      "started_ms": 1790009639884,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 1589890,
+      "sha256": "6370760304ff82430c5955e3bd255cfe735443d122df6def9d10f65b3ce35e7e",
+      "finished_ms": 1790009640167,
+      "receipt_archive_path": "dex_economics/loan/hypurrfi_pooled_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/hypurrfi_pooled_protocol.raw"
+    },
+    {
+      "name": "kinetiq_khype_protocol",
+      "url": "https://api.llama.fi/protocol/kinetiq-khype",
+      "payload": null,
+      "started_ms": 1790009529046,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 213444,
+      "sha256": "8e15fbfa41aff70db8a9ba6af9687a236f896b9b69b55bac09a66bacef055d2d",
+      "finished_ms": 1790009530820,
+      "receipt_archive_path": "dex_economics/loan/kinetiq_khype_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/kinetiq_khype_protocol.raw"
+    },
+    {
+      "name": "kinetiq_kmhype_protocol",
+      "url": "https://api.llama.fi/protocol/kinetiq-kmhype",
+      "payload": null,
+      "started_ms": 1790009529173,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 88356,
+      "sha256": "fd481cad31bdc21b8aa699826f60c33ef0eefafc6aef61fb81da81e4b62d1d11",
+      "finished_ms": 1790009530783,
+      "receipt_archive_path": "dex_economics/loan/kinetiq_kmhype_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/kinetiq_kmhype_protocol.raw"
+    },
+    {
+      "name": "looped_hype_protocol",
+      "url": "https://api.llama.fi/protocol/looped-hype",
+      "payload": null,
+      "started_ms": 1790009529127,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 319442,
+      "sha256": "150059b4321db66b6e216e1c4b67f9ffd61bd0b8c833c90aff2ec89a6defd823",
+      "finished_ms": 1790009529271,
+      "receipt_archive_path": "dex_economics/loan/looped_hype_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/loan/looped_hype_protocol.raw"
+    },
+    {
+      "name": "yields_pools",
+      "url": "https://yields.llama.fi/pools",
+      "payload": null,
+      "started_ms": 1790009554906,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 11844164,
+      "sha256": "a4371c52ccade15e1bceb861a39d9dbc9aa7eb92002ab5b8811582432ccd7ff3",
+      "finished_ms": 1790009555908,
+      "receipt_archive_path": "dex_economics/loan/yields_pools.receipt.json",
+      "raw_archive_path": "dex_economics/loan/yields_pools.raw"
+    },
+    {
+      "name": "nestcl_fees",
+      "url": "https://api.llama.fi/summary/fees/nest-cl?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240783,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 8614,
+      "sha256": "9329cfb395bc6a8112b751e118d1e6939bd5a8136dbaac3994a45fa02c42858e",
+      "finished_ms": 1790009241232,
+      "receipt_archive_path": "dex_economics/nestcl_fees.receipt.json",
+      "raw_archive_path": "dex_economics/nestcl_fees.raw"
+    },
+    {
+      "name": "nestcl_protocol",
+      "url": "https://api.llama.fi/protocol/nest-cl",
+      "payload": null,
+      "started_ms": 1790009241052,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 501359,
+      "sha256": "4cee150cfbb9db7a5facc17e0b0e9819665983a50273f60db67aeed3378a0241",
+      "finished_ms": 1790009242345,
+      "receipt_archive_path": "dex_economics/nestcl_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/nestcl_protocol.raw"
+    },
+    {
+      "name": "nestcl_revenue",
+      "url": "https://api.llama.fi/summary/fees/nest-cl?dataType=dailyRevenue&excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240909,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 8614,
+      "sha256": "9329cfb395bc6a8112b751e118d1e6939bd5a8136dbaac3994a45fa02c42858e",
+      "finished_ms": 1790009242186,
+      "receipt_archive_path": "dex_economics/nestcl_revenue.receipt.json",
+      "raw_archive_path": "dex_economics/nestcl_revenue.raw"
+    },
+    {
+      "name": "nestcl_volume",
+      "url": "https://api.llama.fi/summary/dexs/nest-cl?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240657,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 9647,
+      "sha256": "43468ed8f4015d5f095835dc3fe61342058a674ce178f0b0d08ff44d0a3b97d9",
+      "finished_ms": 1790009241855,
+      "receipt_archive_path": "dex_economics/nestcl_volume.receipt.json",
+      "raw_archive_path": "dex_economics/nestcl_volume.raw"
+    },
+    {
+      "name": "projectx_fees",
+      "url": "https://api.llama.fi/summary/fees/project-x?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240741,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 10645,
+      "sha256": "c7eee70b81e2029c5f686b570e02076ce0e0b7e7a04b3af08ca7bc2a4386075a",
+      "finished_ms": 1790009242071,
+      "receipt_archive_path": "dex_economics/projectx_fees.receipt.json",
+      "raw_archive_path": "dex_economics/projectx_fees.raw"
+    },
+    {
+      "name": "projectx_protocol",
+      "url": "https://api.llama.fi/protocol/project-x",
+      "payload": null,
+      "started_ms": 1790009240998,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 3040805,
+      "sha256": "8ede9b33cc094a4a856465ab80d95cb0738f1d12cd2b42f98b92c8e2af9ad874",
+      "finished_ms": 1790009248734,
+      "receipt_archive_path": "dex_economics/projectx_protocol.receipt.json",
+      "raw_archive_path": "dex_economics/projectx_protocol.raw"
+    },
+    {
+      "name": "projectx_revenue",
+      "url": "https://api.llama.fi/summary/fees/project-x?dataType=dailyRevenue&excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240868,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 10283,
+      "sha256": "cb6b9bb0d0933081c1eaab2ecaa037775425cd2e333bee58557811a0e89d8750",
+      "finished_ms": 1790009242144,
+      "receipt_archive_path": "dex_economics/projectx_revenue.receipt.json",
+      "raw_archive_path": "dex_economics/projectx_revenue.raw"
+    },
+    {
+      "name": "projectx_volume",
+      "url": "https://api.llama.fi/summary/dexs/project-x?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true",
+      "payload": null,
+      "started_ms": 1790009240624,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 12039,
+      "sha256": "d3df8aa89f083d7dfa371c7212e5acb3033229ef6221f118a34c8cbe076837ad",
+      "finished_ms": 1790009241961,
+      "receipt_archive_path": "dex_economics/projectx_volume.receipt.json",
+      "raw_archive_path": "dex_economics/projectx_volume.raw"
+    }
+  ],
+  "market_fetch_manifest": {
+    "server_time_ms": 1790009532015,
+    "local_clock_ms": 1790009532078,
+    "completed_minute_end_exclusive": 1790009520000,
+    "hour_end_exclusive": 1790006400000,
+    "refresh": false,
+    "transport": "Allowlisted CONNECT proxy; IPv4 socket and DNS bound to verified ExpressVPN interface eth1; no direct fallback.",
+    "collector_sha256": "315fc76adc1e554ead9d8b0567600ae82c876a90ec0bd9016bb905d2c8b395b8",
+    "requests": [
+      {
+        "name": "BTC_perp_1m",
+        "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1790009519999",
+        "payload": null,
+        "started_ms": 1790009532079,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "b119848ef12a43aa0580880986a8b253d87117c668e85eb3ac4830d528027c8f",
+        "bytes": 134563,
+        "finished_ms": 1790009532291
+      },
+      {
+        "name": "BTC_spot_1m",
+        "url": "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1790009519999",
+        "payload": null,
+        "started_ms": 1790009532079,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "e270a68e0bf8a75d4e15899edba77b42120f90209986020310b2de4f03657c2a",
+        "bytes": 170878,
+        "finished_ms": 1790009532243
+      },
+      {
+        "name": "BTC_spot_book",
+        "url": "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=100",
+        "payload": null,
+        "started_ms": 1790009532080,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "1f31bc183a1356a8170823054233644a0e55ee6a992838d77da6abd398d70509",
+        "bytes": 6447,
+        "finished_ms": 1790009532189
+      },
+      {
+        "name": "BTC_perp_book",
+        "url": "https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=100",
+        "payload": null,
+        "started_ms": 1790009532189,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "aa89d8e4ddbbd0d59f084515aec91f6fa7a38a4beda11e1001640518588221f3",
+        "bytes": 4285,
+        "finished_ms": 1790009532269
+      },
+      {
+        "name": "BTC_oi_5m",
+        "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=5m&limit=500&endTime=1790009520000",
+        "payload": null,
+        "started_ms": 1790009532243,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "c0bdadea13f71ff50ba83bf11c2b58b3a101ea8b4b180b0a91e6a468a902b16c",
+        "bytes": 85501,
+        "finished_ms": 1790009532372
+      },
+      {
+        "name": "BTC_premium",
+        "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT",
+        "payload": null,
+        "started_ms": 1790009532269,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "e794be084cf7c80d0a25222aab920b5a1ce2277abcdd48521169b771ecff6010",
+        "bytes": 231,
+        "finished_ms": 1790009532380
+      },
+      {
+        "name": "BTC_perp_1h",
+        "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1h&limit=1000&endTime=1790006399999",
+        "payload": null,
+        "started_ms": 1790009532291,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "9f33d68ae1d7a255faa893ecbbe6875c520a9b0af6a732eae2100a0f8055c9a8",
+        "bytes": 142182,
+        "finished_ms": 1790009532423
+      },
+      {
+        "name": "BTC_spot_1h",
+        "url": "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=1000&endTime=1790006399999",
+        "payload": null,
+        "started_ms": 1790009532372,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "346854ea7d6cbfb422c99d8895c4b4b73d66e28fc8dbf765c1b254884f24b249",
+        "bytes": 178497,
+        "finished_ms": 1790009532501
+      },
+      {
+        "name": "BTC_oi_1h",
+        "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=200&endTime=1790006400000",
+        "payload": null,
+        "started_ms": 1790009532381,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "ccec3f127350e8e11d652cde3df3dfa5e0347887f259ba38a4aac18f88e786ce",
+        "bytes": 34201,
+        "finished_ms": 1790009532471
+      },
+      {
+        "name": "BTC_funding",
+        "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&startTime=1788799932015&endTime=1790009532015&limit=1000",
+        "payload": null,
+        "started_ms": 1790009532423,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "d7ff9809cb931cc61bb058b857fc8c9f3657a77f0d3f228155f75d2c915de091",
+        "bytes": 5293,
+        "finished_ms": 1790009532501
+      },
+      {
+        "name": "BTC_bybit_ticker",
+        "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT",
+        "payload": null,
+        "started_ms": 1790009532471,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "6e0cc869ebdfc3a70472effa72165d9440922b66962655eed28ab7553a5ad033",
+        "bytes": 880,
+        "finished_ms": 1790009532827
+      },
+      {
+        "name": "BTC_hl_funding",
+        "url": "https://api.hyperliquid.xyz/info",
+        "payload": {
+          "type": "fundingHistory",
+          "coin": "BTC",
+          "startTime": 1789923132015,
+          "endTime": 1790009532015
+        },
+        "started_ms": 1790009532501,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "2d8df28acd6a90acad1097e8f4f3a4c3f827cd5dd92ee72c4bdf63965b12b7d2",
+        "bytes": 2106,
+        "finished_ms": 1790009532710
+      },
+      {
+        "name": "ETH_perp_1m",
+        "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1m&limit=1000&endTime=1790009519999",
+        "payload": null,
+        "started_ms": 1790009532501,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "a34e5a5bc5b9fda9b20bc0ad859836d4ed22cd2b5f2c1d0809ee814cd69c6931",
+        "bytes": 133341,
+        "finished_ms": 1790009532631
+      },
+      {
+        "name": "ETH_spot_1m",
+        "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1m&limit=1000&endTime=1790009519999",
+        "payload": null,
+        "started_ms": 1790009532631,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "f2f47bae079f17280fb662222d7273268c1f8f677fcfbb1d6d139e001b0416ec",
+        "bytes": 168747,
+        "finished_ms": 1790009532758
+      },
+      {
+        "name": "ETH_spot_book",
+        "url": "https://api.binance.com/api/v3/depth?symbol=ETHUSDT&limit=100",
+        "payload": null,
+        "started_ms": 1790009532710,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "3028d5aba9a9fa0521e8952a8bc58cc222bbe9967e9b7bdc944963f5d20d9c15",
+        "bytes": 6278,
+        "finished_ms": 1790009532786
+      },
+      {
+        "name": "ETH_perp_book",
+        "url": "https://fapi.binance.com/fapi/v1/depth?symbol=ETHUSDT&limit=100",
+        "payload": null,
+        "started_ms": 1790009532758,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "542ee09456ee4eb23e0dce04228f2f3e955d4dade7e0dc685b50c2d8938b576f",
+        "bytes": 4130,
+        "finished_ms": 1790009532854
+      },
+      {
+        "name": "ETH_oi_5m",
+        "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=ETHUSDT&period=5m&limit=500&endTime=1790009520000",
+        "payload": null,
+        "started_ms": 1790009532786,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "d477a10f1daa2e167b9fe01f9721b0fc171f69374bd506cc39752def24d70b4f",
+        "bytes": 86501,
+        "finished_ms": 1790009532897
+      },
+      {
+        "name": "ETH_premium",
+        "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=ETHUSDT",
+        "payload": null,
+        "started_ms": 1790009532827,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "3134152118ae491fadc776131b83b12d4146dc30ad934b1b426252f7fffa1d26",
+        "bytes": 228,
+        "finished_ms": 1790009532896
+      },
+      {
+        "name": "ETH_perp_1h",
+        "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1h&limit=1000&endTime=1790006399999",
+        "payload": null,
+        "started_ms": 1790009532854,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "af1c625405858d0eeccc59fc92f58e90a6649ce14b3dc120c689fd76836547ab",
+        "bytes": 140979,
+        "finished_ms": 1790009532990
+      },
+      {
+        "name": "ETH_spot_1h",
+        "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1h&limit=1000&endTime=1790006399999",
+        "payload": null,
+        "started_ms": 1790009532896,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "c1cb70f78cc2e367d402d64b25f1b85c99b53a62eb411ea9cbb57096cc910f02",
+        "bytes": 176338,
+        "finished_ms": 1790009533027
+      },
+      {
+        "name": "ETH_oi_1h",
+        "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=ETHUSDT&period=1h&limit=200&endTime=1790006400000",
+        "payload": null,
+        "started_ms": 1790009532897,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "60580f15e7ed4db08bee64d14dc1a298e2fe09d93a7abbd18ceed8ce3f39c942",
+        "bytes": 34601,
+        "finished_ms": 1790009533009
+      },
+      {
+        "name": "ETH_funding",
+        "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=ETHUSDT&startTime=1788799932015&endTime=1790009532015&limit=1000",
+        "payload": null,
+        "started_ms": 1790009532990,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "7232965967da4a9a477bc6a0743ad07165da1090475e539d27b101e66ce1c5cf",
+        "bytes": 5259,
+        "finished_ms": 1790009533055
+      },
+      {
+        "name": "ETH_bybit_ticker",
+        "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=ETHUSDT",
+        "payload": null,
+        "started_ms": 1790009533009,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "9a6b387f7750212e7e98c11a595a53b194f811bfdeb9eae028da6e764456dd05",
+        "bytes": 867,
+        "finished_ms": 1790009533162
+      },
+      {
+        "name": "ETH_hl_funding",
+        "url": "https://api.hyperliquid.xyz/info",
+        "payload": {
+          "type": "fundingHistory",
+          "coin": "ETH",
+          "startTime": 1789923132015,
+          "endTime": 1790009532015
+        },
+        "started_ms": 1790009533027,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "d20e6baf68dfa65d4d08ed3ed13edbcfb8eaaf28d8cabf7da60f5877265bb572",
+        "bytes": 2121,
+        "finished_ms": 1790009533126
+      },
+      {
+        "name": "HYPE_perp_1m",
+        "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1m&limit=1000&endTime=1790009519999",
+        "payload": null,
+        "started_ms": 1790009533056,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "8cb915a85068d83f6880ca61cfc8096030caaf20e37889bcb3e0921df29447b7",
+        "bytes": 136789,
+        "finished_ms": 1790009533154
+      },
+      {
+        "name": "HYPE_spot_1m",
+        "url": "https://api.bybit.com/v5/market/kline?category=spot&symbol=HYPEUSDT&interval=1&limit=1000&end=1790009519999",
+        "payload": null,
+        "started_ms": 1790009533126,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "1980a850f360e6b9da41bc0cc57c96ce3617233f7f94f55caf873e01a8d0c8db",
+        "bytes": 73277,
+        "finished_ms": 1790009533355
+      },
+      {
+        "name": "HYPE_spot_book",
+        "url": "https://api.bybit.com/v5/market/orderbook?category=spot&symbol=HYPEUSDT&limit=50",
+        "payload": null,
+        "started_ms": 1790009533154,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "81f0bceeb71b3cd7b94599fe7b1d668b62100b896f41c35709f838dd1d836dd3",
+        "bytes": 2016,
+        "finished_ms": 1790009533345
+      },
+      {
+        "name": "HYPE_perp_book",
+        "url": "https://fapi.binance.com/fapi/v1/depth?symbol=HYPEUSDT&limit=100",
+        "payload": null,
+        "started_ms": 1790009533162,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "da6445649d1fcd935d9bb22810781a7d93ddd33fc16e8fdab98673db35ee4833",
+        "bytes": 4232,
+        "finished_ms": 1790009533233
+      },
+      {
+        "name": "HYPE_oi_5m",
+        "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=HYPEUSDT&period=5m&limit=500&endTime=1790009520000",
+        "payload": null,
+        "started_ms": 1790009533233,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "bf076b93c8eab723595c825dd70859a00b8a7fc6c6ff48e6e33f30551ce28042",
+        "bytes": 86501,
+        "finished_ms": 1790009533344
+      },
+      {
+        "name": "HYPE_premium",
+        "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=HYPEUSDT",
+        "payload": null,
+        "started_ms": 1790009533344,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "42229660133763d3d20e1823e975e476db1a4e06d4866d5761ea99ab61667e10",
+        "bytes": 223,
+        "finished_ms": 1790009533425
+      },
+      {
+        "name": "HYPE_perp_1h",
+        "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1h&limit=1000&endTime=1790006399999",
+        "payload": null,
+        "started_ms": 1790009533345,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "54e12a592c61e7b632cfc9ee4782642a8c4e506865eea56cee93e5f02cd5e3cb",
+        "bytes": 145500,
+        "finished_ms": 1790009533477
+      },
+      {
+        "name": "HYPE_spot_1h",
+        "url": "https://api.bybit.com/v5/market/kline?category=spot&symbol=HYPEUSDT&interval=60&limit=1000&end=1790006399999",
+        "payload": null,
+        "started_ms": 1790009533355,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "4f4a910871b3cdd2b9a643f87654451a36c07c0ad0a7285d25902b256cb386b0",
+        "bytes": 76979,
+        "finished_ms": 1790009533717
+      },
+      {
+        "name": "HYPE_oi_1h",
+        "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=HYPEUSDT&period=1h&limit=200&endTime=1790006400000",
+        "payload": null,
+        "started_ms": 1790009533425,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "839230063171894489f16fea609f4d860c28bd93793f49e1398a7dea9f928d6e",
+        "bytes": 34601,
+        "finished_ms": 1790009533507
+      },
+      {
+        "name": "HYPE_funding",
+        "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=HYPEUSDT&startTime=1788799932015&endTime=1790009532015&limit=1000",
+        "payload": null,
+        "started_ms": 1790009533477,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "e40f0e49c0f67553b195f1d24b183fcfa72a6439c1dd52a06fd2e345c777e78f",
+        "bytes": 10427,
+        "finished_ms": 1790009533539
+      },
+      {
+        "name": "HYPE_bybit_ticker",
+        "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=HYPEUSDT",
+        "payload": null,
+        "started_ms": 1790009533507,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "5092c50df6796d65cb06fc94b0f8be21ff475701f3b9792c8c6dd1d3bedb3f71",
+        "bytes": 865,
+        "finished_ms": 1790009533804
+      },
+      {
+        "name": "HYPE_hl_funding",
+        "url": "https://api.hyperliquid.xyz/info",
+        "payload": {
+          "type": "fundingHistory",
+          "coin": "HYPE",
+          "startTime": 1789923132015,
+          "endTime": 1790009532015
+        },
+        "started_ms": 1790009533539,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "9fde42b8053542809d779cb9e0b51693dcb14aba7a5e1f530f86a09d963f1ba6",
+        "bytes": 2140,
+        "finished_ms": 1790009533619
+      },
+      {
+        "name": "hl_contexts",
+        "url": "https://api.hyperliquid.xyz/info",
+        "payload": {
+          "type": "metaAndAssetCtxs"
+        },
+        "started_ms": 1790009533619,
+        "attempt": 0,
+        "status": "ok",
+        "sha256": "826c18904d7895d82f24ce39f805c72f647441318f9494fc1b45c8bb3cc9ac75",
+        "bytes": 72602,
+        "finished_ms": 1790009533726
+      }
+    ],
+    "completed_ms": 1790009533804
+  },
+  "prior_report": "../2026-09-22-lp-heat/report.md",
+  "verification": {
+    "successful_raw_sha256_checked": 53,
+    "market_successful_sha256_checked": 37,
+    "fail_closed_transport": "All external HTTP and DNS use verified local ExpressVPN-bound IPv4 proxy; no direct fallback."
+  },
+  "limits": [
+    "Stablecoin supply, bridge balances and TVL are stocks, not traced external deposits.",
+    "Core/EVM internal transfers are not cross-chain inflow; avoid double counting wrappers and underlying collateral.",
+    "Current UTC-day volume/fees/gas/transactions excluded from completed 7-day flow comparisons; stock observations use explicit provider date labels.",
+    "Daily active users and bot-adjusted organic usage remain unverified.",
+    "Provider revenue is not independent proof of actual token-buy execution; fees are not net LP PnL.",
+    "Market figures refer to the recorded capture, not a live feed or a validated return forecast."
+  ],
+  "lending_analysis_artifacts": [
+    "dex_economics/loan/hyperlend_stock_decomposition.json"
+  ],
+  "lending": {
+    "hyperlend_stock_decomposition": {
+      "method": {
+        "formula": "delta(q*p) = delta(q)*(p0+p1)/2 + delta(p)*(q0+q1)/2",
+        "dates": "same UTC-midnight stock records; Sep21 00:00 is a stock record, not a flow total",
+        "interpretation_limit": "Quantity effect is a change in reported token balance, not proof of net deposits, withdrawals, leverage, or rehypothecation. USD valuation and token reporting methodology can affect both terms.",
+        "residual_policy": "New/removed/missing/zero-quantity symbols are left as residual, never force-allocated. Token USD sum is separately reconciled to protocol TVL.",
+        "symbol_limit": "The source maps are keyed by symbol, with no contract address in these rows. There are no duplicate map keys to exclude, but a cross-contract symbol collision cannot be independently detected and no claim is made that symbols are unique assets."
+      },
+      "results": {
+        "supplied_tvl": {
+          "1d": {
+            "start_timestamp": 1789862400,
+            "end_timestamp": 1789948800,
+            "tvl_start_usd": 521344011,
+            "tvl_end_usd": 464707557,
+            "tvl_change_usd": -56636454,
+            "token_usd_sum_start": 521344011.99772,
+            "token_usd_sum_end": 464707557.6385,
+            "token_sum_minus_tvl_start": 0.9977200031280518,
+            "token_sum_minus_tvl_end": 0.6384999752044678,
+            "comparable_token_count": 17,
+            "excluded_token_count": 0,
+            "comparable_usd_change": -56636454.359220006,
+            "quantity_effect": -67245033.90556829,
+            "price_effect": 10608579.546348268,
+            "excluded_symbol_change_residual": -2.2351741790771484e-08,
+            "tvl_reconciliation_residual": 0.3592200428247452,
+            "top_quantity_effects": [
+              {
+                "symbol": "WHYPE",
+                "q0": 683142.00841,
+                "q1": 63552.76406,
+                "usd0": 63012391.26271,
+                "usd1": 5989668.46994,
+                "p0": 92.23908131395716,
+                "p1": 94.24717490312726,
+                "usd_change": -57022722.79277,
+                "quantity_effect": -57772439.285601914,
+                "price_effect": 749716.4928319174
+              },
+              {
+                "symbol": "KHYPE",
+                "q0": 3509776.98392,
+                "q1": 3365378.34983,
+                "usd0": 330929062.39567,
+                "usd1": 324689265.64198,
+                "p0": 94.2877749531715,
+                "p1": 96.47927569819348,
+                "usd_change": -6239796.753690004,
+                "quantity_effect": -13773250.771717457,
+                "price_effect": 7533454.018027444
+              },
+              {
+                "symbol": "USDC",
+                "q0": 19162650.24808,
+                "q1": 24818875.9371,
+                "usd0": 19157316.28587,
+                "usd1": 24812547.2873,
+                "p0": 0.9997216479901816,
+                "p1": 0.999745006590305,
+                "usd_change": 5655231.001430001,
+                "quantity_effect": 5654717.327988514,
+                "price_effect": 513.6734414875461
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 1637901.64913,
+                "q1": 3162037.56645,
+                "usd0": 1637369.57388,
+                "usd1": 3161075.49209,
+                "p0": 0.9996751482298815,
+                "p1": 0.9996957422738402,
+                "usd_change": 1523705.9182099998,
+                "quantity_effect": 1523656.4931303973,
+                "price_effect": 49.42507960239634
+              },
+              {
+                "symbol": "PT-KHYPE-24SEP2026",
+                "q0": 233757.15517,
+                "q1": 220002.15183,
+                "usd0": 21443754.59955,
+                "usd1": 20702695.3276,
+                "p0": 91.73517954543475,
+                "p1": 94.1022401617116,
+                "usd_change": -741059.2719500028,
+                "quantity_effect": -1278097.1643843923,
+                "price_effect": 537037.8924343904
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 699981.70762,
+                "q1": 688213.55437,
+                "usd0": 66614316.6518,
+                "usd1": 67042493.65288,
+                "p0": 95.16579637244321,
+                "p1": 97.41524738531429,
+                "usd_change": 428177.0010799989,
+                "quantity_effect": -1133161.6179931206,
+                "price_effect": 1561338.6190731179
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 137.62911,
+                "q1": 132.09622,
+                "usd0": 11184347.8794,
+                "usd1": 10798157.67652,
+                "p0": 81264.40605043512,
+                "p1": 81744.63793528687,
+                "usd_change": -386190.2028800007,
+                "quantity_effect": -450955.55468908144,
+                "price_effect": 64765.35180907961
+              },
+              {
+                "symbol": "USOL",
+                "q0": 2350.31797,
+                "q1": 2267.47827,
+                "usd0": 260754.62452,
+                "usd1": 255003.82604,
+                "p0": 110.94440320345251,
+                "p1": 112.46141998970513,
+                "usd_change": -5750.798479999998,
+                "quantity_effect": -9253.43568578711,
+                "price_effect": 3502.637205787129
+              },
+              {
+                "symbol": "USDE",
+                "q0": 71786.36499,
+                "q1": 65217.46175,
+                "usd0": 71762.0859,
+                "usd1": 65206.51424,
+                "p0": 0.999661786886641,
+                "p1": 0.9998321383613185,
+                "usd_change": -6555.571660000009,
+                "quantity_effect": -6567.241061960818,
+                "price_effect": 11.669401960808278
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1190.43223,
+                "q1": 1191.86521,
+                "usd0": 3125841.75256,
+                "usd1": 3201160.50654,
+                "p0": 2625.8040346908283,
+                "p1": 2685.8410495428425,
+                "usd_change": 75318.75398000004,
+                "quantity_effect": 3805.7405864026978,
+                "price_effect": 71513.01339359768
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 40495.5131,
+                "q1": 40458.60627,
+                "usd0": 3766998.91679,
+                "usd1": 3846988.87728,
+                "p0": 93.02262469147479,
+                "p1": 95.08456251822341,
+                "usd_change": 79989.96048999997,
+                "quantity_effect": -3471.2199900632436,
+                "price_effect": 83461.18048006302
+              },
+              {
+                "symbol": "USDHL",
+                "q0": 534.4829,
+                "q1": 517.30104,
+                "usd0": 534.33412,
+                "usd1": 517.17027,
+                "p0": 0.9997216374929863,
+                "p1": 0.9997472071581376,
+                "usd_change": -17.163850000000025,
+                "quantity_effect": -17.17729688157871,
+                "price_effect": 0.01344688157867116
+              }
+            ],
+            "top_price_effects": [
+              {
+                "symbol": "KHYPE",
+                "q0": 3509776.98392,
+                "q1": 3365378.34983,
+                "usd0": 330929062.39567,
+                "usd1": 324689265.64198,
+                "p0": 94.2877749531715,
+                "p1": 96.47927569819348,
+                "usd_change": -6239796.753690004,
+                "quantity_effect": -13773250.771717457,
+                "price_effect": 7533454.018027444
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 699981.70762,
+                "q1": 688213.55437,
+                "usd0": 66614316.6518,
+                "usd1": 67042493.65288,
+                "p0": 95.16579637244321,
+                "p1": 97.41524738531429,
+                "usd_change": 428177.0010799989,
+                "quantity_effect": -1133161.6179931206,
+                "price_effect": 1561338.6190731179
+              },
+              {
+                "symbol": "WHYPE",
+                "q0": 683142.00841,
+                "q1": 63552.76406,
+                "usd0": 63012391.26271,
+                "usd1": 5989668.46994,
+                "p0": 92.23908131395716,
+                "p1": 94.24717490312726,
+                "usd_change": -57022722.79277,
+                "quantity_effect": -57772439.285601914,
+                "price_effect": 749716.4928319174
+              },
+              {
+                "symbol": "PT-KHYPE-24SEP2026",
+                "q0": 233757.15517,
+                "q1": 220002.15183,
+                "usd0": 21443754.59955,
+                "usd1": 20702695.3276,
+                "p0": 91.73517954543475,
+                "p1": 94.1022401617116,
+                "usd_change": -741059.2719500028,
+                "quantity_effect": -1278097.1643843923,
+                "price_effect": 537037.8924343904
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 40495.5131,
+                "q1": 40458.60627,
+                "usd0": 3766998.91679,
+                "usd1": 3846988.87728,
+                "p0": 93.02262469147479,
+                "p1": 95.08456251822341,
+                "usd_change": 79989.96048999997,
+                "quantity_effect": -3471.2199900632436,
+                "price_effect": 83461.18048006302
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1190.43223,
+                "q1": 1191.86521,
+                "usd0": 3125841.75256,
+                "usd1": 3201160.50654,
+                "p0": 2625.8040346908283,
+                "p1": 2685.8410495428425,
+                "usd_change": 75318.75398000004,
+                "quantity_effect": 3805.7405864026978,
+                "price_effect": 71513.01339359768
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 137.62911,
+                "q1": 132.09622,
+                "usd0": 11184347.8794,
+                "usd1": 10798157.67652,
+                "p0": 81264.40605043512,
+                "p1": 81744.63793528687,
+                "usd_change": -386190.2028800007,
+                "quantity_effect": -450955.55468908144,
+                "price_effect": 64765.35180907961
+              },
+              {
+                "symbol": "USOL",
+                "q0": 2350.31797,
+                "q1": 2267.47827,
+                "usd0": 260754.62452,
+                "usd1": 255003.82604,
+                "p0": 110.94440320345251,
+                "p1": 112.46141998970513,
+                "usd_change": -5750.798479999998,
+                "quantity_effect": -9253.43568578711,
+                "price_effect": 3502.637205787129
+              },
+              {
+                "symbol": "PT-KHYPE-13NOV2025",
+                "q0": 1461.57735,
+                "q1": 1461.57735,
+                "usd0": 134439.82028,
+                "usd1": 137569.31256,
+                "p0": 91.98269272577329,
+                "p1": 94.12386731362524,
+                "usd_change": 3129.4922799999767,
+                "quantity_effect": 0.0,
+                "price_effect": 3129.492279999995
+              },
+              {
+                "symbol": "USDC",
+                "q0": 19162650.24808,
+                "q1": 24818875.9371,
+                "usd0": 19157316.28587,
+                "usd1": 24812547.2873,
+                "p0": 0.9997216479901816,
+                "p1": 0.999745006590305,
+                "usd_change": 5655231.001430001,
+                "quantity_effect": 5654717.327988514,
+                "price_effect": 513.6734414875461
+              },
+              {
+                "symbol": "PT-KHYPE-19MAR2026",
+                "q0": 38.24469,
+                "q1": 38.24469,
+                "usd0": 3517.84947,
+                "usd1": 3599.73803,
+                "p0": 91.98269014600459,
+                "p1": 94.12386477704487,
+                "usd_change": 81.88855999999987,
+                "quantity_effect": 0.0,
+                "price_effect": 81.88856000000011
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 1637901.64913,
+                "q1": 3162037.56645,
+                "usd0": 1637369.57388,
+                "usd1": 3161075.49209,
+                "p0": 0.9996751482298815,
+                "p1": 0.9996957422738402,
+                "usd_change": 1523705.9182099998,
+                "quantity_effect": 1523656.4931303973,
+                "price_effect": 49.42507960239634
+              }
+            ],
+            "excluded_symbols": []
+          },
+          "7d": {
+            "start_timestamp": 1789344000,
+            "end_timestamp": 1789948800,
+            "tvl_start_usd": 516262226,
+            "tvl_end_usd": 464707557,
+            "tvl_change_usd": -51554669,
+            "token_usd_sum_start": 516262226.27867,
+            "token_usd_sum_end": 464707557.6385,
+            "token_sum_minus_tvl_start": 0.2786700129508972,
+            "token_sum_minus_tvl_end": 0.6384999752044678,
+            "comparable_token_count": 17,
+            "excluded_token_count": 0,
+            "comparable_usd_change": -51554668.64017002,
+            "quantity_effect": -143123364.15111497,
+            "price_effect": 91568695.51094495,
+            "excluded_symbol_change_residual": -1.4901161193847656e-08,
+            "tvl_reconciliation_residual": -0.35982996225357056,
+            "top_quantity_effects": [
+              {
+                "symbol": "WSTHYPE",
+                "q0": 1580596.27355,
+                "q1": 688213.55437,
+                "usd0": 126247276.61804,
+                "usd1": 67042493.65288,
+                "p0": 79.87319642003847,
+                "p1": 97.41524738531429,
+                "usd_change": -59204782.96516,
+                "quantity_effect": -79104571.78110567,
+                "price_effect": 19899788.81594565
+              },
+              {
+                "symbol": "WHYPE",
+                "q0": 736383.8445,
+                "q1": 63552.76406,
+                "usd0": 56967526.41453,
+                "usd1": 5989668.46994,
+                "p0": 77.36118444207666,
+                "p1": 94.24717490312726,
+                "usd_change": -50977857.94459,
+                "quantity_effect": -57731718.915384665,
+                "price_effect": 6753860.970794662
+              },
+              {
+                "symbol": "KHYPE",
+                "q0": 3541345.44692,
+                "q1": 3365378.34983,
+                "usd0": 280693411.09429,
+                "usd1": 324689265.64198,
+                "p0": 79.26179902568283,
+                "p1": 96.47927569819348,
+                "usd_change": 43995854.547689974,
+                "quantity_effect": -15462323.379318627,
+                "price_effect": 59458177.92700863
+              },
+              {
+                "symbol": "USDC",
+                "q0": 16150066.4581,
+                "q1": 24818875.9371,
+                "usd0": 16147460.30348,
+                "usd1": 24812547.2873,
+                "p0": 0.9998386288609546,
+                "p1": 0.999745006590305,
+                "usd_change": 8665086.983820003,
+                "quantity_effect": 8667004.78652658,
+                "price_effect": -1917.8027065773792
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 1473812.24702,
+                "q1": 3162037.56645,
+                "usd0": 1473184.86613,
+                "usd1": 3161075.49209,
+                "p0": 0.9995743142376049,
+                "p1": 0.9996957422738402,
+                "usd_change": 1687890.6259599999,
+                "quantity_effect": 1687609.1648904341,
+                "price_effect": 281.461069565656
+              },
+              {
+                "symbol": "PT-KHYPE-24SEP2026",
+                "q0": 231955.72253,
+                "q1": 220002.15183,
+                "usd0": 17927651.79844,
+                "usd1": 20702695.3276,
+                "p0": 77.28911191713033,
+                "p1": 94.1022401617116,
+                "usd_change": 2775043.5291600004,
+                "quantity_effect": -1024369.3222215154,
+                "price_effect": 3799412.8513815165
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1263.22962,
+                "q1": 1191.86521,
+                "usd0": 3129073.58186,
+                "usd1": 3201160.50654,
+                "p0": 2477.0425996344193,
+                "p1": 2685.8410495428425,
+                "usd_change": 72086.92468000017,
+                "quantity_effect": -184223.0727610915,
+                "price_effect": 256309.9974410919
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 130.14279,
+                "q1": 132.09622,
+                "usd0": 9999388.17936,
+                "usd1": 10798157.67652,
+                "p0": 76833.97735179952,
+                "p1": 81744.63793528687,
+                "usd_change": 798769.4971599989,
+                "quantity_effect": 154886.1122301264,
+                "price_effect": 643883.3849298722
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 41734.74697,
+                "q1": 40458.60627,
+                "usd0": 3255008.7333,
+                "usd1": 3846988.87728,
+                "p0": 77.99277507635983,
+                "p1": 95.08456251822341,
+                "usd_change": 591980.1439800002,
+                "quantity_effect": -110435.5173760442,
+                "price_effect": 702415.6613560444
+              },
+              {
+                "symbol": "USOL",
+                "q0": 2508.29662,
+                "q1": 2267.47827,
+                "usd0": 249319.65287,
+                "usd1": 255003.82604,
+                "p0": 99.39799419336617,
+                "p1": 112.46141998970513,
+                "usd_change": 5684.173170000024,
+                "quantity_effect": -25509.817277766913,
+                "price_effect": 31193.990447766937
+              },
+              {
+                "symbol": "USDE",
+                "q0": 53614.95065,
+                "q1": 65217.46175,
+                "usd0": 53590.03106,
+                "usd1": 65206.51424,
+                "p0": 0.9995352119194761,
+                "p1": 0.9998321383613185,
+                "usd_change": 11616.483179999996,
+                "quantity_effect": 11598.840937305256,
+                "price_effect": 17.642242694735334
+              },
+              {
+                "symbol": "PT-KHYPE-19MAR2026",
+                "q0": 54.69002,
+                "q1": 38.24469,
+                "usd0": 4230.23816,
+                "usd1": 3599.73803,
+                "p0": 77.34936209568035,
+                "p1": 94.12386477704487,
+                "usd_change": -630.5001299999999,
+                "quantity_effect": -1409.9669010434168,
+                "price_effect": 779.4667710434172
+              }
+            ],
+            "top_price_effects": [
+              {
+                "symbol": "KHYPE",
+                "q0": 3541345.44692,
+                "q1": 3365378.34983,
+                "usd0": 280693411.09429,
+                "usd1": 324689265.64198,
+                "p0": 79.26179902568283,
+                "p1": 96.47927569819348,
+                "usd_change": 43995854.547689974,
+                "quantity_effect": -15462323.379318627,
+                "price_effect": 59458177.92700863
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 1580596.27355,
+                "q1": 688213.55437,
+                "usd0": 126247276.61804,
+                "usd1": 67042493.65288,
+                "p0": 79.87319642003847,
+                "p1": 97.41524738531429,
+                "usd_change": -59204782.96516,
+                "quantity_effect": -79104571.78110567,
+                "price_effect": 19899788.81594565
+              },
+              {
+                "symbol": "WHYPE",
+                "q0": 736383.8445,
+                "q1": 63552.76406,
+                "usd0": 56967526.41453,
+                "usd1": 5989668.46994,
+                "p0": 77.36118444207666,
+                "p1": 94.24717490312726,
+                "usd_change": -50977857.94459,
+                "quantity_effect": -57731718.915384665,
+                "price_effect": 6753860.970794662
+              },
+              {
+                "symbol": "PT-KHYPE-24SEP2026",
+                "q0": 231955.72253,
+                "q1": 220002.15183,
+                "usd0": 17927651.79844,
+                "usd1": 20702695.3276,
+                "p0": 77.28911191713033,
+                "p1": 94.1022401617116,
+                "usd_change": 2775043.5291600004,
+                "quantity_effect": -1024369.3222215154,
+                "price_effect": 3799412.8513815165
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 41734.74697,
+                "q1": 40458.60627,
+                "usd0": 3255008.7333,
+                "usd1": 3846988.87728,
+                "p0": 77.99277507635983,
+                "p1": 95.08456251822341,
+                "usd_change": 591980.1439800002,
+                "quantity_effect": -110435.5173760442,
+                "price_effect": 702415.6613560444
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 130.14279,
+                "q1": 132.09622,
+                "usd0": 9999388.17936,
+                "usd1": 10798157.67652,
+                "p0": 76833.97735179952,
+                "p1": 81744.63793528687,
+                "usd_change": 798769.4971599989,
+                "quantity_effect": 154886.1122301264,
+                "price_effect": 643883.3849298722
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1263.22962,
+                "q1": 1191.86521,
+                "usd0": 3129073.58186,
+                "usd1": 3201160.50654,
+                "p0": 2477.0425996344193,
+                "p1": 2685.8410495428425,
+                "usd_change": 72086.92468000017,
+                "quantity_effect": -184223.0727610915,
+                "price_effect": 256309.9974410919
+              },
+              {
+                "symbol": "USOL",
+                "q0": 2508.29662,
+                "q1": 2267.47827,
+                "usd0": 249319.65287,
+                "usd1": 255003.82604,
+                "p0": 99.39799419336617,
+                "p1": 112.46141998970513,
+                "usd_change": 5684.173170000024,
+                "quantity_effect": -25509.817277766913,
+                "price_effect": 31193.990447766937
+              },
+              {
+                "symbol": "PT-KHYPE-13NOV2025",
+                "q0": 1461.57735,
+                "q1": 1461.57735,
+                "usd0": 113052.07795,
+                "usd1": 137569.31256,
+                "p0": 77.34936365153716,
+                "p1": 94.12386731362524,
+                "usd_change": 24517.234609999985,
+                "quantity_effect": 0.0,
+                "price_effect": 24517.234609999992
+              },
+              {
+                "symbol": "USDC",
+                "q0": 16150066.4581,
+                "q1": 24818875.9371,
+                "usd0": 16147460.30348,
+                "usd1": 24812547.2873,
+                "p0": 0.9998386288609546,
+                "p1": 0.999745006590305,
+                "usd_change": 8665086.983820003,
+                "quantity_effect": 8667004.78652658,
+                "price_effect": -1917.8027065773792
+              },
+              {
+                "symbol": "PT-KHYPE-19MAR2026",
+                "q0": 54.69002,
+                "q1": 38.24469,
+                "usd0": 4230.23816,
+                "usd1": 3599.73803,
+                "p0": 77.34936209568035,
+                "p1": 94.12386477704487,
+                "usd_change": -630.5001299999999,
+                "quantity_effect": -1409.9669010434168,
+                "price_effect": 779.4667710434172
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 1473812.24702,
+                "q1": 3162037.56645,
+                "usd0": 1473184.86613,
+                "usd1": 3161075.49209,
+                "p0": 0.9995743142376049,
+                "p1": 0.9996957422738402,
+                "usd_change": 1687890.6259599999,
+                "quantity_effect": 1687609.1648904341,
+                "price_effect": 281.461069565656
+              }
+            ],
+            "excluded_symbols": []
+          }
+        },
+        "reported_borrowed": {
+          "1d": {
+            "start_timestamp": 1789862400,
+            "end_timestamp": 1789948800,
+            "tvl_start_usd": 314650739,
+            "tvl_end_usd": 275030043,
+            "tvl_change_usd": -39620696,
+            "token_usd_sum_start": 314650739.15914,
+            "token_usd_sum_end": 275030043.60803,
+            "token_sum_minus_tvl_start": 0.1591399908065796,
+            "token_sum_minus_tvl_end": 0.6080300211906433,
+            "comparable_token_count": 13,
+            "excluded_token_count": 0,
+            "comparable_usd_change": -39620695.551109985,
+            "quantity_effect": -44230417.877423696,
+            "price_effect": 4609722.326313698,
+            "excluded_symbol_change_residual": 1.4901161193847656e-08,
+            "tvl_reconciliation_residual": -0.4488900154829025,
+            "top_quantity_effects": [
+              {
+                "symbol": "USDC",
+                "q0": 92283739.35431,
+                "q1": 58646121.10533,
+                "usd0": 92258051.99001,
+                "usd1": 58631166.73096,
+                "p0": 0.9997216479904288,
+                "p1": 0.9997450065905784,
+                "usd_change": -33626885.25905,
+                "quantity_effect": -33628648.01418055,
+                "price_effect": 1762.7551305535653
+              },
+              {
+                "symbol": "WHYPE",
+                "q0": 2261017.14233,
+                "q1": 2147372.87586,
+                "usd0": 208554144.04242,
+                "usd1": 202383827.00883,
+                "p0": 92.23908131342291,
+                "p1": 94.24717490099498,
+                "usd_change": -6170317.033589989,
+                "quantity_effect": -10596546.897112014,
+                "price_effect": 4426229.863522014
+              },
+              {
+                "symbol": "KHYPE",
+                "q0": 3036.03635,
+                "q1": 3599.9839,
+                "usd0": 286261.11208,
+                "usd1": 347323.83891,
+                "p0": 94.28777494050755,
+                "p1": 96.47927561842707,
+                "usd_change": 61062.72683,
+                "quantity_effect": 53791.305391718684,
+                "price_effect": 7271.421438281334
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 3815549.91457,
+                "q1": 3763089.34134,
+                "usd0": 3814310.42642,
+                "usd1": 3761944.39233,
+                "p0": 0.9996751482282366,
+                "p1": 0.9996957422728656,
+                "usd_change": -52366.03408999974,
+                "quantity_effect": -52444.0715075319,
+                "price_effect": 78.0374175318901
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 28.74029,
+                "q1": 28.11849,
+                "usd0": 2335562.42425,
+                "usd1": 2298535.9076,
+                "p0": 81264.40005476632,
+                "p1": 81744.64231898655,
+                "usd_change": -37026.51665000012,
+                "quantity_effect": -50679.51127399979,
+                "price_effect": 13652.99462399994
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1926.96709,
+                "q1": 1945.15165,
+                "usd0": 5059837.95329,
+                "usd1": 5224368.15409,
+                "p0": 2625.8040313963015,
+                "p1": 2685.84105207941,
+                "usd_change": 164530.2008000007,
+                "quantity_effect": 48294.96435958433,
+                "price_effect": 116235.236440416
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 15725.20628,
+                "q1": 15680.49982,
+                "usd0": 1496501.77831,
+                "usd1": 1527519.76904,
+                "p0": 95.16579634400827,
+                "p1": 97.41524738208248,
+                "usd_change": 31017.99072999996,
+                "quantity_effect": -4304.808364049308,
+                "price_effect": 35322.79909404932
+              },
+              {
+                "symbol": "USOL",
+                "q0": 4534.18642,
+                "q1": 4534.72583,
+                "usd0": 503042.60624,
+                "usd1": 509981.70594,
+                "p0": 110.94440317255416,
+                "p1": 112.4614199531441,
+                "usd_change": 6939.099700000021,
+                "quantity_effect": 60.25366752615179,
+                "price_effect": 6878.84603247384
+              },
+              {
+                "symbol": "USDE",
+                "q0": 229500.11495,
+                "q1": 229531.43717,
+                "usd0": 229422.49499,
+                "usd1": 229492.90765,
+                "p0": 0.9996617868360681,
+                "p1": 0.9998321383751393,
+                "usd_change": 70.41266000000178,
+                "quantity_effect": 31.314294307066326,
+                "price_effect": 39.098365692939495
+              },
+              {
+                "symbol": "USDHL",
+                "q0": 7623.61305,
+                "q1": 7639.11337,
+                "usd0": 7621.491,
+                "usd1": 7637.18219,
+                "p0": 0.9997216477297467,
+                "p1": 0.9997471984108021,
+                "usd_change": 15.69119000000046,
+                "quantity_effect": 15.496203472604737,
+                "price_effect": 0.1949865273963493
+              },
+              {
+                "symbol": "USDH",
+                "q0": 4209.5609,
+                "q1": 4221.63317,
+                "usd0": 4201.29019,
+                "usd1": 4208.3537,
+                "p0": 0.9980352558861898,
+                "p1": 0.9968544235215964,
+                "usd_change": 7.063509999999951,
+                "quantity_effect": 12.04142341501178,
+                "price_effect": -4.97791341501211
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 1093.92816,
+                "q1": 1093.92868,
+                "usd0": 101760.06875,
+                "usd1": 104015.73027,
+                "p0": 93.02262476724249,
+                "p1": 95.08456279800617,
+                "usd_change": 2255.661519999994,
+                "quantity_effect": 0.04890786877179602,
+                "price_effect": 2255.6126121312286
+              }
+            ],
+            "top_price_effects": [
+              {
+                "symbol": "WHYPE",
+                "q0": 2261017.14233,
+                "q1": 2147372.87586,
+                "usd0": 208554144.04242,
+                "usd1": 202383827.00883,
+                "p0": 92.23908131342291,
+                "p1": 94.24717490099498,
+                "usd_change": -6170317.033589989,
+                "quantity_effect": -10596546.897112014,
+                "price_effect": 4426229.863522014
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1926.96709,
+                "q1": 1945.15165,
+                "usd0": 5059837.95329,
+                "usd1": 5224368.15409,
+                "p0": 2625.8040313963015,
+                "p1": 2685.84105207941,
+                "usd_change": 164530.2008000007,
+                "quantity_effect": 48294.96435958433,
+                "price_effect": 116235.236440416
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 15725.20628,
+                "q1": 15680.49982,
+                "usd0": 1496501.77831,
+                "usd1": 1527519.76904,
+                "p0": 95.16579634400827,
+                "p1": 97.41524738208248,
+                "usd_change": 31017.99072999996,
+                "quantity_effect": -4304.808364049308,
+                "price_effect": 35322.79909404932
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 28.74029,
+                "q1": 28.11849,
+                "usd0": 2335562.42425,
+                "usd1": 2298535.9076,
+                "p0": 81264.40005476632,
+                "p1": 81744.64231898655,
+                "usd_change": -37026.51665000012,
+                "quantity_effect": -50679.51127399979,
+                "price_effect": 13652.99462399994
+              },
+              {
+                "symbol": "KHYPE",
+                "q0": 3036.03635,
+                "q1": 3599.9839,
+                "usd0": 286261.11208,
+                "usd1": 347323.83891,
+                "p0": 94.28777494050755,
+                "p1": 96.47927561842707,
+                "usd_change": 61062.72683,
+                "quantity_effect": 53791.305391718684,
+                "price_effect": 7271.421438281334
+              },
+              {
+                "symbol": "USOL",
+                "q0": 4534.18642,
+                "q1": 4534.72583,
+                "usd0": 503042.60624,
+                "usd1": 509981.70594,
+                "p0": 110.94440317255416,
+                "p1": 112.4614199531441,
+                "usd_change": 6939.099700000021,
+                "quantity_effect": 60.25366752615179,
+                "price_effect": 6878.84603247384
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 1093.92816,
+                "q1": 1093.92868,
+                "usd0": 101760.06875,
+                "usd1": 104015.73027,
+                "p0": 93.02262476724249,
+                "p1": 95.08456279800617,
+                "usd_change": 2255.661519999994,
+                "quantity_effect": 0.04890786877179602,
+                "price_effect": 2255.6126121312286
+              },
+              {
+                "symbol": "USDC",
+                "q0": 92283739.35431,
+                "q1": 58646121.10533,
+                "usd0": 92258051.99001,
+                "usd1": 58631166.73096,
+                "p0": 0.9997216479904288,
+                "p1": 0.9997450065905784,
+                "usd_change": -33626885.25905,
+                "quantity_effect": -33628648.01418055,
+                "price_effect": 1762.7551305535653
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 3815549.91457,
+                "q1": 3763089.34134,
+                "usd0": 3814310.42642,
+                "usd1": 3761944.39233,
+                "p0": 0.9996751482282366,
+                "p1": 0.9996957422728656,
+                "usd_change": -52366.03408999974,
+                "quantity_effect": -52444.0715075319,
+                "price_effect": 78.0374175318901
+              },
+              {
+                "symbol": "USDE",
+                "q0": 229500.11495,
+                "q1": 229531.43717,
+                "usd0": 229422.49499,
+                "usd1": 229492.90765,
+                "p0": 0.9996617868360681,
+                "p1": 0.9998321383751393,
+                "usd_change": 70.41266000000178,
+                "quantity_effect": 31.314294307066326,
+                "price_effect": 39.098365692939495
+              },
+              {
+                "symbol": "USDH",
+                "q0": 4209.5609,
+                "q1": 4221.63317,
+                "usd0": 4201.29019,
+                "usd1": 4208.3537,
+                "p0": 0.9980352558861898,
+                "p1": 0.9968544235215964,
+                "usd_change": 7.063509999999951,
+                "quantity_effect": 12.04142341501178,
+                "price_effect": -4.97791341501211
+              },
+              {
+                "symbol": "USR",
+                "q0": 230.46686,
+                "q1": 230.475,
+                "usd0": 21.48119,
+                "usd1": 21.92652,
+                "p0": 0.0932072836849515,
+                "p1": 0.0951362186788155,
+                "usd_change": 0.44532999999999845,
+                "quantity_effect": 0.0007665580546202842,
+                "price_effect": 0.44456344194538
+              }
+            ],
+            "excluded_symbols": []
+          },
+          "7d": {
+            "start_timestamp": 1789344000,
+            "end_timestamp": 1789948800,
+            "tvl_start_usd": 280916005,
+            "tvl_end_usd": 275030043,
+            "tvl_change_usd": -5885962,
+            "token_usd_sum_start": 280916005.4004,
+            "token_usd_sum_end": 275030043.60803,
+            "token_sum_minus_tvl_start": 0.40039998292922974,
+            "token_sum_minus_tvl_end": 0.6080300211906433,
+            "comparable_token_count": 13,
+            "excluded_token_count": 0,
+            "comparable_usd_change": -5885961.792369987,
+            "quantity_effect": -43740920.623513594,
+            "price_effect": 37854958.83114359,
+            "excluded_symbol_change_residual": 2.514570951461792e-08,
+            "tvl_reconciliation_residual": -0.2076300187036395,
+            "top_quantity_effects": [
+              {
+                "symbol": "USDC",
+                "q0": 95750445.87991,
+                "q1": 58646121.10533,
+                "usd0": 95734994.52136,
+                "usd1": 58631166.73096,
+                "p0": 0.9998386288605967,
+                "p1": 0.9997450065905784,
+                "usd_change": -37103827.7904,
+                "quantity_effect": -37096600.3118579,
+                "price_effect": -7227.478542095413
+              },
+              {
+                "symbol": "WHYPE",
+                "q0": 2225579.27591,
+                "q1": 2147372.87586,
+                "usd0": 172173448.85345,
+                "usd1": 202383827.00883,
+                "p0": 77.36118444176802,
+                "p1": 94.24717490099498,
+                "usd_change": 30210378.15538001,
+                "quantity_effect": -6710436.001342123,
+                "price_effect": 36920814.156722106
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 4055417.91682,
+                "q1": 3763089.34134,
+                "usd0": 4053691.58314,
+                "usd1": 3761944.39233,
+                "p0": 0.9995743142345848,
+                "p1": 0.9996957422728656,
+                "usd_change": -291747.1908099996,
+                "quantity_effect": -292221.88380932115,
+                "price_effect": 474.6929993215072
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1834.47625,
+                "q1": 1945.15165,
+                "usd0": 4544075.81442,
+                "usd1": 5224368.15409,
+                "p0": 2477.0425969919206,
+                "p1": 2685.84105207941,
+                "usd_change": 680292.3396700006,
+                "quantity_effect": 285702.10650721483,
+                "price_effect": 394590.23316278594
+              },
+              {
+                "symbol": "KHYPE",
+                "q0": 2867.01857,
+                "q1": 3599.9839,
+                "usd0": 227245.0499,
+                "usd1": 347323.83891,
+                "p0": 79.26179909605538,
+                "p1": 96.47927561842707,
+                "usd_change": 120078.78900999998,
+                "quantity_effect": 64406.057411327645,
+                "price_effect": 55672.73159867235
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 28.04179,
+                "q1": 28.11849,
+                "usd0": 2154562.40781,
+                "usd1": 2298535.9076,
+                "p0": 76833.98270260208,
+                "p1": 81744.64231898655,
+                "usd_change": 143973.49979000026,
+                "quantity_effect": 6081.4902695781175,
+                "price_effect": 137892.0095204221
+              },
+              {
+                "symbol": "USOL",
+                "q0": 4515.4022,
+                "q1": 4534.72583,
+                "usd0": 448821.92159,
+                "usd1": 509981.70594,
+                "p0": 99.39799417868024,
+                "p1": 112.4614199531441,
+                "usd_change": 61159.78435000003,
+                "quantity_effect": 2046.9464653500581,
+                "price_effect": 59112.83788464995
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 15657.92922,
+                "q1": 15680.49982,
+                "usd0": 1250648.8561,
+                "usd1": 1527519.76904,
+                "p0": 79.87319641875351,
+                "p1": 97.41524738208248,
+                "usd_change": 276870.91293999995,
+                "quantity_effect": 2000.753274825656,
+                "price_effect": 274870.1596651744
+              },
+              {
+                "symbol": "USDE",
+                "q0": 231519.87077,
+                "q1": 229531.43717,
+                "usd0": 231412.26311,
+                "usd1": 229492.90765,
+                "p0": 0.9995352119900459,
+                "p1": 0.9998321383751393,
+                "usd_change": -1919.3554599999916,
+                "quantity_effect": -1987.8046091045717,
+                "price_effect": 68.44914910459873
+              },
+              {
+                "symbol": "USDH",
+                "q0": 4136.92777,
+                "q1": 4221.63317,
+                "usd0": 4126.26587,
+                "usd1": 4208.3537,
+                "p0": 0.9974227492978442,
+                "p1": 0.9968544235215964,
+                "usd_change": 82.08782999999949,
+                "quantity_effect": 84.46302281726975,
+                "price_effect": -2.3751928172703543
+              },
+              {
+                "symbol": "USDHL",
+                "q0": 7635.87156,
+                "q1": 7639.11337,
+                "usd0": 7634.63935,
+                "usd1": 7637.18219,
+                "p0": 0.9998386287681351,
+                "p1": 0.9997471984108021,
+                "usd_change": 2.5428400000000693,
+                "quantity_effect": 3.2411386652039162,
+                "price_effect": -0.6982986652034687
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 1093.92505,
+                "q1": 1093.92868,
+                "usd0": 85318.25071,
+                "usd1": 104015.73027,
+                "p0": 77.99277538255477,
+                "p1": 95.08456279800617,
+                "usd_change": 18697.479560000007,
+                "quantity_effect": 0.3141353687916672,
+                "price_effect": 18697.16542463121
+              }
+            ],
+            "top_price_effects": [
+              {
+                "symbol": "WHYPE",
+                "q0": 2225579.27591,
+                "q1": 2147372.87586,
+                "usd0": 172173448.85345,
+                "usd1": 202383827.00883,
+                "p0": 77.36118444176802,
+                "p1": 94.24717490099498,
+                "usd_change": 30210378.15538001,
+                "quantity_effect": -6710436.001342123,
+                "price_effect": 36920814.156722106
+              },
+              {
+                "symbol": "UETH",
+                "q0": 1834.47625,
+                "q1": 1945.15165,
+                "usd0": 4544075.81442,
+                "usd1": 5224368.15409,
+                "p0": 2477.0425969919206,
+                "p1": 2685.84105207941,
+                "usd_change": 680292.3396700006,
+                "quantity_effect": 285702.10650721483,
+                "price_effect": 394590.23316278594
+              },
+              {
+                "symbol": "WSTHYPE",
+                "q0": 15657.92922,
+                "q1": 15680.49982,
+                "usd0": 1250648.8561,
+                "usd1": 1527519.76904,
+                "p0": 79.87319641875351,
+                "p1": 97.41524738208248,
+                "usd_change": 276870.91293999995,
+                "quantity_effect": 2000.753274825656,
+                "price_effect": 274870.1596651744
+              },
+              {
+                "symbol": "UBTC",
+                "q0": 28.04179,
+                "q1": 28.11849,
+                "usd0": 2154562.40781,
+                "usd1": 2298535.9076,
+                "p0": 76833.98270260208,
+                "p1": 81744.64231898655,
+                "usd_change": 143973.49979000026,
+                "quantity_effect": 6081.4902695781175,
+                "price_effect": 137892.0095204221
+              },
+              {
+                "symbol": "USOL",
+                "q0": 4515.4022,
+                "q1": 4534.72583,
+                "usd0": 448821.92159,
+                "usd1": 509981.70594,
+                "p0": 99.39799417868024,
+                "p1": 112.4614199531441,
+                "usd_change": 61159.78435000003,
+                "quantity_effect": 2046.9464653500581,
+                "price_effect": 59112.83788464995
+              },
+              {
+                "symbol": "KHYPE",
+                "q0": 2867.01857,
+                "q1": 3599.9839,
+                "usd0": 227245.0499,
+                "usd1": 347323.83891,
+                "p0": 79.26179909605538,
+                "p1": 96.47927561842707,
+                "usd_change": 120078.78900999998,
+                "quantity_effect": 64406.057411327645,
+                "price_effect": 55672.73159867235
+              },
+              {
+                "symbol": "BEHYPE",
+                "q0": 1093.92505,
+                "q1": 1093.92868,
+                "usd0": 85318.25071,
+                "usd1": 104015.73027,
+                "p0": 77.99277538255477,
+                "p1": 95.08456279800617,
+                "usd_change": 18697.479560000007,
+                "quantity_effect": 0.3141353687916672,
+                "price_effect": 18697.16542463121
+              },
+              {
+                "symbol": "USDC",
+                "q0": 95750445.87991,
+                "q1": 58646121.10533,
+                "usd0": 95734994.52136,
+                "usd1": 58631166.73096,
+                "p0": 0.9998386288605967,
+                "p1": 0.9997450065905784,
+                "usd_change": -37103827.7904,
+                "quantity_effect": -37096600.3118579,
+                "price_effect": -7227.478542095413
+              },
+              {
+                "symbol": "USDT0",
+                "q0": 4055417.91682,
+                "q1": 3763089.34134,
+                "usd0": 4053691.58314,
+                "usd1": 3761944.39233,
+                "p0": 0.9995743142345848,
+                "p1": 0.9996957422728656,
+                "usd_change": -291747.1908099996,
+                "quantity_effect": -292221.88380932115,
+                "price_effect": 474.6929993215072
+              },
+              {
+                "symbol": "USDE",
+                "q0": 231519.87077,
+                "q1": 229531.43717,
+                "usd0": 231412.26311,
+                "usd1": 229492.90765,
+                "p0": 0.9995352119900459,
+                "p1": 0.9998321383751393,
+                "usd_change": -1919.3554599999916,
+                "quantity_effect": -1987.8046091045717,
+                "price_effect": 68.44914910459873
+              },
+              {
+                "symbol": "USR",
+                "q0": 230.41722,
+                "q1": 230.475,
+                "usd0": 24.97359,
+                "usd1": 21.92652,
+                "p0": 0.10838421711710611,
+                "p1": 0.0951362186788155,
+                "usd_change": -3.0470700000000015,
+                "quantity_effect": 0.0058797053901450055,
+                "price_effect": -3.0529497053901458
+              },
+              {
+                "symbol": "USDH",
+                "q0": 4136.92777,
+                "q1": 4221.63317,
+                "usd0": 4126.26587,
+                "usd1": 4208.3537,
+                "p0": 0.9974227492978442,
+                "p1": 0.9968544235215964,
+                "usd_change": 82.08782999999949,
+                "quantity_effect": 84.46302281726975,
+                "price_effect": -2.3751928172703543
+              }
+            ],
+            "excluded_symbols": []
+          }
+        }
+      }
+    }
+  }
+}

@@ -241,6 +241,19 @@
       "kill": "成行の向きを資金の純流入と読まない",
       "evidence": ["docs/taker-flow.md", "backtests/taker_flow.py"],
       "updated": "2026-11-19"
+    },
+    {
+      "id": "H-019",
+      "title": "短時間の変化の早期警戒（売りの吸収、抵抗線付近の圧縮、上抜けの確認）",
+      "class": "記述",
+      "payer": "未特定",
+      "observation": ["1 分足（受信時刻つき）", "成行の向き"],
+      "parameters": ["data.kline_ts_convention"],
+      "status": "descriptive_only",
+      "verdict": "現在の状態の診断で、検証済みの戦略ではない。1 回の上昇を見た後に作った規則で、既定値は仮置き",
+      "kill": "1 つの事例に合わせて値を探さない。受信時刻のない足を、当時使えたものとして扱わない",
+      "evidence": ["docs/early-warning.md", "live_signals/early_warning.py"],
+      "updated": "2026-11-19"
     }
   ]
 }

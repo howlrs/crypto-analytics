@@ -1,0 +1,1128 @@
+{
+  "server_time_ms": 1789976231827,
+  "hour_anchor_ms": 1789974000000,
+  "daily_anchor_ms": 1789948800000,
+  "scope": "Current descriptive public-data only. No source DB or sealed research modifications.",
+  "transport": "HTTPS through local allowlisted proxy, IPv4 and DNS bound to ExpressVPN eth1; no fallback",
+  "requests": [
+    {
+      "name": "BTC_binance_perp_1h",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1h&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976231958,
+      "status": "ok",
+      "bytes": 142154,
+      "sha256": "30e66af0ccdffbdfde7851fec838f61dc049dfea260e94169801b23e7479e7de",
+      "completed_ms": 1789976232195
+    },
+    {
+      "name": "BTC_binance_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976231958,
+      "status": "error",
+      "error": "<urlopen error Remote end closed connection without response>",
+      "completed_ms": 1789976251991
+    },
+    {
+      "name": "BTC_binance_perp_1d",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1d&limit=1000&endTime=1789948799999",
+      "payload": null,
+      "started_ms": 1789976231959,
+      "status": "error",
+      "error": "<urlopen error Remote end closed connection without response>",
+      "completed_ms": 1789976252001
+    },
+    {
+      "name": "BTC_binance_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789976232195,
+      "status": "ok",
+      "bytes": 4286,
+      "sha256": "87c4581736da13e516653fdee134695098ccf1deb5f13bbe2eb86154d37ef479",
+      "completed_ms": 1789976232253
+    },
+    {
+      "name": "BTC_binance_spot_1h",
+      "url": "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976232253,
+      "status": "ok",
+      "bytes": 178472,
+      "sha256": "d6f183b54dd69026d519aa01651d1ca9f8f46a40f1f3d06933a668debf115e01",
+      "completed_ms": 1789976232366
+    },
+    {
+      "name": "BTC_binance_spot_1m",
+      "url": "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976232366,
+      "status": "ok",
+      "bytes": 168914,
+      "sha256": "05ee7a6a7ac1728ae83a971a7ff12e1e3dae58e203fadf58a186b9af17e5bbeb",
+      "completed_ms": 1789976232482
+    },
+    {
+      "name": "BTC_binance_spot_book",
+      "url": "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789976232482,
+      "status": "ok",
+      "bytes": 6448,
+      "sha256": "76a83cf44839f9901cbafb35547c0a53fe7e6a41ddaae000b6d789b51dfefae2",
+      "completed_ms": 1789976232557
+    },
+    {
+      "name": "BTC_binance_oi_1h",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=BTCUSDT&period=1h&limit=500&endTime=1789974000000",
+      "payload": null,
+      "started_ms": 1789976232557,
+      "status": "ok",
+      "bytes": 85501,
+      "sha256": "5b758256bf0f7ec4b53667c07494f3383b9c7c99562608415e10453e08fbcda7",
+      "completed_ms": 1789976232648
+    },
+    {
+      "name": "BTC_binance_funding",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=BTCUSDT&startTime=1788764400000&endTime=1789976231827&limit=1000",
+      "payload": null,
+      "started_ms": 1789976232648,
+      "status": "ok",
+      "bytes": 5293,
+      "sha256": "1b5e8e06819fbe552a255aa38638a3716d180d7b1162db232ca5b3e7dc85f318",
+      "completed_ms": 1789976232712
+    },
+    {
+      "name": "BTC_binance_premium",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT",
+      "payload": null,
+      "started_ms": 1789976232712,
+      "status": "ok",
+      "bytes": 231,
+      "sha256": "dbb11ae1aa0eb86155be6ce0eba94897092b6a0da2e59ed5f10b6f67f7027d4d",
+      "completed_ms": 1789976232782
+    },
+    {
+      "name": "BTC_bybit_perp_1h",
+      "url": "https://api.bybit.com/v5/market/kline?category=linear&symbol=BTCUSDT&interval=60&limit=1000&end=1789973999999",
+      "payload": null,
+      "started_ms": 1789976232782,
+      "status": "ok",
+      "bytes": 83721,
+      "sha256": "05f8a4888c19201a0d128adbbafe5dc97d4259d33690c883b629d9209658c867",
+      "completed_ms": 1789976233109
+    },
+    {
+      "name": "BTC_bybit_ticker",
+      "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT",
+      "payload": null,
+      "started_ms": 1789976233109,
+      "status": "ok",
+      "bytes": 879,
+      "sha256": "8b00abd5b51b7dd9e42dae83496ed2ef2bdb2c8806251d50b8300fb6c629f206",
+      "completed_ms": 1789976233238
+    },
+    {
+      "name": "BTC_bybit_funding",
+      "url": "https://api.bybit.com/v5/market/funding/history?category=linear&symbol=BTCUSDT&startTime=1788764400000&endTime=1789976231827&limit=200",
+      "payload": null,
+      "started_ms": 1789976233238,
+      "status": "ok",
+      "bytes": 3745,
+      "sha256": "6d3fe7822d14b61a374114299a27b5fe4d7e418879c80ea2f8fc3873d5556b04",
+      "completed_ms": 1789976233369
+    },
+    {
+      "name": "BTC_hl_funding",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "fundingHistory",
+        "coin": "BTC",
+        "startTime": 1788764400000,
+        "endTime": 1789976231827
+      },
+      "started_ms": 1789976233369,
+      "status": "ok",
+      "bytes": 29988,
+      "sha256": "a583f13efcf8f2d2f7bdc89ca941ac24cf47569fd134564359cd8ab5cd63af4b",
+      "completed_ms": 1789976233763
+    },
+    {
+      "name": "BTC_hl_1h",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "candleSnapshot",
+        "req": {
+          "coin": "BTC",
+          "interval": "1h",
+          "startTime": 1786374000000,
+          "endTime": 1789973999999
+        }
+      },
+      "started_ms": 1789976233763,
+      "status": "ok",
+      "bytes": 138842,
+      "sha256": "fc9304c0c68b5f9cdc628b056f88213bb349079002dbaffb033ec02714cb82b9",
+      "completed_ms": 1789976233962
+    },
+    {
+      "name": "BTC_hl_book",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "l2Book",
+        "coin": "BTC"
+      },
+      "started_ms": 1789976233963,
+      "status": "ok",
+      "bytes": 1564,
+      "sha256": "261b3dd0291b4648f392d2ea38c5d7e8d28c5dbde1236efbbc364693976568ab",
+      "completed_ms": 1789976234023
+    },
+    {
+      "name": "ETH_binance_perp_1h",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1h&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976234023,
+      "status": "ok",
+      "bytes": 140952,
+      "sha256": "746e85a2afdc09f9170648a667b236add31af8317ca59c716fe461967660121d",
+      "completed_ms": 1789976234118
+    },
+    {
+      "name": "ETH_binance_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1m&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976234118,
+      "status": "ok",
+      "bytes": 132187,
+      "sha256": "1df8187fc1545f859f9b18b887c518a39e342a11ff98ae653d61db5da5bbbf17",
+      "completed_ms": 1789976234216
+    },
+    {
+      "name": "ETH_binance_perp_1d",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=ETHUSDT&interval=1d&limit=1000&endTime=1789948799999",
+      "payload": null,
+      "started_ms": 1789976234216,
+      "status": "ok",
+      "bytes": 148463,
+      "sha256": "39b4f91291e9b74de04b7a003d93b41f1acf1f033d8aa32f9b1585edde4fb45e",
+      "completed_ms": 1789976234316
+    },
+    {
+      "name": "ETH_binance_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=ETHUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789976234316,
+      "status": "ok",
+      "bytes": 4137,
+      "sha256": "0ebf8c53e3dc0a447fa47bae6cd1534bdcb4b0e75a456ec4160a880e640f06f7",
+      "completed_ms": 1789976234375
+    },
+    {
+      "name": "ETH_binance_spot_1h",
+      "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1h&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976234375,
+      "status": "ok",
+      "bytes": 176305,
+      "sha256": "145f4d433dc1ae66086bba2636331e3359b052821dc1562197c51ff1cf14ec3f",
+      "completed_ms": 1789976234488
+    },
+    {
+      "name": "ETH_binance_spot_1m",
+      "url": "https://api.binance.com/api/v3/klines?symbol=ETHUSDT&interval=1m&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976234488,
+      "status": "ok",
+      "bytes": 167280,
+      "sha256": "1dab2a16cf2cdbcb78252dddf6cf9d4a321341ca4224fc60f7b61b3f5a6b8633",
+      "completed_ms": 1789976234600
+    },
+    {
+      "name": "ETH_binance_spot_book",
+      "url": "https://api.binance.com/api/v3/depth?symbol=ETHUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789976234600,
+      "status": "ok",
+      "bytes": 6266,
+      "sha256": "bc964972e1d57a4e2a1e36665555ac42faf1c0e833a1be06ef97c1c1cc78e9dd",
+      "completed_ms": 1789976234664
+    },
+    {
+      "name": "ETH_binance_oi_1h",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=ETHUSDT&period=1h&limit=500&endTime=1789974000000",
+      "payload": null,
+      "started_ms": 1789976234664,
+      "status": "ok",
+      "bytes": 86501,
+      "sha256": "dd441a7f7719c4c268aa4af029f2e54656ecd624f612bc809b06aeebe4998e30",
+      "completed_ms": 1789976234770
+    },
+    {
+      "name": "ETH_binance_funding",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=ETHUSDT&startTime=1788764400000&endTime=1789976231827&limit=1000",
+      "payload": null,
+      "started_ms": 1789976234770,
+      "status": "ok",
+      "bytes": 5259,
+      "sha256": "416917c893cfb01d9e29d495fe221fb55928fd7565d73375c8ddd12b33d6b787",
+      "completed_ms": 1789976234839
+    },
+    {
+      "name": "ETH_binance_premium",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=ETHUSDT",
+      "payload": null,
+      "started_ms": 1789976234839,
+      "status": "ok",
+      "bytes": 228,
+      "sha256": "b7cc44674822aa260526e4b6dd5bfdce42aff4ca73cc360c43f7a6f1a629a865",
+      "completed_ms": 1789976234901
+    },
+    {
+      "name": "ETH_bybit_perp_1h",
+      "url": "https://api.bybit.com/v5/market/kline?category=linear&symbol=ETHUSDT&interval=60&limit=1000&end=1789973999999",
+      "payload": null,
+      "started_ms": 1789976234901,
+      "status": "ok",
+      "bytes": 84354,
+      "sha256": "62a294c83735f57264095da1f75e1f49e4e3a6aec34bc00a5eda081b62ab56a7",
+      "completed_ms": 1789976235205
+    },
+    {
+      "name": "ETH_bybit_ticker",
+      "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=ETHUSDT",
+      "payload": null,
+      "started_ms": 1789976235205,
+      "status": "ok",
+      "bytes": 872,
+      "sha256": "fc7504d96b0fe536e68cd649059097d5a21e23aec9b3bff99dc2c69131b9a731",
+      "completed_ms": 1789976235478
+    },
+    {
+      "name": "ETH_bybit_funding",
+      "url": "https://api.bybit.com/v5/market/funding/history?category=linear&symbol=ETHUSDT&startTime=1788764400000&endTime=1789976231827&limit=200",
+      "payload": null,
+      "started_ms": 1789976235478,
+      "status": "ok",
+      "bytes": 3736,
+      "sha256": "11087c48c7730776d4e79a781b9b74287fc24421e34558274b78fef56738f33d",
+      "completed_ms": 1789976235611
+    },
+    {
+      "name": "ETH_hl_funding",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "fundingHistory",
+        "coin": "ETH",
+        "startTime": 1788764400000,
+        "endTime": 1789976231827
+      },
+      "started_ms": 1789976235611,
+      "status": "ok",
+      "bytes": 29895,
+      "sha256": "bc7a6cb8351f5d7f55d4cf1bd3e928da60577a5fabcdc7ddd10cedc2baa33135",
+      "completed_ms": 1789976235725
+    },
+    {
+      "name": "ETH_hl_1h",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "candleSnapshot",
+        "req": {
+          "coin": "ETH",
+          "interval": "1h",
+          "startTime": 1786374000000,
+          "endTime": 1789973999999
+        }
+      },
+      "started_ms": 1789976235725,
+      "status": "ok",
+      "bytes": 134731,
+      "sha256": "0388568d88d40f7004f4c846314392478bac3190e98e2d79e45c491e9ca55f79",
+      "completed_ms": 1789976235914
+    },
+    {
+      "name": "ETH_hl_book",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "l2Book",
+        "coin": "ETH"
+      },
+      "started_ms": 1789976235915,
+      "status": "ok",
+      "bytes": 1572,
+      "sha256": "c12a8910241bfb7d075fb4811d28bc2d774f1bb7acf2614c4dfbf8da08390b4d",
+      "completed_ms": 1789976235983
+    },
+    {
+      "name": "HYPE_binance_perp_1h",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1h&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976235983,
+      "status": "ok",
+      "bytes": 145484,
+      "sha256": "2b49762ed17b0331cbc3e915063c6e1fc7aa39b75b7fb9f34d8781221c88b62c",
+      "completed_ms": 1789976236109
+    },
+    {
+      "name": "HYPE_binance_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1m&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976236109,
+      "status": "ok",
+      "bytes": 135992,
+      "sha256": "bf6f3fdd1e522051146bdd44d5d6668028e70a33ccba159981e53488d9507a76",
+      "completed_ms": 1789976236229
+    },
+    {
+      "name": "HYPE_binance_perp_1d",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=HYPEUSDT&interval=1d&limit=1000&endTime=1789948799999",
+      "payload": null,
+      "started_ms": 1789976236229,
+      "status": "ok",
+      "bytes": 72927,
+      "sha256": "12fc2c9c497efe3c59b9eada362120285f411f7aa16e0d200a914a74fabc37da",
+      "completed_ms": 1789976236326
+    },
+    {
+      "name": "HYPE_binance_perp_book",
+      "url": "https://fapi.binance.com/fapi/v1/depth?symbol=HYPEUSDT&limit=100",
+      "payload": null,
+      "started_ms": 1789976236326,
+      "status": "ok",
+      "bytes": 4235,
+      "sha256": "d97c66a5bd7f02f4d272645b315792d52040d350d19fc39a65e047a42e40afd7",
+      "completed_ms": 1789976237436
+    },
+    {
+      "name": "HYPE_binance_oi_1h",
+      "url": "https://fapi.binance.com/futures/data/openInterestHist?symbol=HYPEUSDT&period=1h&limit=500&endTime=1789974000000",
+      "payload": null,
+      "started_ms": 1789976237436,
+      "status": "ok",
+      "bytes": 86501,
+      "sha256": "dcd6397e8ed36785d328ec9730c71e02ff94b60e33258c9b20e08b47ccd781ed",
+      "completed_ms": 1789976237554
+    },
+    {
+      "name": "HYPE_binance_funding",
+      "url": "https://fapi.binance.com/fapi/v1/fundingRate?symbol=HYPEUSDT&startTime=1788764400000&endTime=1789976231827&limit=1000",
+      "payload": null,
+      "started_ms": 1789976237554,
+      "status": "ok",
+      "bytes": 10426,
+      "sha256": "897bf3747e24d1f26edc5fde32123d9b2e7c0d8153ab90d0d92fcd0902662ebd",
+      "completed_ms": 1789976237631
+    },
+    {
+      "name": "HYPE_binance_premium",
+      "url": "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=HYPEUSDT",
+      "payload": null,
+      "started_ms": 1789976237631,
+      "status": "ok",
+      "bytes": 223,
+      "sha256": "e9e91d972cc7f26397ad22ba8c0aec83429057786caba9edf99834901fce5560",
+      "completed_ms": 1789976237698
+    },
+    {
+      "name": "HYPE_bybit_perp_1h",
+      "url": "https://api.bybit.com/v5/market/kline?category=linear&symbol=HYPEUSDT&interval=60&limit=1000&end=1789973999999",
+      "payload": null,
+      "started_ms": 1789976237698,
+      "status": "ok",
+      "bytes": 76575,
+      "sha256": "72b54bf2009ddd794914c44108302743e1f9f96011c01cf52271a5ebc5707e6c",
+      "completed_ms": 1789976237860
+    },
+    {
+      "name": "HYPE_bybit_ticker",
+      "url": "https://api.bybit.com/v5/market/tickers?category=linear&symbol=HYPEUSDT",
+      "payload": null,
+      "started_ms": 1789976237860,
+      "status": "ok",
+      "bytes": 870,
+      "sha256": "32df1d01e9b3089f6c71c85e4f40fa508ba1c8709826e9c7e1820bb8c42f101e",
+      "completed_ms": 1789976238007
+    },
+    {
+      "name": "HYPE_bybit_funding",
+      "url": "https://api.bybit.com/v5/market/funding/history?category=linear&symbol=HYPEUSDT&startTime=1788764400000&endTime=1789976231827&limit=200",
+      "payload": null,
+      "started_ms": 1789976238007,
+      "status": "ok",
+      "bytes": 3737,
+      "sha256": "096f4d68cb2a3473c9394fd4870853db9b139ab8bf1cf43762e615a95fa88dd7",
+      "completed_ms": 1789976238191
+    },
+    {
+      "name": "HYPE_hl_funding",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "fundingHistory",
+        "coin": "HYPE",
+        "startTime": 1788764400000,
+        "endTime": 1789976231827
+      },
+      "started_ms": 1789976238191,
+      "status": "ok",
+      "bytes": 30240,
+      "sha256": "118e8bf6edae7ac245ae05d06f3cac2a861acb50b9a5db097dba2182b95c57f2",
+      "completed_ms": 1789976238308
+    },
+    {
+      "name": "HYPE_hl_1h",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "candleSnapshot",
+        "req": {
+          "coin": "HYPE",
+          "interval": "1h",
+          "startTime": 1786374000000,
+          "endTime": 1789973999999
+        }
+      },
+      "started_ms": 1789976238308,
+      "status": "ok",
+      "bytes": 134824,
+      "sha256": "7413c37de22a5ce532c631f2c9b521aaaefe7ccb3ecda7164ba9fe98a9646abf",
+      "completed_ms": 1789976238445
+    },
+    {
+      "name": "HYPE_hl_book",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "l2Book",
+        "coin": "HYPE"
+      },
+      "started_ms": 1789976238445,
+      "status": "ok",
+      "bytes": 1441,
+      "sha256": "b60999d863cea3c79dbe496a29a6b98ecc551a14c6f000f72f052a5d26c0caad",
+      "completed_ms": 1789976238582
+    },
+    {
+      "name": "HYPE_bybit_spot_1h",
+      "url": "https://api.bybit.com/v5/market/kline?category=spot&symbol=HYPEUSDT&interval=60&limit=1000&end=1789973999999",
+      "payload": null,
+      "started_ms": 1789976238582,
+      "status": "ok",
+      "bytes": 76973,
+      "sha256": "723d83b4c1fa583dc3e29a6d1af58eb2b4ba28bf8a95dd277d01b2383be1ee60",
+      "completed_ms": 1789976238749
+    },
+    {
+      "name": "HYPE_bybit_perp_1d",
+      "url": "https://api.bybit.com/v5/market/kline?category=linear&symbol=HYPEUSDT&interval=D&limit=1000&end=1789948799999",
+      "payload": null,
+      "started_ms": 1789976238749,
+      "status": "ok",
+      "bytes": 54947,
+      "sha256": "c78d40e571355408d7393d32e929e7a28296eee8d6e18110635a3cd1949e1d15",
+      "completed_ms": 1789976239238
+    },
+    {
+      "name": "HYPE_bybit_spot_book",
+      "url": "https://api.bybit.com/v5/market/orderbook?category=spot&symbol=HYPEUSDT&limit=50",
+      "payload": null,
+      "started_ms": 1789976239238,
+      "status": "ok",
+      "bytes": 2031,
+      "sha256": "9e99124f3f536a8dcc6e13a0cc3776b346f6b12c27459cedd36d6dfb22fd4167",
+      "completed_ms": 1789976239368
+    },
+    {
+      "name": "HYPE_bybit_oi_1h",
+      "url": "https://api.bybit.com/v5/market/open-interest?category=linear&symbol=HYPEUSDT&intervalTime=1h&limit=200&endTime=1789974000000",
+      "payload": null,
+      "started_ms": 1789976239368,
+      "status": "ok",
+      "bytes": 19755,
+      "sha256": "efd1ada0a2eba549a980b00739c8a0e9f3937ef88d5f190b2e42d8f4f9e47852",
+      "completed_ms": 1789976239511
+    },
+    {
+      "name": "hl_meta_contexts",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "metaAndAssetCtxs"
+      },
+      "started_ms": 1789976239511,
+      "status": "ok",
+      "bytes": 72455,
+      "sha256": "565b4730b29c8731fc964bc3fa4537e286aed15720b54ba7c37dd55ab3278822",
+      "completed_ms": 1789976239657
+    },
+    {
+      "name": "hl_spot_meta_contexts",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "spotMetaAndAssetCtxs"
+      },
+      "started_ms": 1789976239658,
+      "status": "ok",
+      "bytes": 298540,
+      "sha256": "3267bde93b9bebb87ae56569fb930d6927cc240a6361d21e6b7928376590c535",
+      "completed_ms": 1789976239786
+    },
+    {
+      "name": "HYPE_hl_spot_1h",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "candleSnapshot",
+        "req": {
+          "coin": "@107",
+          "interval": "1h",
+          "startTime": 1786374000000,
+          "endTime": 1789973999999
+        }
+      },
+      "started_ms": 1789976252003,
+      "status": "ok",
+      "bytes": 133101,
+      "sha256": "fb136e7b5cf84249fb7589e1819c2b74e206d5f5977cddafd4e4fa8556dfbd73",
+      "completed_ms": 1789976252112
+    },
+    {
+      "name": "HYPE_hl_spot_book",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "l2Book",
+        "coin": "@107"
+      },
+      "started_ms": 1789976252112,
+      "status": "ok",
+      "bytes": 1441,
+      "sha256": "786101cc9f280d8294454bc95e42e5f4da411a18244f1c0d3f5cda6b874254f7",
+      "completed_ms": 1789976252194
+    },
+    {
+      "name": "HYPE_hl_1d",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "candleSnapshot",
+        "req": {
+          "coin": "HYPE",
+          "interval": "1d",
+          "startTime": 1703548800000,
+          "endTime": 1789948799999
+        }
+      },
+      "started_ms": 1789976252194,
+      "status": "ok",
+      "bytes": 94754,
+      "sha256": "b21ad12660cb25cc09eaa899c684c37111eb3b6ca56abbb1783391cc0ab9d8d8",
+      "completed_ms": 1789976252319
+    },
+    {
+      "name": "BTC_binance_perp_1m",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1m&limit=1000&endTime=1789973999999",
+      "payload": null,
+      "started_ms": 1789976299459,
+      "status": "ok",
+      "error": null,
+      "completed_ms": 1789976299555,
+      "retry": 1,
+      "bytes": 132612,
+      "sha256": "61e8cbfaf81acea6894c03de7219d52130dc357d1591a24aae631925c5b97e2b"
+    },
+    {
+      "name": "BTC_binance_perp_1d",
+      "url": "https://fapi.binance.com/fapi/v1/klines?symbol=BTCUSDT&interval=1d&limit=1000&endTime=1789948799999",
+      "payload": null,
+      "started_ms": 1789976299555,
+      "status": "ok",
+      "error": null,
+      "completed_ms": 1789976299651,
+      "retry": 1,
+      "bytes": 151064,
+      "sha256": "c11389dbbcc5e3d12a7ffc0e976035a82f2b6019f4eb90999e2037c5f17e4172"
+    },
+    {
+      "name": "BTC_binance_spot_refresh",
+      "url": "https://api.binance.com/api/v3/ticker/bookTicker?symbol=BTCUSDT",
+      "payload": null,
+      "started_ms": 1789977033482,
+      "completed_ms": 1789977033977,
+      "status": "ok",
+      "sha256": "34b7c54a492a8da49b1d8d716a5d701a50afccb65c34eb508cb65f9c0e462092",
+      "bytes": 120
+    },
+    {
+      "name": "ETH_binance_spot_refresh",
+      "url": "https://api.binance.com/api/v3/ticker/bookTicker?symbol=ETHUSDT",
+      "payload": null,
+      "started_ms": 1789977033977,
+      "completed_ms": 1789977034041,
+      "status": "ok",
+      "sha256": "fa821acb72ebf255d93f8ab80df93409cd9a3ca307d25107827fc5529d6105a1",
+      "bytes": 120
+    },
+    {
+      "name": "HYPE_bybit_spot_refresh",
+      "url": "https://api.bybit.com/v5/market/tickers?category=spot&symbol=HYPEUSDT",
+      "payload": null,
+      "started_ms": 1789977034041,
+      "completed_ms": 1789977034247,
+      "status": "ok",
+      "sha256": "93c745c68d6f801fbf09168bbcbca1af86d763d116c145a6987044aad83fa299",
+      "bytes": 399
+    },
+    {
+      "name": "ALL_hl_context_refresh",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "metaAndAssetCtxs"
+      },
+      "started_ms": 1789977034247,
+      "completed_ms": 1789977034569,
+      "status": "ok",
+      "sha256": "c7107af273b73479a2ea3d8c7c0605f0cf908e17c0a6196375232305b4eb9f4a",
+      "bytes": 72199
+    }
+  ],
+  "hype_native_spot_pair": {
+    "tokens": [
+      150,
+      0
+    ],
+    "name": "@107",
+    "index": 107,
+    "isCanonical": false
+  },
+  "completed_ms": 1789976252319,
+  "bundle_created_utc": "2026-09-21T07:57:52.470704+00:00",
+  "notes": [
+    "Archive contains only public market data, no watch-position DB, wallet addresses, or raw wallet logs.",
+    "FRED source retrieval time below is file modification time; original HTTP timing was not recorded.",
+    "HL cohort and HYPE live observations are included as aggregate-only JSON in data.json."
+  ],
+  "archived_files": [
+    {
+      "file": "ALL_hl_context_refresh.json",
+      "bytes": 72199,
+      "sha256": "c7107af273b73479a2ea3d8c7c0605f0cf908e17c0a6196375232305b4eb9f4a"
+    },
+    {
+      "file": "BTC_binance_funding.json",
+      "bytes": 5293,
+      "sha256": "1b5e8e06819fbe552a255aa38638a3716d180d7b1162db232ca5b3e7dc85f318"
+    },
+    {
+      "file": "BTC_binance_oi_1h.json",
+      "bytes": 85501,
+      "sha256": "5b758256bf0f7ec4b53667c07494f3383b9c7c99562608415e10453e08fbcda7"
+    },
+    {
+      "file": "BTC_binance_perp_1d.json",
+      "bytes": 151064,
+      "sha256": "c11389dbbcc5e3d12a7ffc0e976035a82f2b6019f4eb90999e2037c5f17e4172"
+    },
+    {
+      "file": "BTC_binance_perp_1h.json",
+      "bytes": 142154,
+      "sha256": "30e66af0ccdffbdfde7851fec838f61dc049dfea260e94169801b23e7479e7de"
+    },
+    {
+      "file": "BTC_binance_perp_1m.json",
+      "bytes": 132612,
+      "sha256": "61e8cbfaf81acea6894c03de7219d52130dc357d1591a24aae631925c5b97e2b"
+    },
+    {
+      "file": "BTC_binance_perp_book.json",
+      "bytes": 4286,
+      "sha256": "87c4581736da13e516653fdee134695098ccf1deb5f13bbe2eb86154d37ef479"
+    },
+    {
+      "file": "BTC_binance_premium.json",
+      "bytes": 231,
+      "sha256": "dbb11ae1aa0eb86155be6ce0eba94897092b6a0da2e59ed5f10b6f67f7027d4d"
+    },
+    {
+      "file": "BTC_binance_spot_1h.json",
+      "bytes": 178472,
+      "sha256": "d6f183b54dd69026d519aa01651d1ca9f8f46a40f1f3d06933a668debf115e01"
+    },
+    {
+      "file": "BTC_binance_spot_1m.json",
+      "bytes": 168914,
+      "sha256": "05ee7a6a7ac1728ae83a971a7ff12e1e3dae58e203fadf58a186b9af17e5bbeb"
+    },
+    {
+      "file": "BTC_binance_spot_book.json",
+      "bytes": 6448,
+      "sha256": "76a83cf44839f9901cbafb35547c0a53fe7e6a41ddaae000b6d789b51dfefae2"
+    },
+    {
+      "file": "BTC_binance_spot_refresh.json",
+      "bytes": 120,
+      "sha256": "34b7c54a492a8da49b1d8d716a5d701a50afccb65c34eb508cb65f9c0e462092"
+    },
+    {
+      "file": "BTC_bybit_funding.json",
+      "bytes": 3745,
+      "sha256": "6d3fe7822d14b61a374114299a27b5fe4d7e418879c80ea2f8fc3873d5556b04"
+    },
+    {
+      "file": "BTC_bybit_perp_1h.json",
+      "bytes": 83721,
+      "sha256": "05f8a4888c19201a0d128adbbafe5dc97d4259d33690c883b629d9209658c867"
+    },
+    {
+      "file": "BTC_bybit_ticker.json",
+      "bytes": 879,
+      "sha256": "8b00abd5b51b7dd9e42dae83496ed2ef2bdb2c8806251d50b8300fb6c629f206"
+    },
+    {
+      "file": "BTC_hl_1h.json",
+      "bytes": 138842,
+      "sha256": "fc9304c0c68b5f9cdc628b056f88213bb349079002dbaffb033ec02714cb82b9"
+    },
+    {
+      "file": "BTC_hl_book.json",
+      "bytes": 1564,
+      "sha256": "261b3dd0291b4648f392d2ea38c5d7e8d28c5dbde1236efbbc364693976568ab"
+    },
+    {
+      "file": "BTC_hl_funding.json",
+      "bytes": 29988,
+      "sha256": "a583f13efcf8f2d2f7bdc89ca941ac24cf47569fd134564359cd8ab5cd63af4b"
+    },
+    {
+      "file": "ETH_binance_funding.json",
+      "bytes": 5259,
+      "sha256": "416917c893cfb01d9e29d495fe221fb55928fd7565d73375c8ddd12b33d6b787"
+    },
+    {
+      "file": "ETH_binance_oi_1h.json",
+      "bytes": 86501,
+      "sha256": "dd441a7f7719c4c268aa4af029f2e54656ecd624f612bc809b06aeebe4998e30"
+    },
+    {
+      "file": "ETH_binance_perp_1d.json",
+      "bytes": 148463,
+      "sha256": "39b4f91291e9b74de04b7a003d93b41f1acf1f033d8aa32f9b1585edde4fb45e"
+    },
+    {
+      "file": "ETH_binance_perp_1h.json",
+      "bytes": 140952,
+      "sha256": "746e85a2afdc09f9170648a667b236add31af8317ca59c716fe461967660121d"
+    },
+    {
+      "file": "ETH_binance_perp_1m.json",
+      "bytes": 132187,
+      "sha256": "1df8187fc1545f859f9b18b887c518a39e342a11ff98ae653d61db5da5bbbf17"
+    },
+    {
+      "file": "ETH_binance_perp_book.json",
+      "bytes": 4137,
+      "sha256": "0ebf8c53e3dc0a447fa47bae6cd1534bdcb4b0e75a456ec4160a880e640f06f7"
+    },
+    {
+      "file": "ETH_binance_premium.json",
+      "bytes": 228,
+      "sha256": "b7cc44674822aa260526e4b6dd5bfdce42aff4ca73cc360c43f7a6f1a629a865"
+    },
+    {
+      "file": "ETH_binance_spot_1h.json",
+      "bytes": 176305,
+      "sha256": "145f4d433dc1ae66086bba2636331e3359b052821dc1562197c51ff1cf14ec3f"
+    },
+    {
+      "file": "ETH_binance_spot_1m.json",
+      "bytes": 167280,
+      "sha256": "1dab2a16cf2cdbcb78252dddf6cf9d4a321341ca4224fc60f7b61b3f5a6b8633"
+    },
+    {
+      "file": "ETH_binance_spot_book.json",
+      "bytes": 6266,
+      "sha256": "bc964972e1d57a4e2a1e36665555ac42faf1c0e833a1be06ef97c1c1cc78e9dd"
+    },
+    {
+      "file": "ETH_binance_spot_refresh.json",
+      "bytes": 120,
+      "sha256": "fa821acb72ebf255d93f8ab80df93409cd9a3ca307d25107827fc5529d6105a1"
+    },
+    {
+      "file": "ETH_bybit_funding.json",
+      "bytes": 3736,
+      "sha256": "11087c48c7730776d4e79a781b9b74287fc24421e34558274b78fef56738f33d"
+    },
+    {
+      "file": "ETH_bybit_perp_1h.json",
+      "bytes": 84354,
+      "sha256": "62a294c83735f57264095da1f75e1f49e4e3a6aec34bc00a5eda081b62ab56a7"
+    },
+    {
+      "file": "ETH_bybit_ticker.json",
+      "bytes": 872,
+      "sha256": "fc7504d96b0fe536e68cd649059097d5a21e23aec9b3bff99dc2c69131b9a731"
+    },
+    {
+      "file": "ETH_hl_1h.json",
+      "bytes": 134731,
+      "sha256": "0388568d88d40f7004f4c846314392478bac3190e98e2d79e45c491e9ca55f79"
+    },
+    {
+      "file": "ETH_hl_book.json",
+      "bytes": 1572,
+      "sha256": "c12a8910241bfb7d075fb4811d28bc2d774f1bb7acf2614c4dfbf8da08390b4d"
+    },
+    {
+      "file": "ETH_hl_funding.json",
+      "bytes": 29895,
+      "sha256": "bc7a6cb8351f5d7f55d4cf1bd3e928da60577a5fabcdc7ddd10cedc2baa33135"
+    },
+    {
+      "file": "HYPE_binance_funding.json",
+      "bytes": 10426,
+      "sha256": "897bf3747e24d1f26edc5fde32123d9b2e7c0d8153ab90d0d92fcd0902662ebd"
+    },
+    {
+      "file": "HYPE_binance_oi_1h.json",
+      "bytes": 86501,
+      "sha256": "dcd6397e8ed36785d328ec9730c71e02ff94b60e33258c9b20e08b47ccd781ed"
+    },
+    {
+      "file": "HYPE_binance_perp_1d.json",
+      "bytes": 72927,
+      "sha256": "12fc2c9c497efe3c59b9eada362120285f411f7aa16e0d200a914a74fabc37da"
+    },
+    {
+      "file": "HYPE_binance_perp_1h.json",
+      "bytes": 145484,
+      "sha256": "2b49762ed17b0331cbc3e915063c6e1fc7aa39b75b7fb9f34d8781221c88b62c"
+    },
+    {
+      "file": "HYPE_binance_perp_1m.json",
+      "bytes": 135992,
+      "sha256": "bf6f3fdd1e522051146bdd44d5d6668028e70a33ccba159981e53488d9507a76"
+    },
+    {
+      "file": "HYPE_binance_perp_book.json",
+      "bytes": 4235,
+      "sha256": "d97c66a5bd7f02f4d272645b315792d52040d350d19fc39a65e047a42e40afd7"
+    },
+    {
+      "file": "HYPE_binance_premium.json",
+      "bytes": 223,
+      "sha256": "e9e91d972cc7f26397ad22ba8c0aec83429057786caba9edf99834901fce5560"
+    },
+    {
+      "file": "HYPE_bybit_funding.json",
+      "bytes": 3737,
+      "sha256": "096f4d68cb2a3473c9394fd4870853db9b139ab8bf1cf43762e615a95fa88dd7"
+    },
+    {
+      "file": "HYPE_bybit_oi_1h.json",
+      "bytes": 19755,
+      "sha256": "efd1ada0a2eba549a980b00739c8a0e9f3937ef88d5f190b2e42d8f4f9e47852"
+    },
+    {
+      "file": "HYPE_bybit_perp_1d.json",
+      "bytes": 54947,
+      "sha256": "c78d40e571355408d7393d32e929e7a28296eee8d6e18110635a3cd1949e1d15"
+    },
+    {
+      "file": "HYPE_bybit_perp_1h.json",
+      "bytes": 76575,
+      "sha256": "72b54bf2009ddd794914c44108302743e1f9f96011c01cf52271a5ebc5707e6c"
+    },
+    {
+      "file": "HYPE_bybit_spot_1h.json",
+      "bytes": 76973,
+      "sha256": "723d83b4c1fa583dc3e29a6d1af58eb2b4ba28bf8a95dd277d01b2383be1ee60"
+    },
+    {
+      "file": "HYPE_bybit_spot_book.json",
+      "bytes": 2031,
+      "sha256": "9e99124f3f536a8dcc6e13a0cc3776b346f6b12c27459cedd36d6dfb22fd4167"
+    },
+    {
+      "file": "HYPE_bybit_spot_refresh.json",
+      "bytes": 399,
+      "sha256": "93c745c68d6f801fbf09168bbcbca1af86d763d116c145a6987044aad83fa299"
+    },
+    {
+      "file": "HYPE_bybit_ticker.json",
+      "bytes": 870,
+      "sha256": "32df1d01e9b3089f6c71c85e4f40fa508ba1c8709826e9c7e1820bb8c42f101e"
+    },
+    {
+      "file": "HYPE_hl_1d.json",
+      "bytes": 94754,
+      "sha256": "b21ad12660cb25cc09eaa899c684c37111eb3b6ca56abbb1783391cc0ab9d8d8"
+    },
+    {
+      "file": "HYPE_hl_1h.json",
+      "bytes": 134824,
+      "sha256": "7413c37de22a5ce532c631f2c9b521aaaefe7ccb3ecda7164ba9fe98a9646abf"
+    },
+    {
+      "file": "HYPE_hl_book.json",
+      "bytes": 1441,
+      "sha256": "b60999d863cea3c79dbe496a29a6b98ecc551a14c6f000f72f052a5d26c0caad"
+    },
+    {
+      "file": "HYPE_hl_funding.json",
+      "bytes": 30240,
+      "sha256": "118e8bf6edae7ac245ae05d06f3cac2a861acb50b9a5db097dba2182b95c57f2"
+    },
+    {
+      "file": "HYPE_hl_spot_1h.json",
+      "bytes": 133101,
+      "sha256": "fb136e7b5cf84249fb7589e1819c2b74e206d5f5977cddafd4e4fa8556dfbd73"
+    },
+    {
+      "file": "HYPE_hl_spot_book.json",
+      "bytes": 1441,
+      "sha256": "786101cc9f280d8294454bc95e42e5f4da411a18244f1c0d3f5cda6b874254f7"
+    },
+    {
+      "file": "fred_indices.csv",
+      "bytes": 549293,
+      "sha256": "baecaa028e8c248668881416369e29710bc91a4b4a004d79f6b7e56202ef78b1",
+      "url": "https://fred.stlouisfed.org/graph/fredgraph.csv?id=SP500,NASDAQ100,DJIA,NIKKEI225&cosd=2024-01-01&coed=2026-09-21",
+      "file_mtime_utc": "2026-09-21T07:39:25.782247+00:00"
+    },
+    {
+      "file": "hl_meta_contexts.json",
+      "bytes": 72455,
+      "sha256": "565b4730b29c8731fc964bc3fa4537e286aed15720b54ba7c37dd55ab3278822"
+    }
+  ],
+  "analysis_scripts": [
+    {
+      "file": "/tmp/crypto-full-report.cwSLxC/market_metrics.py",
+      "sha256": "e7874f49ac3e16436ade7290ccde226b03caf5ef5fd5011c93b4797892e49395"
+    },
+    {
+      "file": "/tmp/crypto-full-report.cwSLxC/regime/build_regime_report.py",
+      "sha256": "308fdb9dfc0ffe1136bef3007f69cb6168eab2281add21f52e02ae9cc797afc4"
+    },
+    {
+      "file": "/tmp/crypto-full-report.cwSLxC/hl/observe.py",
+      "sha256": "24e9ea01a9fa2482e9b907df20d2cb8484725b3677379c7c3822e43e05723f8e"
+    },
+    {
+      "file": "/tmp/crypto-full-report.cwSLxC/hype_live/collect_hype_live.py",
+      "sha256": "a2e8d2fc40031a0c193aa300389592def0ffadb46660ebd5f0871ae7365db3f6"
+    }
+  ],
+  "historical_manifests": [
+    {
+      "accepted_events": 954,
+      "cutoff_exit_ts_exclusive": 1785542400000,
+      "db": "/mnt/e/Datas/market/market.db",
+      "db_mtime_ns": 1786422844752028500,
+      "db_size_bytes": 2326597632,
+      "format": 1,
+      "inputs": [
+        {
+          "path": "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_btc_long_ret-2_oi-1_entry0_exit24h.csv",
+          "sha256": "9247bffe5771ad6d7e9de08f51b0a85976bc998a9396d42a9d1330679ee8d6b9"
+        },
+        {
+          "path": "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_btc_long_ret-2_oi-1_entry0_exit4h.csv",
+          "sha256": "e27a80d5e4f5ab7bb9921b35ac5ec34d95b699092d9b2380ce434f2560b3420a"
+        },
+        {
+          "path": "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_eth_long_ret-2_oi-1_entry0_exit24h.csv",
+          "sha256": "1b8017330d4513970d64e2a5012c656028a2fb37925ca4e9bba0fd52c39c7e4a"
+        },
+        {
+          "path": "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_eth_long_ret-2_oi-1_entry0_exit4h.csv",
+          "sha256": "21612ddd61c87f91a25248a273f696e4c30bc46b5b0ab23b01c336edab2966e6"
+        }
+      ],
+      "output_sha256": {
+        "event_path_metrics.csv": "4603564f5ca2f071576836248cc0f859202a5171ee76c491b53d35d80ed95b26",
+        "event_path_rejected.csv": "4143453c7988c84cdac678f87b2936260c2b9bf0b77a2d9f4bb64250b037a77c",
+        "event_path_summary.csv": "6e11294163134478c2157ed98f9e5cc1505128a2d22559449d1386f3ae72559e"
+      },
+      "outputs": [
+        "event_path_metrics.csv",
+        "event_path_rejected.csv",
+        "event_path_summary.csv"
+      ],
+      "rejected_events": 0,
+      "script_sha256": "4e2f092ebd4cefc657dd7161f392be6c470bba3c783722e9305f546b830775db",
+      "stop_bp": 100.0,
+      "take_bp": 100.0
+    },
+    {
+      "cutoff_exclusive_ts": 1785542400000,
+      "source_round_trip_cost_bp": 14.0,
+      "prior_completed_minutes": 60,
+      "event_files": [
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_btc_long_ret-2_oi-1_entry0_exit24h.csv",
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_btc_long_ret-2_oi-1_entry0_exit4h.csv",
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_eth_long_ret-2_oi-1_entry0_exit24h.csv",
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_eth_long_ret-2_oi-1_entry0_exit4h.csv"
+      ],
+      "event_file_sha256": {
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_btc_long_ret-2_oi-1_entry0_exit24h.csv": "9247bffe5771ad6d7e9de08f51b0a85976bc998a9396d42a9d1330679ee8d6b9",
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_btc_long_ret-2_oi-1_entry0_exit4h.csv": "e27a80d5e4f5ab7bb9921b35ac5ec34d95b699092d9b2380ce434f2560b3420a",
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_eth_long_ret-2_oi-1_entry0_exit24h.csv": "1b8017330d4513970d64e2a5012c656028a2fb37925ca4e9bba0fd52c39c7e4a",
+        "/home/o9oem/workspace/crypto/analytics/results/liq_reversion/events_eth_long_ret-2_oi-1_entry0_exit4h.csv": "21612ddd61c87f91a25248a273f696e4c30bc46b5b0ab23b01c336edab2966e6"
+      },
+      "database": {
+        "path": "/mnt/e/Datas/market/market.db",
+        "bytes": 2326597632,
+        "mtime_ns": 1786422844752028500,
+        "before": {
+          "bytes": 2326597632,
+          "mtime_ns": 1786422844752028500
+        },
+        "after": {
+          "bytes": 2326597632,
+          "mtime_ns": 1786422844752028500
+        }
+      },
+      "script_sha256": "e3b775cea5b699f2e2e4bd9f7f58f8f2e41726c55118d84fd23f98c28a7086ca",
+      "quote_volume_sha256": {
+        "BTCUSDT": "b89d303edc86bbaed44de67bd75abb8c4e719ea62d0d3332db32b617991c798d",
+        "ETHUSDT": "7a7b908d8d89ae3aacccbac0058e41ba50bf0463413abb1b04cd4a83a54f40c7"
+      },
+      "outputs_sha256": {
+        "common_set_deltas.csv": "dd69666126731aed427905c68ef4907eb8d117f0a9bfcce2d39ecd089fb82d3e",
+        "execution_ledger.csv": "7009aa70064f096ccf64ae9dec79c42be32aca6c0872af9d5eb539b4d922a0b4",
+        "scenario_summary.csv": "f421644feb5a53c37f9ec7f73c29725793d3e11da9ddcbd752cd85e27dc6308f"
+      },
+      "reference_scenario": "baseline_10k_14bp",
+      "impact_model": "per-leg coefficient_bp * sqrt(notional_usd / prior_60m_median_quote_volume)",
+      "disclaimer": "Hypothetical capacity proxy; not observed order-book impact or fill evidence.",
+      "scenarios": [
+        {
+          "name": "baseline_10k_14bp",
+          "notional_usd": 10000.0,
+          "max_participation": 0.1,
+          "fee_bp_one_way": 5.0,
+          "slippage_bp_one_way": 2.0,
+          "impact_coefficient_bp": 0.0
+        },
+        {
+          "name": "impact_100k",
+          "notional_usd": 100000.0,
+          "max_participation": 0.1,
+          "fee_bp_one_way": 5.0,
+          "slippage_bp_one_way": 2.0,
+          "impact_coefficient_bp": 10.0
+        },
+        {
+          "name": "impact_1m",
+          "notional_usd": 1000000.0,
+          "max_participation": 0.1,
+          "fee_bp_one_way": 5.0,
+          "slippage_bp_one_way": 2.0,
+          "impact_coefficient_bp": 10.0
+        }
+      ],
+      "outputs": [
+        "execution_ledger.csv",
+        "scenario_summary.csv",
+        "common_set_deltas.csv"
+      ]
+    }
+  ]
+}

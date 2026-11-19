@@ -1,0 +1,890 @@
+{
+  "generated_utc": "2026-09-21T16:36:21.024777+00:00",
+  "hlp": {
+    "name": "Hyperliquidity Provider (HLP)",
+    "address": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303",
+    "reported_apr_pct": 3.290494436758107,
+    "allow_deposits": true,
+    "periods": {
+      "day": {
+        "start_utc": "2026-09-20T16:05:44.322000+00:00",
+        "end_utc": "2026-09-21T16:30:08.831000+00:00",
+        "elapsed_hours": 24.406808055555555,
+        "account_value_start": 186409595.857415,
+        "account_value_end": 186072750.649912,
+        "pnl_delta": 3809.162497,
+        "account_value_change_pct": -0.18070164572463465,
+        "pnl_over_start_pct": 0.00204343691615191,
+        "residual_flow_proxy": -340654.369999991
+      },
+      "week": {
+        "start_utc": "2026-09-14T14:52:05.269000+00:00",
+        "end_utc": "2026-09-21T16:30:08.831000+00:00",
+        "elapsed_hours": 169.63432277777778,
+        "account_value_start": 186980311.625331,
+        "account_value_end": 186072750.649912,
+        "pnl_delta": 108318.474581,
+        "account_value_change_pct": -0.48537782803441676,
+        "pnl_over_start_pct": 0.057930417186408005,
+        "residual_flow_proxy": -1015879.4500000147
+      },
+      "perpDay": {
+        "start_utc": "2026-09-20T16:05:44.322000+00:00",
+        "end_utc": "2026-09-21T16:30:08.831000+00:00",
+        "elapsed_hours": 24.406808055555555,
+        "account_value_start": 46969921.043968,
+        "account_value_end": 46661951.80735,
+        "pnl_delta": 32685.133382,
+        "account_value_change_pct": -0.6556733112872637,
+        "pnl_over_start_pct": 0.06958737135496529,
+        "residual_flow_proxy": -340654.3699999973
+      },
+      "perpWeek": {
+        "start_utc": "2026-09-14T14:52:05.269000+00:00",
+        "end_utc": "2026-09-21T16:30:08.831000+00:00",
+        "elapsed_hours": 169.63432277777778,
+        "account_value_start": 47579348.76423,
+        "account_value_end": 46661951.80735,
+        "pnl_delta": 161044.82312,
+        "account_value_change_pct": -1.9281410542754007,
+        "pnl_over_start_pct": 0.3384763081101122,
+        "residual_flow_proxy": -1078441.7799999958
+      }
+    },
+    "queried_child_perps": {
+      "child_count": 7,
+      "gross_notional": 9293717.434361992,
+      "margin_used": 464685.871594,
+      "maintenance_margin_used": 92937.174195,
+      "reference_parent_perp_equity": 46661951.80735,
+      "gross_over_reference_pct": 19.91712106842921,
+      "margin_over_reference_pct": 0.9958560531555061,
+      "maintenance_over_reference_pct": 0.19917121036578866,
+      "selected_assets": {
+        "BTC": {
+          "net_notional": -8284.566275999998,
+          "gross_notional": 99578.956756,
+          "net_size": -0.09638999999999998
+        },
+        "ETH": {
+          "net_notional": -18454.470060000003,
+          "gross_notional": 18454.470060000003,
+          "net_size": -6.667800000000001
+        },
+        "HYPE": {
+          "net_notional": 5420.5142399999995,
+          "gross_notional": 20854.72512,
+          "net_size": 58.17999999999999
+        }
+      },
+      "scope": "Officially linked children, default clearinghouse perps only; not consolidated total HLP holdings."
+    }
+  },
+  "dex_history": [
+    {
+      "label": "ProjectX WHYPE-USDC 0.05%",
+      "pool": "f55a970c-7fdb-4087-8c62-258287e7a6cd",
+      "project": "project-x",
+      "symbol": "WHYPE-USDC",
+      "chart_latest_timestamp": "2026-09-21T16:02:35.604Z",
+      "chart_latest_tvl_usd": 14717333,
+      "chart_latest_apy": 40.32418,
+      "history_observation_count": 243,
+      "history_gaps_over_30h": [
+        {
+          "from": "2026-09-09T16:01:57.407Z",
+          "to": "2026-09-16T23:02:23.704Z",
+          "elapsed_hours": 175.00730472222222
+        }
+      ],
+      "snapshot_tvl_usd": 14717333,
+      "snapshot_apy": 40.32418,
+      "snapshot_apy_base": 40.32418,
+      "snapshot_apy_reward": null,
+      "volume_1d_usd": 37812324.9605,
+      "volume_7d_usd": null,
+      "provider_apy_pct_1d": 18.0029,
+      "provider_apy_pct_7d": null,
+      "comparison_1d_available": true,
+      "comparison_1d_prior_timestamp": "2026-09-20T23:02:20.930Z",
+      "comparison_1d_elapsed_hours": 17.00407611111111,
+      "comparison_1d_target_distance_hours": 6.995923888888889,
+      "tvl_change_1d_pct": -1.4912325030747686,
+      "apy_change_1d_pp": 3.544239999999995,
+      "comparison_7d_available": false,
+      "comparison_7d_reason": "no observation within 12h of target",
+      "turnover_1d": 2.5692375758909582
+    },
+    {
+      "label": "ProjectX WHYPE-UETH 0.3%",
+      "pool": "5f952da0-ffd8-4665-9314-9319e4cafaa8",
+      "project": "project-x",
+      "symbol": "WHYPE-UETH",
+      "chart_latest_timestamp": "2026-09-21T16:02:35.604Z",
+      "chart_latest_tvl_usd": 1992514,
+      "chart_latest_apy": 39.56236,
+      "history_observation_count": 243,
+      "history_gaps_over_30h": [
+        {
+          "from": "2026-09-09T16:01:57.407Z",
+          "to": "2026-09-16T23:02:23.704Z",
+          "elapsed_hours": 175.00730472222222
+        }
+      ],
+      "snapshot_tvl_usd": 1992514,
+      "snapshot_apy": 39.56236,
+      "snapshot_apy_base": 39.56236,
+      "snapshot_apy_reward": null,
+      "volume_1d_usd": 837087.58679,
+      "volume_7d_usd": null,
+      "provider_apy_pct_1d": 24.85511,
+      "provider_apy_pct_7d": null,
+      "comparison_1d_available": true,
+      "comparison_1d_prior_timestamp": "2026-09-20T23:02:20.930Z",
+      "comparison_1d_elapsed_hours": 17.00407611111111,
+      "comparison_1d_target_distance_hours": 6.995923888888889,
+      "tvl_change_1d_pct": 3.7715282092519287,
+      "apy_change_1d_pp": 16.15883,
+      "comparison_7d_available": false,
+      "comparison_7d_reason": "no observation within 12h of target",
+      "turnover_1d": 0.42011628866346734
+    },
+    {
+      "label": "nest-cl WHYPE-USDC",
+      "pool": "afe2c8c8-2ab8-4f1b-abda-a8a12718c431",
+      "project": "nest-cl",
+      "symbol": "WHYPE-USDC",
+      "chart_latest_timestamp": "2026-09-21T16:01:32.244Z",
+      "chart_latest_tvl_usd": 8731876,
+      "chart_latest_apy": 110.726,
+      "history_observation_count": 217,
+      "history_gaps_over_30h": [],
+      "snapshot_tvl_usd": 8731876,
+      "snapshot_apy": 110.726,
+      "snapshot_apy_base": null,
+      "snapshot_apy_reward": 110.726,
+      "volume_1d_usd": null,
+      "volume_7d_usd": null,
+      "provider_apy_pct_1d": 47.8084,
+      "provider_apy_pct_7d": 45.3138,
+      "comparison_1d_available": true,
+      "comparison_1d_prior_timestamp": "2026-09-20T23:01:27.340Z",
+      "comparison_1d_elapsed_hours": 17.001362222222223,
+      "comparison_1d_target_distance_hours": 6.998637777777778,
+      "tvl_change_1d_pct": 7.731910047759527,
+      "apy_change_1d_pp": 25.072699999999998,
+      "comparison_7d_available": true,
+      "comparison_7d_prior_timestamp": "2026-09-14T23:02:00.166Z",
+      "comparison_7d_elapsed_hours": 160.99224388888888,
+      "comparison_7d_target_distance_hours": 7.007756111111111,
+      "tvl_change_7d_pct": 48.45771462322455,
+      "apy_change_7d_pp": 45.4238,
+      "turnover_1d": null
+    },
+    {
+      "label": "HyperSwap WHYPE-UETH",
+      "pool": "7223e3c9-85ba-424a-91be-f02dcb6f155e",
+      "project": "hyperswap-v3",
+      "symbol": "WHYPE-UETH",
+      "chart_latest_timestamp": "2026-09-21T16:01:35.912Z",
+      "chart_latest_tvl_usd": 575942,
+      "chart_latest_apy": 4.84642,
+      "history_observation_count": 242,
+      "history_gaps_over_30h": [
+        {
+          "from": "2026-05-01T08:01:32.234Z",
+          "to": "2026-05-05T23:01:39.638Z",
+          "elapsed_hours": 111.00205666666666
+        }
+      ],
+      "snapshot_tvl_usd": 575942,
+      "snapshot_apy": 4.84642,
+      "snapshot_apy_base": 4.84642,
+      "snapshot_apy_reward": null,
+      "volume_1d_usd": 25490.93046,
+      "volume_7d_usd": 124744.56784,
+      "provider_apy_pct_1d": 3.54907,
+      "provider_apy_pct_7d": 3.36491,
+      "comparison_1d_available": true,
+      "comparison_1d_prior_timestamp": "2026-09-20T23:01:39.502Z",
+      "comparison_1d_elapsed_hours": 16.99900277777778,
+      "comparison_1d_target_distance_hours": 7.000997222222222,
+      "tvl_change_1d_pct": 1.07650296240136,
+      "apy_change_1d_pp": 2.5237600000000002,
+      "comparison_7d_available": true,
+      "comparison_7d_prior_timestamp": "2026-09-14T23:01:35.007Z",
+      "comparison_7d_elapsed_hours": 161.0002513888889,
+      "comparison_7d_target_distance_hours": 6.999748611111111,
+      "tvl_change_7d_pct": -12.823501275992866,
+      "apy_change_7d_pp": 2.63917,
+      "turnover_1d": 0.04425954429439075
+    }
+  ],
+  "dexscreener_selected_pairs": {
+    "projectx_usdc_whype": {
+      "chainId": "hyperevm",
+      "dexId": "prjx",
+      "pairAddress": "0x6c9A33E3b592C0d65B3Ba59355d5Be0d38259285",
+      "baseToken": {
+        "address": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+        "name": "USDC",
+        "symbol": "USDC"
+      },
+      "quoteToken": {
+        "address": "0x5555555555555555555555555555555555555555",
+        "name": "Wrapped HYPE",
+        "symbol": "WHYPE"
+      },
+      "liquidity": {
+        "usd": 14703238.83,
+        "base": 10448982,
+        "quote": 45679
+      },
+      "volume": {
+        "h24": 54034690.58,
+        "h6": 20293508.53,
+        "h1": 4107942.69,
+        "m5": 637292.4
+      },
+      "priceChange": {
+        "m5": -0.01,
+        "h1": 0.13,
+        "h6": 0.01,
+        "h24": -0.05
+      },
+      "txns": {
+        "m5": {
+          "buys": 61,
+          "sells": 128
+        },
+        "h1": {
+          "buys": 508,
+          "sells": 677
+        },
+        "h6": {
+          "buys": 3388,
+          "sells": 3743
+        },
+        "h24": {
+          "buys": 10900,
+          "sells": 11710
+        }
+      },
+      "url": "https://dexscreener.com/hyperevm/0x6c9a33e3b592c0d65b3ba59355d5be0d38259285",
+      "volume_24h_over_current_liquidity": 3.6750195793425737,
+      "recent_hour_volume_vs_previous_5h_hourly_average": 1.2690142348461755
+    },
+    "projectx_ueth_whype": {
+      "chainId": "hyperevm",
+      "dexId": "prjx",
+      "pairAddress": "0xaf80230eB13222DB743C21762f65A046bb5F5437",
+      "baseToken": {
+        "address": "0xBe6727B535545C67d5cAa73dEa54865B92CF7907",
+        "name": "Unit Ethereum",
+        "symbol": "UETH"
+      },
+      "quoteToken": {
+        "address": "0x5555555555555555555555555555555555555555",
+        "name": "Wrapped HYPE",
+        "symbol": "WHYPE"
+      },
+      "liquidity": {
+        "usd": 1980688.04,
+        "base": 339.06222,
+        "quote": 11321
+      },
+      "volume": {
+        "h24": 1032873.17,
+        "h6": 400228.36,
+        "h1": 95445.52,
+        "m5": 5987.5
+      },
+      "priceChange": {
+        "m5": -0.06,
+        "h1": 0.87,
+        "h6": 1.14,
+        "h24": 4.65
+      },
+      "txns": {
+        "m5": {
+          "buys": 3,
+          "sells": 0
+        },
+        "h1": {
+          "buys": 83,
+          "sells": 3
+        },
+        "h6": {
+          "buys": 290,
+          "sells": 65
+        },
+        "h24": {
+          "buys": 598,
+          "sells": 347
+        }
+      },
+      "url": "https://dexscreener.com/hyperevm/0xaf80230eb13222db743c21762f65a046bb5f5437",
+      "volume_24h_over_current_liquidity": 0.5214719073075234,
+      "recent_hour_volume_vs_previous_5h_hourly_average": 1.5657955021352254
+    },
+    "nest_token_whype": {
+      "chainId": "hyperevm",
+      "dexId": "nest",
+      "pairAddress": "0x535F30F50eBDa33575242C38B976E681D13db6Fa",
+      "baseToken": {
+        "address": "0x07c57E32a3C29D5659bda1d3EFC2E7BF004E3035",
+        "name": "Nest",
+        "symbol": "NEST"
+      },
+      "quoteToken": {
+        "address": "0x5555555555555555555555555555555555555555",
+        "name": "Wrapped HYPE",
+        "symbol": "WHYPE"
+      },
+      "liquidity": {
+        "usd": 1121444.67,
+        "base": 28310553,
+        "quote": 5381.9467
+      },
+      "volume": {
+        "h24": 804778.61,
+        "h6": 212835.56,
+        "h1": 6424.13,
+        "m5": 0
+      },
+      "priceChange": {
+        "h1": -0.65,
+        "h6": 0.72,
+        "h24": 79.73
+      },
+      "txns": {
+        "m5": {
+          "buys": 0,
+          "sells": 0
+        },
+        "h1": {
+          "buys": 8,
+          "sells": 16
+        },
+        "h6": {
+          "buys": 184,
+          "sells": 191
+        },
+        "h24": {
+          "buys": 765,
+          "sells": 1217
+        }
+      },
+      "url": "https://dexscreener.com/hyperevm/0x535f30f50ebda33575242c38b976e681d13db6fa",
+      "volume_24h_over_current_liquidity": 0.717626675242034,
+      "recent_hour_volume_vs_previous_5h_hourly_average": 0.1556146866479245
+    }
+  },
+  "receipts": [
+    {
+      "name": "dex_overview",
+      "url": "https://api.llama.fi/overview/dexs/Hyperliquid%20L1?excludeTotalDataChart=false&excludeTotalDataChartBreakdown=true&dataType=dailyVolume",
+      "payload": null,
+      "started_ms": 1790008188883,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 112904,
+      "sha256": "9c41058444d41768bfd4813b501b8a77d5c48547765e57b260e9ffec92a4fb3e",
+      "finished_ms": 1790008190414,
+      "evidence_path": "dex/dex_overview.receipt.json"
+    },
+    {
+      "name": "dex_search",
+      "url": "https://api.dexscreener.com/latest/dex/search?q=HYPE%20WETH",
+      "payload": null,
+      "started_ms": 1790008190073,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 74179,
+      "sha256": "612eb1807d9b0ed6215b97095e42c6182244a2640e7f6cac2c4b13cfd1493915",
+      "finished_ms": 1790008191002,
+      "evidence_path": "dex/dex_search.receipt.json"
+    },
+    {
+      "name": "llama_chains",
+      "url": "https://api.llama.fi/v2/chains",
+      "payload": null,
+      "started_ms": 1790008148174,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 64202,
+      "sha256": "37d05a3d6e496b51663554c8c8554fa9e5a80b442d0fe2440ca6e3a96d5640e7",
+      "finished_ms": 1790008148655,
+      "evidence_path": "dex/llama_chains.receipt.json"
+    },
+    {
+      "name": "llama_protocols",
+      "url": "https://api.llama.fi/protocols",
+      "payload": null,
+      "started_ms": 1790008191101,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 8872594,
+      "sha256": "5ba78189c5725e903bed6452499185b8f6c12ba98ce78db7d31ca8ac45c85d84",
+      "finished_ms": 1790008191532,
+      "evidence_path": "dex/llama_protocols.receipt.json"
+    },
+    {
+      "name": "llama_tvl_history",
+      "url": "https://api.llama.fi/v2/historicalChainTvl/Hyperliquid%20L1",
+      "payload": null,
+      "started_ms": 1790008260075,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 25713,
+      "sha256": "d00a8ab5b218a7363b72a87dc3d7bc8d9e925b16b6954a900865fea5577ff76c",
+      "finished_ms": 1790008260235,
+      "evidence_path": "dex/llama_tvl_history.receipt.json"
+    },
+    {
+      "name": "ueth_pairs",
+      "url": "https://api.dexscreener.com/token-pairs/v1/hyperevm/0xbe6727b535545c67d5caa73dea54865b92cf7907",
+      "payload": null,
+      "started_ms": 1790008311342,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 24323,
+      "sha256": "92ccefb859450db2d8af3eaaf51b269401377757a647602eddc83fbdd904a762",
+      "finished_ms": 1790008312251,
+      "evidence_path": "dex/ueth_pairs.receipt.json"
+    },
+    {
+      "name": "whype_pairs",
+      "url": "https://api.dexscreener.com/token-pairs/v1/hyperevm/0x5555555555555555555555555555555555555555",
+      "payload": null,
+      "started_ms": 1790008258534,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 41227,
+      "sha256": "c9573a9abb47149f56254cd1657a6d8d42f068ac0fa9326e76e1b02d41420f9d",
+      "finished_ms": 1790008259052,
+      "evidence_path": "dex/whype_pairs.receipt.json"
+    },
+    {
+      "name": "yields_pools",
+      "url": "https://yields.llama.fi/pools",
+      "payload": null,
+      "started_ms": 1790008146972,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 11844164,
+      "sha256": "a4371c52ccade15e1bceb861a39d9dbc9aa7eb92002ab5b8811582432ccd7ff3",
+      "finished_ms": 1790008148596,
+      "evidence_path": "dex/yields_pools.receipt.json"
+    },
+    {
+      "name": "concentrated_liquidity",
+      "url": "https://docs.hyperswap.exchange/docs/amm/protocol-concepts/liquidity-pool/concentrated-liquidity-position.md",
+      "payload": null,
+      "started_ms": 1790008312348,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "status": "error",
+      "error": "HTTP Error 404: Not Found",
+      "finished_ms": 1790008312455,
+      "evidence_path": "docs/concentrated_liquidity.receipt.json"
+    },
+    {
+      "name": "concentrated_liquidity_page",
+      "url": "https://docs.hyperswap.exchange/docs/amm/protocol-concepts/liquidity-pool/concentrated-liquidity-position",
+      "payload": null,
+      "started_ms": 1790008329345,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "status": "ok",
+      "bytes": 98081,
+      "sha256": "a9f1a7b15cfdb2441e3dce4997cbc71fd99238d6b375dab8a9d15d283b483795",
+      "finished_ms": 1790008329891,
+      "evidence_path": "docs/concentrated_liquidity_page.receipt.json"
+    },
+    {
+      "name": "hl_docs_index",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/llms.txt",
+      "payload": null,
+      "started_ms": 1790008146691,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 21219,
+      "sha256": "1c712a65803e2be8cda816d62167cfd41770cd6f1ab4e1c7ded8e79f1faa3071",
+      "finished_ms": 1790008146877,
+      "evidence_path": "docs/hl_docs_index.receipt.json"
+    },
+    {
+      "name": "hyperswap_docs",
+      "url": "https://docs.hyperswap.exchange/llms.txt",
+      "payload": null,
+      "started_ms": 1790008259147,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "status": "ok",
+      "bytes": 12949,
+      "sha256": "67b68280b6ae75ec5c44a38e799f336ceeb711839d21ee7b74e06edb16d815b7",
+      "finished_ms": 1790008259969,
+      "evidence_path": "docs/hyperswap_docs.receipt.json"
+    },
+    {
+      "name": "llama_definitions",
+      "url": "https://docs.llama.fi/analysts/data-definitions.md",
+      "payload": null,
+      "started_ms": 1790008346427,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 21668,
+      "sha256": "56932045892c5deb9fa94b3082b8bfc44d39d39fa578c8b2976db7cfe393581b",
+      "finished_ms": 1790008346781,
+      "evidence_path": "docs/llama_definitions.receipt.json"
+    },
+    {
+      "name": "llama_docs_index",
+      "url": "https://docs.llama.fi/llms.txt",
+      "payload": null,
+      "started_ms": 1790008312550,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 3907,
+      "sha256": "3623f93b8e9fba10f90d892e06c1af84bf47c3c3c7145931c235f84394f5be85",
+      "finished_ms": 1790008313130,
+      "evidence_path": "docs/llama_docs_index.receipt.json"
+    },
+    {
+      "name": "child_010461_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0x010461c14e146ac35fe42271bdc1134ee31c703a"
+      },
+      "started_ms": 1790008233625,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 65625,
+      "sha256": "8524918a239668b4ffe22865552649832567f2db6716e2045b6e7eea8e4c48f5",
+      "finished_ms": 1790008233976,
+      "evidence_path": "hlp/child_010461_ch_state.receipt.json"
+    },
+    {
+      "name": "child_2e3d94_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0x2e3d94f0562703b25c83308a05046ddaf9a8dd14"
+      },
+      "started_ms": 1790008233628,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 359,
+      "sha256": "471b4648d5216aa3396cddd8468c074b94c093813e6c196f94c6be6e93be336e",
+      "finished_ms": 1790008233810,
+      "evidence_path": "hlp/child_2e3d94_ch_state.receipt.json"
+    },
+    {
+      "name": "child_2ed5c4_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0x2ed5c4484ea3ff8b57d5f2fb152a40d9f2b68308"
+      },
+      "started_ms": 1790008233635,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 339,
+      "sha256": "c21bba2c25b7d1031da25138b7012c287ab556dc46356ae569a0a1ed1bfc1ccc",
+      "finished_ms": 1790008233825,
+      "evidence_path": "hlp/child_2ed5c4_ch_state.receipt.json"
+    },
+    {
+      "name": "child_31ca83_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0x31ca8395cf837de08b24da3f660e77761dfb974b"
+      },
+      "started_ms": 1790008233626,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 65671,
+      "sha256": "a2b011f90c5bb7f96ee531b2a6fb920ace26896846d2cd6e1d9253cf1ac6161e",
+      "finished_ms": 1790008233810,
+      "evidence_path": "hlp/child_31ca83_ch_state.receipt.json"
+    },
+    {
+      "name": "child_469f69_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0x469f690213c467c39a23efacfd2816896009d7d8"
+      },
+      "started_ms": 1790008233625,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 324,
+      "sha256": "670b26e4b2b2078a3b4b9ff0d68c0c6ac1970eaf3bd1f8cf2aedcfcb72dbfea5",
+      "finished_ms": 1790008233770,
+      "evidence_path": "hlp/child_469f69_ch_state.receipt.json"
+    },
+    {
+      "name": "child_5e177e_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0x5e177e5e39c0f4e421f5865a6d8beed8d921cb70"
+      },
+      "started_ms": 1790008233626,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 339,
+      "sha256": "1c33cc24fbf5c0f48a9dcdfb2e2a0206e8a490b5b85c2b9ecad577710e38e7bf",
+      "finished_ms": 1790008233802,
+      "evidence_path": "hlp/child_5e177e_ch_state.receipt.json"
+    },
+    {
+      "name": "child_b0a55f_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0xb0a55f13d22f66e6d495ac98113841b2326e9540"
+      },
+      "started_ms": 1790008233635,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 344,
+      "sha256": "db8e9c9d4fd19e34bdc115c102a2324e9b92a13c3f8c8af544e0d802235bfd60",
+      "finished_ms": 1790008233837,
+      "evidence_path": "hlp/child_b0a55f_ch_state.receipt.json"
+    },
+    {
+      "name": "hlp_borrow_lend_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "borrowLendUserState",
+        "user": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303"
+      },
+      "started_ms": 1790008296192,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 58,
+      "sha256": "2eedfefb2651155f9d16862ce3a6e160cb64ae6e77e87df83068fab7ab256d1f",
+      "finished_ms": 1790008296301,
+      "evidence_path": "hlp/hlp_borrow_lend_state.receipt.json"
+    },
+    {
+      "name": "hlp_ch_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "clearinghouseState",
+        "user": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303"
+      },
+      "started_ms": 1790008209003,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 396,
+      "sha256": "5f900529d4bfab580128ce8b84c6c34cfc179af9389f0706630eb4f9be6a1ff9",
+      "finished_ms": 1790008209117,
+      "evidence_path": "hlp/hlp_ch_state.receipt.json"
+    },
+    {
+      "name": "hlp_portfolio",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "portfolio",
+        "user": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303"
+      },
+      "started_ms": 1790008209014,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 36909,
+      "sha256": "edc3e87d37ecb7df4a5aa21305e474b6c182318097c47543a8f1fb91e599d22b",
+      "finished_ms": 1790008209141,
+      "evidence_path": "hlp/hlp_portfolio.receipt.json"
+    },
+    {
+      "name": "hlp_spot_state",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "spotClearinghouseState",
+        "user": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303"
+      },
+      "started_ms": 1790008296193,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 15,
+      "sha256": "524ce15a3ba4e57e130190de01eca238ef18a4637ae106ee2dcc1584236d1a00",
+      "finished_ms": 1790008296304,
+      "evidence_path": "hlp/hlp_spot_state.receipt.json"
+    },
+    {
+      "name": "hlp_subaccounts",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "subAccounts",
+        "user": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303"
+      },
+      "started_ms": 1790008209015,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 4,
+      "sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+      "finished_ms": 1790008209145,
+      "evidence_path": "hlp/hlp_subaccounts.receipt.json"
+    },
+    {
+      "name": "hlp_vault_details",
+      "url": "https://api.hyperliquid.xyz/info",
+      "payload": {
+        "type": "vaultDetails",
+        "vaultAddress": "0xdfc24b077bc1425ad1dea75bcb6f8158e10df303"
+      },
+      "started_ms": 1790008209007,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json",
+      "status": "ok",
+      "bytes": 60219,
+      "sha256": "f0bf2ac89030d662f61545b351007393a2f8c392f9384159f63956b6da387e67",
+      "finished_ms": 1790008209160,
+      "evidence_path": "hlp/hlp_vault_details.receipt.json"
+    },
+    {
+      "name": "info_endpoint",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint.md",
+      "payload": null,
+      "started_ms": 1790008189199,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 55013,
+      "sha256": "f4228fc7734af5dbf420e5bdf2b25c248a5b5287035ab2d8a645dc14ce64f0bd",
+      "finished_ms": 1790008189389,
+      "evidence_path": "hlp/info_endpoint.receipt.json"
+    },
+    {
+      "name": "protocol_vaults",
+      "url": "https://hyperliquid.gitbook.io/hyperliquid-docs/hypercore/vaults/protocol-vaults.md",
+      "payload": null,
+      "started_ms": 1790008189024,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "text/markdown; charset=utf-8",
+      "status": "ok",
+      "bytes": 951,
+      "sha256": "253368da607ce79327057362c9bafbf6b0736c2b3801439956dc58cd62ad86cf",
+      "finished_ms": 1790008189150,
+      "evidence_path": "hlp/protocol_vaults.receipt.json"
+    },
+    {
+      "name": "hyperswap_whype_ueth",
+      "url": "https://yields.llama.fi/chart/7223e3c9-85ba-424a-91be-f02dcb6f155e",
+      "payload": null,
+      "started_ms": 1790008273497,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 38813,
+      "sha256": "186ff27aa41b42a7b311087ce851dd15c363ae6c01c17f8a02902d08e8ccb2e9",
+      "finished_ms": 1790008274860,
+      "evidence_path": "pool_history/hyperswap_whype_ueth.receipt.json"
+    },
+    {
+      "name": "nest_whype_usdc",
+      "url": "https://yields.llama.fi/chart/afe2c8c8-2ab8-4f1b-abda-a8a12718c431",
+      "payload": null,
+      "started_ms": 1790008272350,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 34066,
+      "sha256": "672e3dd3602acd55928a5ecb8191e83c70e679dce376c7c03d692f146b09d968",
+      "finished_ms": 1790008273450,
+      "evidence_path": "pool_history/nest_whype_usdc.receipt.json"
+    },
+    {
+      "name": "projectx_whype_ueth",
+      "url": "https://yields.llama.fi/chart/5f952da0-ffd8-4665-9314-9319e4cafaa8",
+      "payload": null,
+      "started_ms": 1790008270908,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 38621,
+      "sha256": "1cf8ab4691415db26c826a9781381f1ffa70f4f4e669dbf830aa1d1692bed230",
+      "finished_ms": 1790008272301,
+      "evidence_path": "pool_history/projectx_whype_ueth.receipt.json"
+    },
+    {
+      "name": "projectx_whype_usdc",
+      "url": "https://yields.llama.fi/chart/f55a970c-7fdb-4087-8c62-258287e7a6cd",
+      "payload": null,
+      "started_ms": 1790008269474,
+      "transport": "IPv4 TCP and DNS bound to verified ExpressVPN interface; allowlisted HTTPS CONNECT proxy; no direct fallback",
+      "http_status": 200,
+      "content_type": "application/json; charset=utf-8",
+      "status": "ok",
+      "bytes": 38969,
+      "sha256": "7faadcf81ff9c4890f89a9d2e193b2a8e22130b3519e0c7ef766446975d75381",
+      "finished_ms": 1790008270859,
+      "evidence_path": "pool_history/projectx_whype_usdc.receipt.json"
+    }
+  ],
+  "limitations": [
+    "USD TVL change is not net inflow.",
+    "Displayed APY is not assured return.",
+    "Total liquidity is not active in-range liquidity.",
+    "DEX chart comparisons are timestamp-qualified; missing ProjectX 7d baselines are unavailable.",
+    "Trade counts do not identify net notional flow, trader type or cross-venue hedge."
+  ]
+}
