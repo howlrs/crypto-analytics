@@ -22,9 +22,24 @@ crypto/analytics/
 ├── hl-watch/          Hyperliquidオンチェーン観測 (hl_watch.py, README.md)
 ├── data-tools/         market.db 構築スクリプト群 (fetch_*.py, load_to_sqlite.py, common.py, validate_and_manifest.py)
 ├── backtests/          バックテスト/イベントスタディ (funding_capture*.py, liq_reversion.py, crowding_signals.py, market_regimes.py, strategy_robustness.py, prospective_validation.py, research_manifest.py)
+├── research_loop/      観測→パラメータ→仮説の台帳 (parameters.json, hypotheses.json, annotations.jsonl, registry.py)
 ├── docs/                本README以下のドキュメント群
 └── results/             backtests の出力 (CSV/JSON, スクリプト実行毎に生成)
 ```
+
+## 観測 → パラメータ → 仮説のループ
+
+分析が依存する定数、仮説とその判定、いつ何をしたかを、3つの台帳で持つ (標準ライブラリのみ、取得・発注なし):
+
+```bash
+cd /home/o9oem/workspace/crypto/analytics
+python3 -m research_loop.registry check                    # 台帳と相互参照の検査
+python3 -m research_loop.registry params --status unknown  # まだ測っていないパラメータと測り方
+python3 -m research_loop.registry review                   # 定期の振り返りで見るものの一覧
+```
+
+台帳の規則と振り返りの手順は [operating-loop.md](docs/operating-loop.md)、新しい仮説を受け付けるときの問いと判断の原則は
+[playbook.md](docs/playbook.md) を参照。
 
 ## クイックスタート
 
@@ -136,6 +151,9 @@ hl_watch.db と market.db は完全に独立したファイルであり、相互
 
 ## docs/ への導線
 
+- [docs/operating-loop.md](docs/operating-loop.md) — 観測→パラメータ→仮説→検証→計測のループ、3つの台帳の規則、定期の振り返りの手順、未計測の一覧
+- [docs/playbook.md](docs/playbook.md) — 判断の原則（利益の源泉、裁定、指値、取引所のパラメータ、検証の落とし穴、資金管理）と、仮説を受け付けるときの問い
+- [docs/propagation-lag.md](docs/propagation-lag.md) — BTC の急変は ETH・HYPE へ遅れて伝わるか（設計を先に固定した探索。結論: 1分足で見える遅れはなく、この形では棄却）
 - [docs/hl-watch.md](docs/hl-watch.md) — hl-watch コマンドリファレンスと5段パイプラインの仕組み
 - [docs/hl-api-notes.md](docs/hl-api-notes.md) — Hyperliquid info API / Hypurrscan / L1 explorer の実測済み仕様
 - [docs/schema.md](docs/schema.md) — hl_watch.db / market.db の実スキーマ

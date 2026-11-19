@@ -199,11 +199,28 @@ gcloud --configuration=gonumb --project=<project> compute ssh orderbook-collecto
 ```
 
 2026-10-06 01:47 UTC から、プロジェクト `crypto-bitflyer-418902` の VM `orderbook-collector` で稼働している。
-対象は 11 ストリーム・60 秒間隔で、`--until 2026-11-06T00:00:00Z` までの 1 か月を試行とする（見込み約 1.8GB）。
-延長するときは `startup.sh` の `--until`（メタデータ `orderbook-until`）を変更する。
+対象は 11 ストリーム・60 秒間隔。止めずに続ける前提で動かす。
 
-コードを更新するときは、メタデータの `orderbook-commit` を書き換えて、VM を再起動するか、
-VM 上で `sudo google_metadata_script_runner startup` を実行する。
+- **欠測**: 当初は `--until 2026-11-06T00:00:00Z` までの 1 か月を試行としていたため、その時刻で収集が止まった。
+  2026-11-19 03:25 UTC に終了時刻を外して再開した。**2026-11-06 00:00〜2026-11-19 03:25 UTC の板は欠測**で、後から取得できない
+  （公開 API は過去の板を返さない）。
+- **終了時刻**: メタデータ `orderbook-until` は任意。空か未設定なら終了しない。期間を区切るときだけ `2026-12-31T00:00:00Z` の形で入れる。
+- **VM 上のファイルの整理**: 締まった日の DB は、アップロード後も `KEEP_DAYS`（既定 14）日は VM に残す。それより古い日は、
+  バケットにサイズが 0 でない実体があると確かめてから消す（`upload-closed.sh`）。消さないとディスクが埋まり、空きの下限（3GB）で
+  collector が停止して、再起動もされない。バケット側は消さない（サービスアカウントに削除・上書きの権限がない）。
+- **止まっていないかの確認**: 最新の日次 DB が直近の締まった日（UTC）でなければ、終了コード 1 で不足日数を出す。
+
+  ```bash
+  CLOUDSDK_ACTIVE_CONFIG_NAME=gonumb orderbook/deploy/gce/check-freshness.sh gs://<project>-orderbook/orderbook
+  ```
+
+- **コードの更新**: メタデータの `orderbook-commit` を書き換えて、VM を再起動するか、VM 上で
+  `sudo google_metadata_script_runner startup` を実行する。`startup.sh` 自体は VM 作成時にメタデータ `startup-script` へ入れたものが
+  使われるので、変更したら `compute instances add-metadata --metadata-from-file startup-script=orderbook/deploy/gce/startup.sh` で入れ直す。
+
+2026-11-19 の再開は、稼働中のコード（`7c4cb98`）のまま、`orderbook-until` を遠い将来の時刻にして行った。この時点の VM の空きは 12GB で、
+1 日あたり約 68MB 増える。ファイルの整理を含むコードへ更新するまでの猶予は、下限まで約 130 日。
+
 同じ時刻を WSL と GCE の両方で集めると、分析で二重に数えられる。両方の DB を分析に渡すときは、
 `--start` / `--end` で期間を分けるか、どちらか一方だけを使う。
 
@@ -269,6 +286,53 @@ python3 -m orderbook.analyze --db /mnt/e/Datas/market/orderbook-2026-10.db \
 - **BTC を 100 万ドル成行で買う場合**: Binance perp（中央値 0.42〜0.47bp）は、他の 3 ストリームとの
   各ペア比較で 83〜100% の時点で安かった。
 - **Binance BTC perp の被覆**: 1000 段でも ±15bp 程度しか見えず、25bp 帯の深さは常に欠測になった。
+
+## 1 か月の集計（2026-10-06〜2026-11-05、GCE 東京、60 秒間隔）
+
+日ごとの DB 31 本（2.04GiB、489,823 スナップショット、11 ストリーム各約 44,500 件）を 2026-11-19 に集計した。
+出力は `/mnt/e/Datas/market/orderbook-analysis/2026-10-06_2026-11-05/`。台帳に入れる値は
+`python3 -m research_loop.orderbook_params --analysis-dir <出力先>` で取り出す（[operating-loop.md](operating-loop.md)）。
+1 か月・平時中心の値で、急変時の値ではない。
+
+### 成行のコスト（買い、bp。中央値 / 90% 点）
+
+| ストリーム | 1 万ドル | 10 万ドル | 100 万ドル |
+|---|---:|---:|---:|
+| Binance perp BTC | 0.01 / 0.01 | 0.01 / 0.01 | 0.32 / 0.93 |
+| Binance perp ETH | 0.02 / 0.02 | 0.02 / 0.23 | 0.85 / 1.50 |
+| Binance spot BTC | 0.00 / 0.00 | 0.00 / 0.37 | 0.73 / 1.81 |
+| Binance spot ETH | 0.02 / 0.02 | 0.11 / 1.07 | 2.56 / 3.88 |
+| Hyperliquid perp BTC | 0.06 / 0.07 | 0.06 / 0.53 | 0.38 / 1.37 |
+| Hyperliquid perp ETH | 0.21 / 0.32 | 0.21 / 0.83 | 1.02 / 2.18 |
+| Hyperliquid perp HYPE（`:4`） | 0.66 / 2.23 | 2.65 / 4.25 | 8.60 / 10.98 |
+| Bybit perp HYPE | 0.87 / 1.88 | 3.06 / 4.42 | 12.21 / 15.15 |
+| Bybit spot HYPE | 2.79 / 4.30 | 10.19 / 15.06 | 欠測（板が足りない） |
+
+売りもほぼ同じ値だった。Hyperliquid の全桁の HYPE は 20 段しか見えず、10 万ドルで計算できたのは 60% の時点だけ、100 万ドルは 1% だった。
+`:4` はまとめ表示のぶん高めに出る。UTC の時間帯による差は小さい（Binance perp BTC の 100 万ドルで 0.25〜0.42bp）。
+
+- **イベントスタディの滑りの仮定（片道 2bp）との比較**: BTC・ETH の Binance perp は、100 万ドルでも 90% 点が 1.5bp 以下で、仮定は保守的だった。
+  HYPE は 10 万ドルで中央値が約 3bp、100 万ドルで約 12bp と、仮定を超える。HYPE を 1 回 10 万ドル以上で成行する設計は、2bp の仮定のままでは甘い。
+  ただし、この実測の期間はイベントスタディの期間（2026-08-01 より前）と重ならない。
+
+### 取得の遅延（ms）
+
+| 取引所 | 往復時間 p10 / p50 / p90 / p99 | 取引所の時刻から受信まで p50 / p90 / p99 |
+|---|---|---|
+| Binance | 36 / 52 / 70 / 104 | 37 / 51 / 73（perp だけ） |
+| Bybit | 97 / 104 / 162 / 303 | 167 / 424 / 1,264 |
+| Hyperliquid | 29 / 41 / 95 / 274 | 500 / 720 / 849 |
+
+往復時間は GCE 東京からの REST 1 回の値。手元（WSL と VPN、2026-10-06 の 21 時刻だけ）では中央値が Binance 131、Bybit 238、Hyperliquid 114 で、2〜3 倍だった。
+取引所の時刻が何を指すかは取引所ごとに違い、時計のずれも含むので、右の列は「届いた板がどれだけ古いか」の目安として読む。配信（WebSocket）の受信遅延は、まだ測っていない。
+
+### 板の偏りと将来の仲値、壁
+
+- 偏りの最上位と最下位の区間で 60 / 300 / 900 秒後の仲値変化を比べた 33 セルのうち、区間が 0 を上回ったのは 2 つだけだった
+  （Binance spot ETH の 300 秒後、Hyperliquid perp HYPE `:4` の 60 秒後）。多重比較の補正はしていない。残りは 0 を含むか、端の区間の標本が足りない。
+  60 秒間隔のスナップショットからは、取引に使える関係は見えない。
+- 大きな指値の多くは、仲値が近づく前に板から消えた。「仲値が離れたまま消えた」割合は、Binance perp BTC で 68%、Binance spot ETH で 80%、Bybit perp HYPE で 94%。
+  スナップショットの間の約定と取消は区別できないので、取り消されたとまでは言えない。
 
 ## 限界
 
