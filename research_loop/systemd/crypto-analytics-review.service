@@ -1,0 +1,23 @@
+# Template for a systemd user service; the values below are for the author's WSL + ExpressVPN setup
+# (interface, resolver, bucket, gcloud configuration, and the directories on PATH).
+# Install: see docs/paseo-review.md "定期実行". The timer starts this once a day; whether a review
+# actually runs is decided by --if-due from loop.review_interval_days in the parameter register.
+[Unit]
+Description=Periodic review of the research registers (crypto-analytics research_loop.paseo_review)
+Documentation=https://github.com/howlrs/crypto-analytics/blob/main/docs/paseo-review.md
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/workspace/crypto/analytics
+ExecStart=/usr/bin/python3 -m research_loop.paseo_review --if-due --rounds 2 --sources \
+  --source-interface eth1 --dns-server 100.64.100.1 \
+  --freshness gs://crypto-bitflyer-418902-orderbook/orderbook --gcloud-config gonumb
+# node (for the Paseo CLI), claude, codex and gcloud have to be found here.
+Environment=PATH=%h/.local/bin:%h/google-cloud-sdk/bin:%h/.nvm/versions/node/v24.22.1/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+Environment=PYTHONUNBUFFERED=1
+UMask=0077
+# Up to four agent runs at 20 minutes each, plus the fetches; a hung run is killed with its daemon.
+TimeoutStartSec=100min
+KillMode=control-group
+StandardOutput=append:%h/.local/state/crypto-analytics/review.log
+StandardError=append:%h/.local/state/crypto-analytics/review.log

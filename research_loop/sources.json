@@ -1,0 +1,184 @@
+{
+ "hosts": [
+  "api.bybit.com",
+  "api.hyperliquid.xyz",
+  "fapi.binance.com",
+  "hyperliquid.gitbook.io",
+  "www.bybit.com"
+ ],
+ "sources": [
+  {
+   "id": "bybit-instruments-btcusdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/market/instruments-info?category=linear&symbol=BTCUSDT",
+   "parameters": ["funding.cap_per_interval.bybit", "funding.formula_constants"],
+   "shows": "Bybit の BTCUSDT 無期限。funding の上限と下限（upperFundingRate・lowerFundingRate、比率）、間隔（fundingInterval、分）、最大レバレッジ"
+  },
+  {
+   "id": "bybit-instruments-ethusdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/market/instruments-info?category=linear&symbol=ETHUSDT",
+   "parameters": ["funding.cap_per_interval.bybit", "funding.formula_constants"],
+   "shows": "Bybit の ETHUSDT 無期限。funding の上限と下限（upperFundingRate・lowerFundingRate、比率）、間隔（fundingInterval、分）、最大レバレッジ"
+  },
+  {
+   "id": "bybit-instruments-hypeusdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/market/instruments-info?category=linear&symbol=HYPEUSDT",
+   "parameters": ["funding.cap_per_interval.bybit", "funding.formula_constants"],
+   "shows": "Bybit の HYPEUSDT 無期限。funding の上限と下限（upperFundingRate・lowerFundingRate、比率）、間隔（fundingInterval、分）、最大レバレッジ"
+  },
+  {
+   "id": "bybit-risk-limit-btcusdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/market/risk-limit?category=linear&symbol=BTCUSDT",
+   "parameters": ["margin.bybit.mmr_tier1"],
+   "shows": "Bybit の BTCUSDT 無期限のリスク制限。段ごとの維持証拠金率（maintenanceMargin）と当初証拠金率（initialMargin）、比率。isLowestRisk が 1 の段が最初の段"
+  },
+  {
+   "id": "bybit-risk-limit-ethusdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/market/risk-limit?category=linear&symbol=ETHUSDT",
+   "parameters": ["margin.bybit.mmr_tier1"],
+   "shows": "Bybit の ETHUSDT 無期限のリスク制限。段ごとの維持証拠金率（maintenanceMargin）と当初証拠金率（initialMargin）、比率。isLowestRisk が 1 の段が最初の段"
+  },
+  {
+   "id": "bybit-collateral-btc",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/spot-margin-trade/collateral?currency=BTC",
+   "parameters": ["margin.bybit.collateral_haircut"],
+   "shows": "Bybit 統合口座の BTC の担保掛目（collateralRatio）。数量帯（minQty〜maxQty）ごと"
+  },
+  {
+   "id": "bybit-collateral-eth",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/spot-margin-trade/collateral?currency=ETH",
+   "parameters": ["margin.bybit.collateral_haircut"],
+   "shows": "Bybit 統合口座の ETH の担保掛目（collateralRatio）。数量帯（minQty〜maxQty）ごと"
+  },
+  {
+   "id": "bybit-collateral-usdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "api.bybit.com",
+   "path": "/v5/spot-margin-trade/collateral?currency=USDT",
+   "parameters": ["margin.bybit.collateral_haircut"],
+   "shows": "Bybit 統合口座の USDT の担保掛目（collateralRatio）。数量帯（minQty〜maxQty）ごと"
+  },
+  {
+   "id": "bybit-help-trading-fees",
+   "kind": "page",
+   "method": "GET",
+   "host": "www.bybit.com",
+   "path": "/en/help-center/article/Trading-Fee-Structure",
+   "parameters": ["cost.venue_schedule.perp_bp"],
+   "shows": "Bybit ヘルプの手数料表。無期限・先物の maker と taker（VIP でない利用者の行が基本の料率）"
+  },
+  {
+   "id": "bybit-help-funding-rate",
+   "kind": "page",
+   "method": "GET",
+   "host": "www.bybit.com",
+   "path": "/en/help-center/article/Introduction-to-Funding-Rate",
+   "parameters": ["funding.formula_constants"],
+   "shows": "Bybit ヘルプの funding の式。金利の項、プレミアムを抑える帯（clamp）、上限と下限の決め方"
+  },
+  {
+   "id": "bybit-help-uta-margin-modes",
+   "kind": "page",
+   "method": "GET",
+   "host": "www.bybit.com",
+   "path": "/en/help-center/article/Differences-Between-the-Margin-Modes-Under-the-Unified-Trading-Account",
+   "parameters": ["liquidation.unit_by_venue"],
+   "shows": "Bybit ヘルプの統合口座の証拠金モード（分離・クロス・ポートフォリオ）の違い。清算が銘柄ごとか口座全体かを含む"
+  },
+  {
+   "id": "binance-funding-info",
+   "kind": "json",
+   "method": "GET",
+   "host": "fapi.binance.com",
+   "path": "/fapi/v1/fundingInfo",
+   "parameters": ["funding.formula_constants"],
+   "shows": "Binance の USDⓈ-M 無期限。銘柄ごとの funding の上限と下限（adjustedFundingRateCap・adjustedFundingRateFloor、比率）と間隔（fundingIntervalHours）。数百銘柄あるので銘柄名で検索する"
+  },
+  {
+   "id": "binance-premium-index-btcusdt",
+   "kind": "json",
+   "method": "GET",
+   "host": "fapi.binance.com",
+   "path": "/fapi/v1/premiumIndex?symbol=BTCUSDT",
+   "parameters": ["funding.formula_constants"],
+   "shows": "Binance の BTCUSDT 無期限。金利の項（interestRate、1 回あたりの比率）。価格と直近の funding は取得した時点の値で、定数ではない"
+  },
+  {
+   "id": "hyperliquid-meta",
+   "kind": "json",
+   "method": "POST",
+   "host": "api.hyperliquid.xyz",
+   "path": "/info",
+   "body": {"type": "meta"},
+   "parameters": ["margin.hyperliquid.hype_perp"],
+   "shows": "Hyperliquid の無期限の一覧。銘柄ごとの最大レバレッジ（universe[].maxLeverage）と、建玉の大きさで変わる証拠金の段（marginTables）。維持証拠金率そのものは載っていない"
+  },
+  {
+   "id": "hyperliquid-user-fees",
+   "kind": "json",
+   "method": "POST",
+   "host": "api.hyperliquid.xyz",
+   "path": "/info",
+   "body": {"type": "userFees", "user": "0x0000000000000000000000000000000000000000"},
+   "parameters": ["cost.venue_schedule.perp_bp"],
+   "shows": "Hyperliquid の手数料表。基本の料率は feeSchedule.cross（taker）と feeSchedule.add（maker）、比率。user で始まる項目はゼロアドレスのもので、基本の料率ではない"
+  },
+  {
+   "id": "hyperliquid-docs-fees",
+   "kind": "page",
+   "method": "GET",
+   "host": "hyperliquid.gitbook.io",
+   "path": "/hyperliquid-docs/trading/fees",
+   "parameters": ["cost.venue_schedule.perp_bp"],
+   "shows": "Hyperliquid の文書の手数料表（無期限と現物、取引量の段ごと）"
+  },
+  {
+   "id": "hyperliquid-docs-funding",
+   "kind": "page",
+   "method": "GET",
+   "host": "hyperliquid.gitbook.io",
+   "path": "/hyperliquid-docs/trading/funding",
+   "parameters": ["funding.formula_constants"],
+   "shows": "Hyperliquid の文書の funding の式。金利の項、プレミアムを抑える帯、上限、間隔"
+  },
+  {
+   "id": "hyperliquid-docs-margining",
+   "kind": "page",
+   "method": "GET",
+   "host": "hyperliquid.gitbook.io",
+   "path": "/hyperliquid-docs/trading/margining",
+   "parameters": ["margin.hyperliquid.hype_perp", "margin.hyperliquid.spot_as_perp_collateral"],
+   "shows": "Hyperliquid の文書の証拠金の説明。当初証拠金と維持証拠金の関係、証拠金に使える資産、証拠金モード"
+  },
+  {
+   "id": "hyperliquid-docs-liquidations",
+   "kind": "page",
+   "method": "GET",
+   "host": "hyperliquid.gitbook.io",
+   "path": "/hyperliquid-docs/trading/liquidations",
+   "parameters": ["liquidation.unit_by_venue"],
+   "shows": "Hyperliquid の文書の清算の説明。判定の単位（分離かクロスか）と清算の進み方"
+  }
+ ]
+}
