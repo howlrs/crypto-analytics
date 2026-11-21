@@ -461,11 +461,13 @@
       "id": "loop.review_interval_days",
       "group": "loop",
       "name": "定期の振り返りの間隔",
-      "value": null,
+      "value": 15,
       "unit": "days",
-      "status": "unknown",
-      "how_to_measure": "利用者が決める。決めたら値を入れ、振り返りのたびに annotations に kind=review を残す",
-      "used_by": []
+      "status": "assumed",
+      "as_of": "2026-11-21",
+      "source": "利用者の決定（2026-11-21）",
+      "used_by": ["research_loop/paseo_review.py"],
+      "note": "振り返りのたびに annotations に kind=review を残す。定期実行（paseo_review --if-due）は、最後の review からこの日数が過ぎていれば流す"
     },
     {
       "id": "loop.hypothesis_yield",

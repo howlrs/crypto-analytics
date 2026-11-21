@@ -1,0 +1,12 @@
+# Template for a systemd user timer. Install: see docs/paseo-review.md "定期実行".
+[Unit]
+Description=Ask once a day whether the periodic review of the research registers is due
+
+[Timer]
+OnCalendar=*-*-* 09:40:00 Asia/Tokyo
+Persistent=true
+RandomizedDelaySec=300
+Unit=crypto-analytics-review.service
+
+[Install]
+WantedBy=timers.target
