@@ -121,7 +121,7 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 ## 範囲と限界
 
 - 台帳は状態の記録であり、値や判定の正しさを保証しない。値の根拠は `source` と `evidence` の先にある。
-- 可視化の基盤（時系列 DB とグラフ）は、このリポジトリにはまだない。振り返りは 15 日ごとに流せる（[paseo-review.md](paseo-review.md) の「定期実行」）。計測は自動化していない。
+- 可視化の基盤（時系列 DB とグラフ）は、このリポジトリにはまだない。振り返りは、systemd のタイマーが 1 日 1 回確かめ、15 日ごとに流す（[paseo-review.md](paseo-review.md) の「定期実行」。2026-11-21 から）。計測は自動化していない。
   通知は板の収集の停止だけが対象で、振り返りの候補ができても通知は出ない。
 - `research_loop/`、本書、`playbook.md` は、`results/research_manifest.json` が固定するスナップショットの対象ではない。
 - テストは `tests/test_research_loop.py`。一時ディレクトリと合成の値を使い、リポジトリの台帳は読むだけで書き換えない。
