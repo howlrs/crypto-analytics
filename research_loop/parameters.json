@@ -10,7 +10,7 @@
       "status": "assumed",
       "as_of": "2026-09-04",
       "source": "backtests/liq_reversion.py と backtests/crowding_signals.py の定数。取引所の現在の料率を写したものではない",
-      "used_by": ["backtests/liq_reversion.py", "backtests/crowding_signals.py", "backtests/execution_sensitivity.py"]
+      "used_by": ["backtests/liq_reversion.py", "backtests/crowding_signals.py", "backtests/execution_sensitivity.py", "backtests/propagation_lag.py", "backtests/japan_crossmarket.py"]
     },
     {
       "id": "cost.event_study.slippage_bp",
@@ -21,7 +21,7 @@
       "status": "assumed",
       "as_of": "2026-09-04",
       "source": "同上。片道 7bp、往復 14bp の規約（docs/data-pipeline.md）",
-      "used_by": ["backtests/liq_reversion.py", "backtests/crowding_signals.py", "backtests/execution_sensitivity.py"],
+      "used_by": ["backtests/liq_reversion.py", "backtests/crowding_signals.py", "backtests/execution_sensitivity.py", "backtests/propagation_lag.py", "backtests/japan_crossmarket.py"],
       "note": "板から測った値ではない。2026-10-06〜2026-11-05 の実測（liquidity.impact_bp）では、Binance 無期限の BTC・ETH は 100 万ドルの成行でも 90% 点が 1.5bp 以下で、この仮定は保守的。HYPE は 10 万ドルで中央値が約 3bp、100 万ドルで約 12bp と、この仮定を超える。実測の期間はイベントスタディの期間（2026-08-01 より前）と重ならない"
     },
     {
@@ -33,7 +33,7 @@
       "status": "assumed",
       "as_of": "2026-08-11",
       "source": "backtests/funding_capture_v2.py の TAKER_BP。滑りは一律 2.0bp、リバランスは一律 17bp の単純化",
-      "used_by": ["backtests/funding_capture_v2.py"]
+      "used_by": ["backtests/funding_capture_v2.py", "backtests/funding_capture.py"]
     },
     {
       "id": "cost.venue_basis.fee_bp",
@@ -129,12 +129,13 @@
       "id": "funding.cap_per_interval.bybit",
       "group": "funding",
       "name": "Bybit の funding の上下限（1 回あたり、BTC・ETH）",
-      "value": 0.5,
+      "value": 0.333,
       "unit": "percent",
       "status": "documented",
-      "as_of": "2026-08-11",
-      "source": "Bybit の公開仕様（2026-08-11 に確認）",
-      "used_by": []
+      "as_of": "2026-11-21",
+      "source": "Bybit の instruments-info API（https://api.bybit.com/v5/market/instruments-info?category=linear、BTCUSDT・ETHUSDT の upperFundingRate・lowerFundingRate、2026-11-21 に取得）",
+      "used_by": [],
+      "note": "以前の値は 0.5。2026-11-21 の API は、BTCUSDT・ETHUSDT とも上限 0.00333（比率、0.333%）を返した。HYPEUSDT は 0.0063（0.63%）で、この値の対象外。間隔は 8 時間（fundingInterval 480 分）"
     },
     {
       "id": "funding.formula_constants",
@@ -172,12 +173,13 @@
       "id": "margin.bybit.mmr_tier1",
       "group": "margin",
       "name": "Bybit USDT 無期限の維持証拠金率（最下位の階層、BTC・ETH）",
-      "value": 0.5,
+      "value": 0.33,
       "unit": "percent",
       "status": "documented",
-      "as_of": "2026-08-11",
-      "source": "Bybit の公開仕様（当初証拠金率は 1.0%）",
-      "used_by": []
+      "as_of": "2026-11-21",
+      "source": "Bybit の risk-limit API（https://api.bybit.com/v5/market/risk-limit?category=linear、BTCUSDT・ETHUSDT の isLowestRisk=1 の段、2026-11-21 に取得）。当初証拠金率は 0.66%",
+      "used_by": [],
+      "note": "以前の値は維持 0.5%・当初 1.0%。現在その率は 2 段目（リスク上限 BTCUSDT 200 万、ETHUSDT 90 万 USDT まで）の値で、最下位の段（リスク上限 30 万 USDT まで）は BTCUSDT・ETHUSDT とも維持 0.33%・当初 0.66%"
     },
     {
       "id": "margin.binance.portfolio_margin_min_usdt",
@@ -376,7 +378,7 @@
       "status": "assumed",
       "as_of": "2026-09-04",
       "source": "docs/prospective-validation.md の source data cutoff。新しい分析はコードで上限を検証する",
-      "used_by": ["backtests/execution_sensitivity.py", "backtests/venue_basis.py", "backtests/taker_flow.py", "backtests/event_paths.py"]
+      "used_by": ["backtests/execution_sensitivity.py", "backtests/venue_basis.py", "backtests/taker_flow.py", "backtests/event_paths.py", "backtests/propagation_lag.py", "backtests/japan_crossmarket.py", "backtests/japan_crypto_equities.py", "backtests/japan_closing_checks.py", "backtests/japan_margin_crowding.py", "backtests/japan_positioning.py", "backtests/hl_japan_carry.py"]
     },
     {
       "id": "data.hl_watch.population",
@@ -396,8 +398,8 @@
       "value": {"active_twap_holders": 60, "others": 300},
       "unit": "seconds",
       "status": "measured",
-      "as_of": "2026-08-11",
-      "source": "docs/limitations.md",
+      "as_of": "2026-11-21",
+      "source": "docs/limitations.md。hl-watch/hl_watch.py の POSITION_SNAPSHOT_INTERVAL_S = 60（45 行）と CANDIDATE_SNAPSHOT_INTERVAL_S = 300（46 行）で再確認",
       "used_by": ["hl-watch/hl_watch.py"]
     },
     {
@@ -444,7 +446,7 @@
       "status": "assumed",
       "as_of": "2026-08-11",
       "source": "利用者の方針（2026-08-11）",
-      "used_by": []
+      "used_by": ["backtests/japan_crossmarket.py", "backtests/hl_japan_carry.py", "backtests/japan_earnings_risk.py"]
     },
     {
       "id": "policy.forward_window_utc",
