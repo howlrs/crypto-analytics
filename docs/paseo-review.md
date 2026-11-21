@@ -143,7 +143,8 @@ python3 -m research_loop.sources --out /tmp/copies --source-interface eth1 --dns
 
 ## 定期実行
 
-間隔は台帳の `loop.review_interval_days` が持つ。systemd のタイマーは 1 日 1 回スクリプトを起こすだけで、実際に流すかどうかは `--if-due` が決める。
+間隔は台帳の `loop.review_interval_days` が持つ（2026-11-21 に 15 日と決定）。systemd のタイマーは 1 日 1 回スクリプトを起こすだけで、実際に流すかどうかは `--if-due` が決める。
+この環境では 2026-11-21 に有効にした（毎日 09:40 JST ごろ）。
 
 - `loop.review_interval_days` が `unknown` の間は、何もしない。
 - `main` の台帳の最後の `review` から間隔が過ぎていれば流す。`review` が 1 件もなければ流す。
@@ -214,7 +215,7 @@ npm install --prefix "$BASE/cli" --ignore-scripts --no-audit --no-fund --save-ex
 - 2 回目は、作業役への指示に「一覧は抜けなく」と足したところ、1 巡目で 6 項目に広がり、検証役も 6 件とも根拠ありとした。
   そのうえで検証役が漏れを 8 件挙げ、作業役が足したところ、次の検証役は足した分の 3 件を根拠不足とし、さらに漏れを 19 件挙げた。
   `used_by`（その値に依存するファイル）に、テストや下流の集計を含めるかの線引きがなく、検証役どうしで基準がそろわない。
-- 候補は `review/20261121-110248` と `review/20261121-110800`（この 2 回は Paseo が worktree を作ったので、置き場所は `home/worktrees/` の下）。
+- この 2 回の候補は、夜の回が同じ内容を含んだので破棄した。最後の差分は `runs/<時刻>/final-worktree.diff` に残してある。
 
 ### 写しと鮮度の確認つき（夜。今のコード）
 
@@ -256,7 +257,8 @@ npm install --prefix "$BASE/cli" --ignore-scripts --no-audit --no-fund --save-ex
 
 検証役は 3 回とも単独で動いた（Codex のセッションは呼び出し 1 回につき 1 つで、道具はコマンドの実行だけ）。作業役が `results/` を読んだ記録はなく、封印の確認は実行後も通っている。
 
-候補は `review/20261121-133339`、`review/20261121-133840`、`review/20261121-134412` の worktree（`worktrees/` の下）。内容がいちばん絞られているのは 5 回目の `134412`。
+5 回目の候補を、`note` の書き方 1 点（「改定されていた」）を直して取り込んだ。不合格の候補なので、`review` の行は手で足し、その経緯を `note` に書いた。
+3・4 回目の候補は破棄した（最後の差分は `runs/<時刻>/final-worktree.diff`）。
 
 ## 残っている危険と、確かめていないこと
 
