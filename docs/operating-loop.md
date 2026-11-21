@@ -23,7 +23,7 @@
 | パラメータにする | `research_loop/parameters.json`。板の深さと成行コストは `orderbook.analyze`、出来高に対する参加率は `execution_sensitivity.py` | 実測の往復コスト、注文が板に反映されるまでの時間、約定後の値動き |
 | 仮説を立てて判定する | `research_loop/hypotheses.json`。検証は `strategy_robustness.py`（重複の除外、時系列の分割、多重比較）、`prospective_validation.py`（事前登録と封印）、`event_paths.py`（途中の逆行） | — |
 | 運用して計測する | `research_loop/annotations.jsonl`（いつ何をしたか）。`live_signals/`（現在の状態の診断、オフライン）、`japan_perp_monitor.py`（追跡中の受取 funding と清算余裕）。板の収集が止まったときのメール（`orderbook/deploy/gce/heartbeat.sh`、`alerting.sh`） | 実取引、グラフ（施策と結果を同じ時間軸で見る画面）、自動停止 |
-| 振り返る | `python3 -m research_loop.registry review` の出力を入力にして、下の手順で行う | 定期実行の設定 |
+| 振り返る | `python3 -m research_loop.registry review` の出力を入力にして、下の手順で行う。机上の部分と取引所の公開情報との照合は `research_loop.paseo_review` に任せられる | 振り返りの候補ができたときの通知 |
 
 ## 3 つの台帳
 
@@ -85,7 +85,15 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 7. 続けている収集が止まっていないことを確かめる（板は `orderbook/deploy/gce/check-freshness.sh`、[orderbook.md](orderbook.md)）。止まっていた期間は後から埋められない。
 8. `annotate --kind review` で記録する。`note` に仮説の status の内訳を残すと、歩留まりの推移になる。
 
-間隔はまだ決めていない（`loop.review_interval_days` は `unknown`）。
+間隔は 15 日（`loop.review_interval_days`、2026-11-21 に決定）。
+
+手順のうち、次の 3 つはエージェントとスクリプトに任せられる（`python3 -m research_loop.paseo_review`、[paseo-review.md](paseo-review.md)）。
+
+- 台帳と、リポジトリ内のコード・文書の突き合わせ。
+- 取引所の公開 API・文書との照合（手順 4 のうち、取得できるもの）。
+- 収集の鮮度の確認（手順 7）。
+
+計測（手順 3）は含まれない。結果は人が読んでから取り込む。
 
 ## 2026-11-19 時点の状態
 
@@ -113,6 +121,7 @@ python3 -m research_loop.registry annotate --kind deploy --title "…" --refs H-
 ## 範囲と限界
 
 - 台帳は状態の記録であり、値や判定の正しさを保証しない。値の根拠は `source` と `evidence` の先にある。
-- 可視化の基盤（時系列 DB とグラフ）と、振り返りの定期実行は、このリポジトリにはまだない。通知は板の収集の停止だけが対象。
+- 可視化の基盤（時系列 DB とグラフ）は、このリポジトリにはまだない。振り返りは 15 日ごとに流せる（[paseo-review.md](paseo-review.md) の「定期実行」）。計測は自動化していない。
+  通知は板の収集の停止だけが対象で、振り返りの候補ができても通知は出ない。
 - `research_loop/`、本書、`playbook.md` は、`results/research_manifest.json` が固定するスナップショットの対象ではない。
 - テストは `tests/test_research_loop.py`。一時ディレクトリと合成の値を使い、リポジトリの台帳は読むだけで書き換えない。
